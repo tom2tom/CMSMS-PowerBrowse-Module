@@ -129,7 +129,6 @@ if($rcount)
 		$smarty->assign('rowchanger',
 			$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,
 			'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows'));
-//		$smarty->assign('selectors','OBJECTS TO FIND/FILTER DISPLAY');	//TODO objects to find/filter display
 		$curpg='<span id="cpage">1</span>';
 		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
 		$smarty->assign('pageof',$this->Lang('pageof',$curpg,$totpg));
@@ -240,7 +239,7 @@ EOS;
 }
 else
 {
-	$smarty->assign('norecords','TODO');
+	$smarty->assign('norecords',$this->Lang('norecords'));
 }
 
 if($pmod)
