@@ -19,20 +19,39 @@
 
 class PowerBrowse extends CMSModule
 {
-	private $mutex = FALSE; //fake mutex for serializing
-//	private $mcache = FALSE; //memcache to use as mutex for serializing queue access
-//	private $lockid = FALSE; //memcache key
-	private $mh = FALSE; //curl_multi handle for async queue processing
+	private $faketex = FALSE; //fake mutex for serializing
+	private $mcache = FALSE; //memcache to use as mutex for serializing queue access
+	private $lockid = FALSE; //memcache key
+	private $mh; //curl_multi handle for async queue processing
+	private $Qurl;
 	protected $running = FALSE; //whether the queue-processor is active
 	protected $queue = array();
+	protected $Locker;
+	protected $UnLocker;
 
-/*	function __construct()
+	function __construct()
 	{
 		parent::__construct();
-		$this->mcache = new Memcache;
-		$this->mcache->connect($config['root_url'],11211);
-		$this->lockid = uniqid('pwbr',TRUE);
+		if(class_exists('Memcache'))
+		{
+			$this->mcache = new Memcache;
+			$this->mcache->connect($config['root_url'],11211);
+			$this->lockid = uniqid('pwbr',TRUE);
+			$this->Locker = 'LockCache';
+			$this->UnLocker = 'UnLockCache';
+		}
+		else
+		{
+			$this->Locker = 'LockFake';
+			$this->UnLocker = 'UnLockFake';
+		}
 		$this->mh = curl_multi_init();
+		//cmsms 1.10+ also has ->create_url();
+		//bogus frontend link (i.e. no admin login needed)
+		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
+		//strip the (trailing) fake returnid, hence use the default
+		$sep = strpos($url,'&amp;');
+		$this->Qurl = substr($url,0,$sep);
 	}
 	
 	function __destruct()
@@ -42,7 +61,7 @@ class PowerBrowse extends CMSModule
 		curl_multi_close($this->mh);
 //		parent::__destruct();
 	}
-*/
+	
 	function AllowAutoInstall()
 	{
 		return FALSE;
@@ -282,9 +301,8 @@ class PowerBrowse extends CMSModule
 	Returns: boolean, whether the lock was obtained
 	This is a mutex-equivalent. Atomic. May block if multiple servers are in play.
 	*/
-	protected function Lock($token)
+	protected function LockCache($token)
 	{
-/* Memcache works in this context, but it's not always available
 		$mc =& $this->mcache; 
 		$stored = $mc->get($this->lockid);
 		if($stored)
@@ -301,21 +319,28 @@ class PowerBrowse extends CMSModule
 				usleep(mt_rand(1000,100000));
 			}
 		}
-*/
+	}
+
+	protected function UnLockCache()
+	{
+		$this->mcache->delete($this->lockid);
+	}
+
+	protected function LockFake($token)
+	{
 		//TODO find some way that's more-atomic and also generally available
-		list($was,$this->mutex) = array($this->mutex,$token);
+		list($was,$this->faketex) = array($this->faketex,$token);
 		if($was !== $token && $was !== FALSE)
 		{
-			$this->mutex = $was;
+			$this->faketex = $was;
 			return FALSE;
 		}
 		return TRUE;
 	}
 
-	protected function UnLock()
+	protected function UnLockFake()
 	{
-//		$this->mcache->delete($this->lockid);
-		$this->mutex = FALSE;
+		$this->faketex = FALSE;
 	}
 
 	/**
@@ -332,20 +357,23 @@ class PowerBrowse extends CMSModule
 	function SaveFormData(&$contents)
 	{
 		$token = md5(mt_rand(1,1000000).reset($contents['data'])); //almost absolutely unique
-		while(!$this->Lock($token))
+		while(!$this->Locker($token))
 			usleep(mt_rand(10000,50000));
 		$this->queue[] = $contents;
-		$this->UnLock();
+		$this->UnLocker();
 		if(!$this->running)
 		{
-			//cmsms 1.10+ also has ->create_url();
-			//bogus frontend link (i.e. no admin login needed)
-			$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
-			//strip the (trailing) fake returnid, hence use the default
-			$sep = strpos($url,'&amp;');
-			$url = substr($url,0,$sep);
-
-			$ch = curl_init($url);
+/*			if(0)
+			{
+				foreach(x as $ch)
+				{
+					curl_multi_remove_handle($this->mh,$ch);
+					curl_close($ch);
+					remove $ch from X
+				}
+			}
+*/
+			$ch = curl_init($this->Qurl);
 			curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
 			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
 			curl_setopt($ch,CURLOPT_FORBID_REUSE,TRUE);
@@ -354,19 +382,21 @@ class PowerBrowse extends CMSModule
 			curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
 			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
 
-			$mh = curl_multi_init(); //TODO in module constructor
-			curl_multi_add_handle($mh,$ch);
+			curl_multi_add_handle($this->mh,$ch);
 			$running = NULL;
 			do
 			{
-				$mrc = curl_multi_exec($mh,$running);
+				$mrc = curl_multi_exec($this->mh,$running);
 			} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
-//			if($mrc != CURLM_OK) >> CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-			if(running === 0) //otherwise, leak!
+//			if($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
+			if(running === 0)
 			{
-				curl_multi_remove_handle($mh,$ch);
-				curl_multi_close($mh); //TODO in module destructor
+				curl_multi_remove_handle($this->mh,$ch);
 				curl_close($ch);
+			}
+			else
+			{
+				//TODO cache $ch for later cleanup
 			}
 		}
 	}
