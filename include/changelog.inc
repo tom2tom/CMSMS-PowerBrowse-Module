@@ -1,0 +1,17 @@
+<ul>
+<li>Version 0.7 - May 2015
+<ul>
+<li>upgrade to work with CMSMS 1.11, 1.12</li>
+<li>omit lots of superfluous stuff</li>
+<li>manage table-sorting internally</li>
+<li>various re-naming, to allow co-existence with FormBrowser module</li>
+<li>revised interface with companion builder module (incompatible with older versions)</li>
+</ul>
+</li>
+<li>Initial fork - September 2011
+<ul>
+<li>upgrade to work with CMSMS 1.10</li>
+<li>many small refinements, including new default templates</li>
+</ul>
+</li>
+</ul>

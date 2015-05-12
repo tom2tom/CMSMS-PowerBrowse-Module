@@ -1,0 +1,50 @@
+<?php
+# This file is part of CMS Made Simple module: PowerBrowse
+# Copyright (C) 2011-2015 Tom Phane <tpgww@onepost.net>
+# Refer to licence and other details at the top of file PowerBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+
+$canadmin = $this->CheckAccess('admin');
+$canmod = $this->CheckAccess('modify');
+$canview = $this->CheckAccess('view');
+if(!($canadmin || $canmod || $canview)) exit;
+
+if($canadmin)
+{
+	if(isset($params['submit']))
+	{
+		$this->SetPreference('date_format',trim($params['date_format']));
+/*		$t = trim($params['default_phrase']);
+		$old = $this->GetPreference('default_phrase');
+		if($t != $old)
+		{
+TODO re-encrypt all stored data
+			$this->SetPreference('default_phrase',$t);
+		}
+*/
+		$this->SetPreference('export_file',!empty($params['export_file']));
+		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
+		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
+		$this->SetPreference('onchange_notices',!empty($params['onchange_notices']));
+		$this->SetPreference('oldmodule_data',!empty($params['oldmodule_data']));
+		$this->SetPreference('owned_forms',!empty($params['owned_forms']));
+		$this->SetPreference('strip_on_export',!empty($params['strip_on_export']));
+		$t = trim($params['uploads_path']);
+		if($t && $t[0] == DIRECTORY_SEPARATOR)
+			$t = substr($t,1);
+		$this->SetPreference('uploads_path',$t);
+
+		$params['message'] = $this->PrettyMessage('prefs_updated');
+		$params['active_tab'] = 'settings';
+	}
+	elseif(isset($params['cancel']))
+	{
+		$params['active_tab'] = 'settings';
+	}
+}
+
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.defaultadmin.php';
+
+echo $this->ProcessTemplate('adminpanel.tpl');
+
+?>

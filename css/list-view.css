@@ -1,0 +1,50 @@
+table.table_sort th
+{
+	//ensure consistent header background
+	background-image: url(../images/empty.png);
+	background-repeat: no-repeat;
+	background-position: center left -10px;
+}
+table.table_sort th.SortAble
+{
+	padding-left: 10px;
+	background-image: url(../images/sortdark.png);
+	background-repeat: no-repeat;
+	background-position: center left;
+	cursor: pointer;
+}
+table.table_sort th.SortUp
+{
+	padding-left: 10px;
+	background-image: url(../images/ascdark.png);
+	background-repeat: no-repeat;
+	background-position: center left;
+	cursor: pointer;
+}
+table.table_sort th.SortDown
+{
+	padding-left: 10px;
+	background-image: url(../images/descdark.png);
+	background-repeat: no-repeat;
+	background-position: center left;
+	cursor: pointer;
+}
+
+table.table_sort tbody td.row1s
+{
+	background-color: #E9E9E9;
+}
+table.table_sort tbody td.row1s:hover
+{
+	background-color: #D1D1D1;
+}
+table.table_sort tbody td.row2s
+{
+	background: #D9D9D9;
+}
+table.table_sort tbody td.row2s:hover
+{
+	background: #C2C2C2;
+}
+
+table.table_sort th.divider,table.table_sort td.divider { padding-left: 5px; border-left: 3px dotted #E5B400; }

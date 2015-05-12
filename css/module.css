@@ -1,0 +1,22 @@
+.dndhelp { display:none; } /* changed at runtime if js is available */
+img.tipper { display:none; } /* ditto */
+//most of these styles are not actually used ATM
+//.pbr_area_short {width:50em; height:8em;}
+//.pbr_area_tall {width:50em; height:15em;}
+.pbr_innernav, .pbr_browsenav {padding:5px;}
+//.pbr_legend {font-size:9px; margin:6px; border-width:1px; border-style:solid;}
+//.pbr_link {text-decoration:underline;}
+div.pbr_overflow {overflow:auto;}
+//.pbr_table {font-size:10px;}
+span.pbr_order { display:none; visibility:hidden; }
+//.pbr_help { display:none; }
+table.leftwards {
+margin-left:5%;
+width:auto;
+table-layout:auto;
+}
+table.rightwards {
+margin-right:5%;
+width:auto;
+table-layout:auto;
+}
