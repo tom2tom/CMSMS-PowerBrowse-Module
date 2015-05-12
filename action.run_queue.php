@@ -18,11 +18,10 @@ $funcs = new pwbrRecordStore();
 $token = uniqid('pwbrQ.'.mt_rand(100,1000100),FALSE);
 $this->running = TRUE; //flag that Q is being processed now
 
-while(!$this->Lock($token))
+while(!$this->Locker($token))
 	usleep(60000); //bit longer than SaveFormData() timeout
 
-$data = current($this->queue);
-while($data)
+while($data = current($this->queue))
 {
 	$form_id = (int)$data['formid'];
 	$browsers = $db->GetCol('SELECT browser_id FROM '.$pre.
@@ -35,18 +34,18 @@ while($data)
 	}
 
 	$datakey = key($this->queue);
-	next($this->queue);
 	unset($this->queue[$datakey],$data);
 
-	$this->UnLock();
+	$this->UnLocker();
 	do
 	{
 //		usleep(60000);
 		usleep(mt_rand(10000,60000));
-	} while (!$this->Lock($token));
+	} while(!$this->Locker($token));
+	next($this->queue);
 }
 
-$this->UnLock();
+$this->UnLocker();
 $this->running = FALSE;
 
 //fwrite($fh,"Q has been processed\n");
