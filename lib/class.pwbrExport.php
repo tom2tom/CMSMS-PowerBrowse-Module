@@ -11,9 +11,18 @@ class pwbrExport
 	ExportName:
 	@mod: reference to current PowerBrowse module object
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
+	@record_id: index of the record to process, or array of such, or FALSE if @record_id is provided
 	*/
-	public function ExportName(&$mod,$browser_id)
+	public function ExportName(&$mod,$browser_id=FALSE,$record_id=FALSE)
 	{
+		if(!$browser_id)
+		{
+			if(is_array($record_id))
+				$rid = reset($record_id);
+			else
+				$rid = $record_id;
+			$browser_id = pwbrUtils::GetBrowserIDForRecord($rid);
+		}
 		$bname = pwbrUtils::GetBrowserNameFromID($browser_id);
 		$sname = preg_replace('/\W/','_',$bname);
 		$datestr = date('Y-m-d-H-i');
@@ -184,6 +193,86 @@ class pwbrExport
 			return $outstr; //encoding conversion upstream
 		}
 
+	}
+
+	/**
+	Export:
+	@mod: reference to current PowerBrowse module object
+	@browser_id: optional browser identifier, default FALSE
+	@record_id: optional record_id, or array of such id's, default FALSE
+	@sep: optional field-separator for exported content default ','
+	At least one of @browser_id, @record_id must be provided
+	Returns: TRUE on success, or lang key for error message upon failure
+	*/
+	public function Export(&$mod,$browser_id=FALSE,$record_id=FALSE,$sep = ',')
+	{
+		if (!($browser_id || $record_id))
+			return 'error_export'; //TODO this is a syetem bug
+		$fname = $this->ExportName($mod,$browser_id,$record_id);
+
+		if($mod->GetPreference('export_file'))
+		{
+			$updir = pwbrUtils::GetUploadsPath($mod);
+			if($updir)
+			{
+				$filepath = $updir.DIRECTORY_SEPARATOR.$fname;
+				$fp = fopen($filepath,'w');
+				if($fp)
+				{
+					$success = $this->CSV($mod,$browser_id,$record_id,$fp,$sep);
+					fclose($fp);
+					if($success)
+					{
+						$url = pwbrUtils::GetUploadsUrl($mod).'/'.$fname;
+						@ob_clean();
+						@ob_clean();
+						header('Location: '.$url);
+						return TRUE;
+					}
+				}
+			}
+		}
+		else
+		{
+			$csv = $this->CSV($mod,$browser_id,$record_id,FALSE,$sep);
+			if($csv)
+			{
+				$config = cmsms()->GetConfig();
+				if(!empty($config['default_encoding']))
+					$defchars = trim($config['default_encoding']);
+				else
+					$defchars = 'UTF-8';
+
+				if(ini_get('mbstring.internal_encoding') !== FALSE) //conversion is possible
+				{
+					$expchars = $mod->GetPreference('export_file_encoding','ISO-8859-1');
+					$convert = (strcasecmp ($expchars,$defchars) != 0);
+				}
+				else
+				{
+					$expchars = $defchars;
+					$convert = FALSE;
+				}
+
+				@ob_clean();
+				@ob_clean();
+				header('Pragma: public');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+				header('Cache-Control: private',FALSE);
+				header('Content-Description: File Transfer');
+				//note: some older HTTP/1.0 clients did not deal properly with an explicit charset parameter
+				header('Content-Type: text/csv; charset='.$expchars);
+				header('Content-Length: '.strlen($csv));
+				header('Content-Disposition: attachment; filename='.$fname);
+				if($convert)
+					echo mb_convert_encoding($csv,$expchars,$defchars);
+				else
+					echo $csv;
+				return TRUE;
+			}
+		}
+		return 'error_export';
 	}
 
 }

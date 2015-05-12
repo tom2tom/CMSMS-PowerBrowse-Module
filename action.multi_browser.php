@@ -29,6 +29,7 @@ if(isset($params['clone']))
 		$params['browser_id'] = $browser_id;
 		$funcs->CloneBrowser($this,$params);
 	}
+	unset($funcs);
 	$params = array(); //nothing to report
 }
 elseif(isset($params['delete']))
@@ -42,93 +43,66 @@ elseif(isset($params['delete']))
 		if(!$funcs->DeleteBrowser($browser_id))
 			$success = FALSE;
 	}
+	unset($funcs);
 	$params = ($success)?
 		array():
 		array('message' => $this->PrettyMessage('error_failed',FALSE));
 }
 elseif(isset($params['export']))
 {
-	if(!($this->CheckAccess('view') || $this->CheckAccess('admin'))) exit;
+	if(!$this->CheckAccess()) exit;
 
 	$funcs = new pwbrExport();
 	if(count($params['sel']) == 1)
 	{
-	//TODO as per action.export_browser.php
 		$browser_id = reset($params['sel']);
+		$res = $funcs->Export($this,$browser_id);
+		if($res === TRUE)
+			exit;
+		$params = array('message' => $this->PrettyMessage($res,FALSE));
 	}
 	else
 	{
-	//TODO cannot export multi browsers as a single item - see Tourney zip process
-		foreach($params['sel'] as $browser_id)
+		//cannot export multi browsers as a single item, so stuff em into a zip
+		$fn = $this->GetName().$this->Lang('export').
+			'-'.implode('-',$params['sel']).'-'.date('Y-m-d-H-i').'.zip';
+		$fp = pwbrUtils::GetUploadsPath($this);
+		if(!$fp)
+			$fp = cms_join_path($config['root_path'],'tmp');
+		$fp .= DIRECTORY_SEPARATOR.$fn;
+		$zip = new ZipArchive();
+		if($zip && $zip->open($fp,ZipArchive::CREATE) === TRUE)
 		{
-			$fname = $funcs->ExportName($this,$params['browser_id']);
-			
-		}
-	}
-
-/*	if($this->GetPreference('export_file','0'))
-	{
-		$updir = pwbrUtils::GetUploadsPath($this);
-		if($updir)
-		{
-			$filepath = $updir.DIRECTORY_SEPARATOR.$fname;
-			$fp = fopen($filepath,'w');
-			if($fp)
+			foreach($params['sel'] as $browser_id)
 			{
-				$success = $funcs->CSV($this,$params['browser_id'],FALSE,$fp);
-				fclose($fp);
-				if($success)
-				{
-					$url = pwbrUtils::GetUploadsUrl($this).'/'.$fname;
-					@ob_clean();
-					@ob_clean();
-					header('Location: '.$url);
+				$fname = $funcs->ExportName($this,$browser_id);
+				$content = $funcs->CSV($this,$browser_id);
+				if(!$content)
+					$content = 'OOPS - CSV file creation failed';
+				$zip->addFromString($fname,$content);
+			}
+			$zip->close();
+			if(is_file($fp))
+			{
+				$content = @file_get_contents($fp);
+				unlink($fp);
+
+				@ob_clean();
+				header('Pragma: public');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate,post-check=0,pre-check=0');
+				header('Cache-Control: private',FALSE);
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/zip');
+				header('Content-Length: '.strlen($content));
+				header('Content-Disposition: attachment; filename="'.$fn.'"');
+				echo $content;
 					exit;
-				}
 			}
 		}
-		$params = array('message' => $this->PrettyMessage('error_export',FALSE));
-		$this->Redirect($id, 'defaultadmin', $returnid, $params);
+		$params = array('message'=>$this->PrettyMessage('error_zip',FALSE));
 	}
-
-	$reportString = $funcs->CSV($this,$params['browser_id']);
-	if($reportString)
-	{
-		if(!empty($config['default_encoding']))
-			$defchars = trim($config['default_encoding']);
-		else
-			$defchars = 'UTF-8';
-
-		if(ini_get('mbstring.internal_encoding') !== FALSE) //we can convert if needed
-		{
-			$expchars = $this->GetPreference('export_file_encoding','ISO-8859-1');
-			$convert = (strcasecmp ($expchars,$defchars) != 0);
-		}
-		else
-		{
-			$expchars = $defchars;
-			$convert = FALSE;
-		}
-	
-		@ob_clean();
-		@ob_clean();
-		header('Pragma: public');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-		header('Cache-Control: private',FALSE);
-		header('Content-Description: File Transfer');
-		//note: some older HTTP/1.0 clients did not deal properly with an explicit charset parameter
-		header('Content-Type: text/csv; charset='.$expchars);
-		header('Content-Length: '.strlen($reportString));
-		header('Content-Disposition: attachment; filename='.$fname);
-		if($convert)
-			echo mb_convert_encoding($reportString, $expchars, $defchars);
-		else
-			echo $reportString;
-		exit;
-	}
-	$params = array('message' => $this->PrettyMessage('error_export',FALSE));
-*/
+	unset($funcs);
 }
 
 $this->Redirect($id,'defaultadmin',$returnid,$params);
