@@ -99,7 +99,16 @@ class PowerBrowse extends CMSModule
 
 	function GetHelp()
 	{
-		return $this->Lang('help_module');
+		$fp = cms_join_path(dirname(__FILE__),'css','list-view.css');
+		$cont = @file_get_contents($fp);
+		if($cont)
+		{
+			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm','~\s?//.*$~m'),array('',''),$cont);
+			$example = str_replace(array("\n\n","\n","\t"),array('<br />','<br />',' '),trim($example));
+		}
+		else
+			$example = $this->Lang('error_missing');
+		return $this->Lang('help_module',$example);
 	}
 
 	function GetVersion()
@@ -280,7 +289,7 @@ class PowerBrowse extends CMSModule
 			return 'maintab';
 	}
 
-	function buildBrowseNav($id,$returnid,&$params)
+	function BuildNav($id,$returnid,&$params)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('title_browsers'));

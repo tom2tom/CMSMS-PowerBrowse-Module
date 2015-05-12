@@ -32,6 +32,7 @@ $lang['error_data']='Cannot process stored data';
 $lang['error_database']='Cannot find requested data';
 $lang['error_export']='A problem occurred during the export process.'; //how vague is that !!
 $lang['error_failed']='The requested operation failed to complete';
+$lang['error_missing']='Cannot find it';
 $lang['error_module']='The PowerForms module is missing. Please advise your site administrator.';
 $lang['error_noform']='Cannot find a requested form. Please advise your site administrator.';
 $lang['error_system']='Something is not working correctly. Please advise your site administrator.';
@@ -62,7 +63,6 @@ $lang['last']='last';
 $lang['message_records_deleted']='%d submission(s) deleted';
 //$lang['message_records_exported']='%d submission(s) exported';
 $lang['moddescription']='PowerBrowse enables review of submitted form data.';
-//$lang['must_save']='You must save your browser once for the fields to be available to the templates.';
 
 $lang['next']='next';
 $lang['nobrowsers']='No browser is registered';
@@ -153,18 +153,19 @@ add/edit/delete/export records.</p>
 <h4>List styling</h4>
 <p>Recognised classes are<ul>
 <li>table_sort</li>
-<li>SortAble</li>
-<li>SortUp</li>
-<li>SortDown</li>
+<li>SortAble for sortable columns</li>
+<li>SortUp for the column sorted ascending</li>
+<li>SortDown for the column sorted descending</li>
+<li>row1s and row2s for alternate rows in the sorted column</li>
 </ul></p>
 <p>For example, the following represents the default settings:
-<pre>%sTODO</pre>
+<pre>%s</pre>
 <h3>Requirements</h3>
 <ul>
 <li>CMS Made Simple 1.9+</li>
 <li>PHP 5.2+</li>
-<li>PHP extensions mbstring curl</li>
-<li>PHP extension Memcache if possible!</li>
+<li>PHP extensions mbstring, curl, zip. Also Memcache if possible!</li>
+<li>TODO</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.</p>
