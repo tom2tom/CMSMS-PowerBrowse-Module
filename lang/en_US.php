@@ -34,13 +34,13 @@ $lang['error_export']='A problem occurred during the export process.'; //how vag
 $lang['error_failed']='The requested operation failed to complete';
 $lang['error_module']='The PowerForms module is missing. Please advise your site administrator.';
 $lang['error_noform']='Cannot find a requested form. Please advise your site administrator.';
+$lang['error_zip']='Zip file creation failed';
 $lang['export']='Export';
 
 $lang['first']='first';
 $lang['friendlyname']='Forms Data Browser';
 
 //$lang['help_browser_css_class']='Optional name of class, or space-separated series of class names, applied to list views';
-$lang['help_date_format']='A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://php.net/manual/en/function.date.php">php manual</a>. Remember to escape any characters you don\'t want interpreted as date format codes!';
 $lang['help_dnd']='You can change the order by dragging any row, or double-click on any number of rows prior to dragging them all.';
 $lang['help_export_file']='Progressively create each .csv file in the general or specific <em>uploads</em> directory, instead of processing the export in memory. This may be wise if there is a lot of data to export. The downside is that someone needs to get that file and (usually) then delete it.';
 $lang['help_field_draggable']='Display order can be changed by dragging row(s).';
@@ -105,7 +105,6 @@ $lang['title_browser_owner']='Responsible person';
 $lang['title_browser_search_field']='Field to display as the record\'s title when a record is shown in site search results';
 $lang['title_browsers']='Browsers';
 $lang['title_data']='List data';
-$lang['title_date_format']='Date Format';
 $lang['title_display']='Displayed';
 $lang['title_export_file']='Export to host';
 $lang['title_export_file_encoding']='Character-encoding of exported content';
