@@ -58,7 +58,7 @@ $this->CreatePermission('ModifyPwBrowsers',$this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData',$this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData',$this->Lang('perm_see'));
 
-$this->SetPreference('default_phrase',uniqid('Suck it up, crackers! Guess ')); //TODO make this adjustable via UI
+$this->SetPreference('default_phrase',uniqid('Suck it up, crackers! Try to guess ')); //TODO make this adjustable via UI
 $this->SetPreference('export_file',0);
 $this->SetPreference('export_file_encoding','ISO-8859-1');
 $this->SetPreference('list_cssfile','');
