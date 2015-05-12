@@ -14,7 +14,7 @@ if(isset($params['submit']))
 	$collapsed = array();
 	//TODO field identifiers in the saved data
 	foreach($params['field'] as $k=>$name)
-		$collapsed[] = array($name, html_entity_decode($params['value'][$k]));
+		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
 	$pass = $this->GetPreference('default_phrase');
 	$funcs = new pwbrRecordStore();
 	$funcs->Update($params['record_id'],$collapsed,$pass,$db,cms_db_prefix());
