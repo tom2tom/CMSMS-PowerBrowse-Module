@@ -46,5 +46,3 @@ table.table_sort tbody td.row2s:hover
 {
 	background: #C2C2C2;
 }
-
-table.table_sort th.divider,table.table_sort td.divider { padding-left: 5px; border-left: 3px dotted #E5B400; }
