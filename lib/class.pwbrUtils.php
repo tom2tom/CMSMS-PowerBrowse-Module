@@ -18,6 +18,17 @@ class pwbrUtils
 	}
 
 	/**
+	GetBrowserIDForRecord:
+	@record_id: record identifier
+	*/
+	public static function GetBrowserIDForRecord($record_id)
+	{
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_pwbr_record WHERE record_id=?';
+		return $db->GetOne($sql,array($record_id));
+	}
+
+	/**
 	GetFormIDFromID:
 	@browser_id: browser identifier
 	*/
