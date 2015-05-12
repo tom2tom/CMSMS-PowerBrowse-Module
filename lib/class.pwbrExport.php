@@ -207,7 +207,7 @@ class pwbrExport
 	public function Export(&$mod,$browser_id=FALSE,$record_id=FALSE,$sep = ',')
 	{
 		if (!($browser_id || $record_id))
-			return 'error_export'; //TODO this is a syetem bug
+			return 'error_system';
 		$fname = $this->ExportName($mod,$browser_id,$record_id);
 
 		if($mod->GetPreference('export_file'))
