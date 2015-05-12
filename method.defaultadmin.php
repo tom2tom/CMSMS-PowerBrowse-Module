@@ -12,7 +12,7 @@ $tab = $this->GetActiveTab($params);
 
 $this->buildBrowseNav($id,$returnid,$params);
 $t = $this->starttabheaders().
-	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'browsers'));
+	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
 if($canadmin)
 {
 	$t .= $this->settabheader('settings',$this->lang('tab_settings'),($tab == 'settings'));
