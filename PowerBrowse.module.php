@@ -23,6 +23,7 @@ class PowerBrowse extends CMSModule
 	private $mcache = FALSE; //memcache to use as mutex for serializing queue access
 	private $lockid = FALSE; //memcache key
 	private $mh; //curl_multi handle for async queue processing
+	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
 	protected $running = FALSE; //whether the queue-processor is active
 	protected $queue = array();
@@ -58,6 +59,11 @@ class PowerBrowse extends CMSModule
 	{
 		if(is_object($this->mcache))
 			$this->mcache->delete($this->lockid); //just in case ...
+		if($this->ch)
+		{
+			curl_multi_remove_handle($this->mh,$this->ch);
+			curl_close($this->ch);
+		}
 		curl_multi_close($this->mh);
 //		parent::__destruct();
 	}
@@ -372,16 +378,16 @@ class PowerBrowse extends CMSModule
 		$this->UnLocker();
 		if(!$this->running)
 		{
-/*			if(0)
+			//initiate async queue processing
+			if($this->ch)
 			{
-				foreach(x as $ch)
-				{
-					curl_multi_remove_handle($this->mh,$ch);
-					curl_close($ch);
-					remove $ch from X
-				}
+				while(curl_multi_info_read($this->mh))
+					usleep(20000);
+				curl_multi_remove_handle($this->mh,$this->ch);
+				curl_close($this->ch);
+				$this->ch = FALSE;
 			}
-*/
+
 			$ch = curl_init($this->Qurl);
 			curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
 			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
@@ -392,20 +398,20 @@ class PowerBrowse extends CMSModule
 			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
 
 			curl_multi_add_handle($this->mh,$ch);
-			$running = NULL;
+			$runcount = 0;
 			do
 			{
-				$mrc = curl_multi_exec($this->mh,$running);
+				$mrc = curl_multi_exec($this->mh,$runcount);
 			} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
 //			if($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-			if(running === 0)
+			if($runcount)
 			{
-				curl_multi_remove_handle($this->mh,$ch);
-				curl_close($ch);
+				$this->ch = $ch; //cache for later cleanup
 			}
 			else
 			{
-				//TODO cache $ch for later cleanup
+				curl_multi_remove_handle($this->mh,$ch);
+				curl_close($ch);
 			}
 		}
 	}
