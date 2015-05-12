@@ -3,7 +3,7 @@
 # Copyright (C) 2011-2015 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
-//TODO optimise this for high traffic-volume
+
 class pwbrRecordStore
 {
 	/*
