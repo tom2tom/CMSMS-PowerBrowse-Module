@@ -58,36 +58,6 @@ $this->CreatePermission('ModifyPwBrowsers',$this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData',$this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData',$this->Lang('perm_see'));
 
-//use system setting for default date format MAYBE THIS SHOULD BE IN UTILS CLASS
-$format = get_site_preference('defaultdateformat');
-if($format)
-{
-	$strftokens = array(
-	// Day - no strf eq : S
-	'a' => 'D', 'A' => 'l', 'd' => 'd', 'e' => 'j', 'j' => 'z', 'u' => 'N', 'w' => 'w',
-	// Week - no date eq : %U, %W
-	'V' => 'W',
-	// Month - no strf eq : n, t
-	'b' => 'M', 'B' => 'F', 'm' => 'm',
-	// Year - no strf eq : L; no date eq : %C, %g
-	'G' => 'o', 'y' => 'y', 'Y' => 'Y',
-	// Full Date / Time - no strf eq : c, r; no date eq : %c
-	's' => 'U', 'D' => 'j/n/y', 'F' => 'Y-m-d', 'x' => 'j F Y'
- 	);
-	$format = str_replace('%','',$format);
-	$parts = explode(' ',$format);
-	foreach($parts as $i => $fmt)
-	{
-		if(array_key_exists($fmt, $strftokens))
-			$parts[$i] = $strftokens[$fmt];
-		else
-			unset($parts[$i]);
-	}
-	$format = implode(' ', $parts);
-}
-else
-	$format = 'd F y';
-$this->SetPreference('date_format',$format);
 $this->SetPreference('default_phrase',uniqid('Suck it up, crackers! Guess ')); //TODO make this adjustable via UI
 $this->SetPreference('export_file',0);
 $this->SetPreference('export_file_encoding','ISO-8859-1');
@@ -96,6 +66,16 @@ $this->SetPreference('onchange_notices',0);
 $this->SetPreference('oldmodule_data',0); //use FormBrowser/Builder data if avaialable
 $this->SetPreference('owned_forms',0);	//enable user-specific browsing
 $this->SetPreference('strip_on_export',0);
-$this->SetPreference('uploads_path',$this->GetName());
+$fp = $config['uploads_path'];
+if($fp && is_dir($fp))
+{
+	$ud = $this->GetName();
+	$fp = $fp.DIRECTORY_SEPARATOR.$ud;
+	if(!(is_dir($fp) || mkdir($fp,0644)))
+		$ud = '';
+}
+else
+	$ud = '';
+$this->SetPreference('uploads_path',$ud);
 
 ?>

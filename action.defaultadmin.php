@@ -13,7 +13,6 @@ if($canadmin)
 {
 	if(isset($params['submit']))
 	{
-		$this->SetPreference('date_format',trim($params['date_format']));
 /*		$t = trim($params['default_phrase']);
 		$old = $this->GetPreference('default_phrase');
 		if($t != $old)
@@ -32,6 +31,18 @@ TODO re-encrypt all stored data
 		$t = trim($params['uploads_path']);
 		if($t && $t[0] == DIRECTORY_SEPARATOR)
 			$t = substr($t,1);
+		if($t)
+		{
+			$fp = $config['uploads_path'];
+			if($fp && is_dir($fp))
+			{
+				$fp = $fp.DIRECTORY_SEPARATOR.$t;
+				if(!(is_dir($fp) || mkdir($fp,0644)))
+					$t = '';
+			}
+			else
+				$t = '';
+		}
 		$this->SetPreference('uploads_path',$t);
 
 		$params['message'] = $this->PrettyMessage('prefs_updated');
