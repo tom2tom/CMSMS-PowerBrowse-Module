@@ -34,6 +34,7 @@ $lang['error_export']='A problem occurred during the export process.'; //how vag
 $lang['error_failed']='The requested operation failed to complete';
 $lang['error_module']='The PowerForms module is missing. Please advise your site administrator.';
 $lang['error_noform']='Cannot find a requested form. Please advise your site administrator.';
+$lang['error_system']='Something is not working correctly. Please advise your site administrator.';
 $lang['error_zip']='Zip file creation failed';
 $lang['export']='Export';
 
@@ -46,7 +47,7 @@ $lang['help_export_file']='Progressively create each .csv file in the general or
 $lang['help_field_draggable']='Display order can be changed by dragging row(s).';
 $lang['help_list_cssfile']='A .css file in the general or specific <em>uploads</em> directory. Module help provides details about the contents. If left blank, default styles will be used.';
 $lang['help_oldmodule_data']='Work directly with data recorded by those modules, instead of PowerForms';
-$lang['help_onchange_notices']='If a form has disposition(s) that send email or other notice, such notice will be sent after a record is edited via the PowerBrowse admin, unless this option is de-selected.';
+$lang['help_onchange_notices']='If a form has disposition(s) that send email or other notice, such notice will not be sent after a record is edited via the PowerBrowse admin, if this option is de-selected.';
 $lang['help_order']='Row-order here corresponds to column-order for listed data.';
 $lang['help_owned_forms']='Enable blocking of form-data access by any non-administrator other than a specified user';
 $lang['help_pagerows']='This is the minimum length of displayed pages. The length can be increased, while browsing.';
@@ -67,6 +68,7 @@ $lang['next']='next';
 $lang['nobrowsers']='No browser is registered';
 $lang['nofields']='The form has no user-input fields';
 $lang['noforms']='No PowerForms form is browsable';
+$lang['norecords']='No data are recorded for this browser';
 $lang['none']='None';
 
 $lang['owner']='Owner';
@@ -139,29 +141,37 @@ $lang['help_module']= <<<EOS
 <p>It allows authorised users to review and modify data recorded by the
 PowerForms module for submitted forms.</p>
 <h3>How is it used?</h3>
-<p>In the CMSMS admin Content Menu, there should be a menu item called
-'Browse Forms Data'. Click on that. On the displayed page, there are
-links and inputs by which to add a new browser, or configure module settings
-such as the number of rows displayed in list views.</p>
+<p>In the CMSMS admin Content menu, there should be an item labelled
+'Forms&nbsp;Data&nbsp;Browser'. Click on that. On the displayed page, there are
+links and inputs by which to add a new browser, or configure module settings.</p>
 <h4>Create a browser</h4>
-<p>Click on a "add browser" link.</p>
-<p>During browser creation, you must select a PowerForms form whose results the
-browser will display.</p>
+<p>Click on a 'Add browser' link. During browser creation, you must select a
+PowerForms form whose results the browser will display.</p>
 <h4>Administering browser data</h4>
 <p>By clicking on the 'inspect' icon next to a browser in the list, you can
 add/edit/delete/export records.</p>
-<h4>Requirements</h4>
+<h4>List styling</h4>
+<p>Recognised classes are<ul>
+<li>table_sort</li>
+<li>SortAble</li>
+<li>SortUp</li>
+<li>SortDown</li>
+</ul></p>
+<p>For example, the following represents the default settings:
+<pre>%sTODO</pre>
+<h3>Requirements</h3>
 <ul>
-<li>CMS Made Simple version X</li>
-<li>PHP version X</li>
-<li>TODO</li>
+<li>CMS Made Simple 1.9+</li>
+<li>PHP 5.2+</li>
+<li>PHP extensions mbstring curl</li>
+<li>PHP extension Memcache if possible!</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.</p>
 <p>There are a few resources available to help you with it:</p>
 <ul>
 <li>for the latest version of this module, FAQs, or to file a bug report, please visit the CMS Made Simple  <a href="http://dev.cmsmadesimple.org/powerbrowse">Developer Forge</a>;</li>
-<li>additional discussion of this module may also be found in the CMS Made Simple <a href="http://forum.cmsmadesimple.org">Forum;</a></li>
+<li>discussion of this module might be found in the CMS Made Simple <a href="http://forum.cmsmadesimple.org">Forum;</a></li>
 <li>perhaps you might have some success emailing the author directly.</li>
 </ul>
 <h3>Copyright and license</h3>
