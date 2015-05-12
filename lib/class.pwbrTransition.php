@@ -150,14 +150,13 @@ $vals = array (size=whatever)
 	function Get_Data(&$db,$pre,$oldbid,$newbid,$oldfid)
 	{
 		$mod = cms_utils::get_module('PowerBrowse');
-		$fmt = $mod->GetPreference('date_format');
 		$pass = $mod->GetPreference('default_phrase');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
 		$fb = cms_utils::get_module('FormBuilder');
 		$flds = array();
 		$parms = array();
 		list($count,$names,$details) = $fb->GetSortedResponses($oldfid,
-			-1,-1,FALSE,FALSE,$flds,$fmt,$parms);
+			-1,-1,FALSE,FALSE,$flds,'Y-m-d',$parms);
 		$funcs = new pwbrRecordStore();
 		foreach($details as &$one)
 		{

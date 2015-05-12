@@ -237,12 +237,6 @@ if($canadmin)
 	$configs[] = $oneset;
 
 	$oneset = new stdClass();
-	$oneset->title = $this->Lang('title_date_format');
-	$oneset->input = $this->CreateInputText($id,'date_format',$this->GetPreference('date_format'),20,255);
-	$oneset->help = $this->Lang('help_date_format');
-	$configs[] = $oneset;
-
-	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_owned_forms');
 	$oneset->input = $this->CreateInputCheckbox($id,'owned_forms',1,
 		   $this->GetPreference('owned_forms'));
