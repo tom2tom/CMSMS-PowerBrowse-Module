@@ -83,7 +83,7 @@ else //clone existing browser
 	$tpl = 'clone_browser.tpl';
 }
 
-$this->buildBrowseNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params);
 $tab = $this->GetActiveTab($params);
 
 $smarty->assign('start_form',

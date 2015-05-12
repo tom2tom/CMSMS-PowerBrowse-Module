@@ -10,7 +10,7 @@ $jsfuncs = array(); //script accumulator
 
 $tab = $this->GetActiveTab($params);
 
-$this->buildBrowseNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params);
 $t = $this->starttabheaders().
 	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
 if($canadmin)

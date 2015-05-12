@@ -6,7 +6,7 @@
 
 //Setup tabbed page to edit a browser's parameters
 
-$this->buildBrowseNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params);
 if(!empty($params['message']))
 	$smarty->assign('message',$params['message']);
 $smarty->assign('start_form',

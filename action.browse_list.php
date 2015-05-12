@@ -19,7 +19,7 @@ $smarty->assign('pmod',(($pmod)?1:0));
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
 
-$this->buildBrowseNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params);
 $smarty->assign('start_form',
 	$this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
 		array('browser_id'=>$bid,'form_id'=>$fid)));

@@ -30,7 +30,7 @@ if(!$when)
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-$this->buildBrowseNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params);
 
 $smarty->assign('start_form',
 	$this->CreateFormStart($id,'browse_record',$returnid,'POST','','','',
