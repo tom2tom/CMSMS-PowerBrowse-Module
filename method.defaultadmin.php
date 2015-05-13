@@ -10,7 +10,6 @@ $jsfuncs = array(); //script accumulator
 
 $tab = $this->GetActiveTab($params);
 
-$this->BuildNav($id,$returnid,$params);
 $t = $this->starttabheaders().
 	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
 if($canadmin)
@@ -24,7 +23,7 @@ $smarty->assign('start_browsers_tab',$this->StartTab('browsers'));
 $smarty->assign('end_tab',$this->EndTab());
 $smarty->assign('end_tabs',$this->EndTabContent());
 
-$smarty->assign('message',isset($params['message'])?$params['message']:'');
+$smarty->assign('message',(isset($params['message']))?$params['message']:'');
 $smarty->assign('start_browsersform',$this->CreateFormStart($id,'multi_browser',$returnid));
 $smarty->assign('end_form',$this->CreateFormEnd());
 
