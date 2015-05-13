@@ -78,4 +78,12 @@ else
 	$ud = '';
 $this->SetPreference('uploads_path',$ud);
 
+//install our disposer
+$fp = cms_join_path($config['root_path'],'modules','PowerForms','lib');
+if(is_dir($fp))
+{
+	$fs = cms_join_path($this->GetModulePath(),'lib','class.pwfDispositionFormBrowser.php');
+	copy($fs,$fp);
+}
+
 ?>

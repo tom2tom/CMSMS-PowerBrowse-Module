@@ -67,4 +67,9 @@ if($fp && is_dir($fp))
 // remove preferences
 $this->RemovePreference();
 
+// remove disposer
+$fp = cms_join_path($config['root_path'],'modules','PowerForms','lib','class.pwfDispositionFormBrowser.php');
+if(is_file($fp))
+	unlink($fp);
+
 ?>
