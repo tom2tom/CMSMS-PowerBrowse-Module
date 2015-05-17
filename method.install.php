@@ -7,6 +7,10 @@
 
 if(!$this->CheckAccess('modify')) exit;
 
+$pfmod = $this->GetModuleInstance('PowerForms');
+if(!$pfmod)
+	return $this->PrettyMessage('error_module',FALSE);
+
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
  'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
 $dict = NewDataDictionary($db);
@@ -79,11 +83,8 @@ else
 $this->SetPreference('uploads_path',$ud);
 
 //install our disposer
-$fp = cms_join_path($config['root_path'],'modules','PowerForms','lib');
-if(is_dir($fp))
-{
-	$fs = cms_join_path($this->GetModulePath(),'lib','class.pwfDispositionFormBrowser.php');
-	copy($fs,$fp);
-}
+$fp = cms_join_path($this->GetModulePath(),'lib','class.pwfDispositionFormBrowser.php');
+$pfmod->RegisterField($fp,$this->Lang('field_label'));
+unset($pfmod);
 
 ?>
