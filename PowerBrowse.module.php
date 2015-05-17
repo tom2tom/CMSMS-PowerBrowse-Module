@@ -369,9 +369,9 @@ class PowerBrowse extends CMSModule
 		'data' => array in which each key = formfield id, corresponding value = array(field identifier, field value)
 		)
 	*/
-	function SaveFormData(&$contents)
+/*MIGRATED TO POWERFORMS CLASS	function SaveFormData(&$contents)
 	{
-		$token = md5(mt_rand(1,1000000).reset($contents['data'])); //almost absolutely unique
+		$token = md5(mt_rand(1,1000000).reset(reset($contents['data']))); //almost absolutely unique
 		while(!$this->Locker($token))
 			usleep(mt_rand(10000,50000));
 		$this->queue[] = $contents;
@@ -415,7 +415,7 @@ class PowerBrowse extends CMSModule
 			}
 		}
 	}
-
+*/
 }
 
 ?>
