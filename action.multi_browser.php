@@ -97,7 +97,7 @@ elseif(isset($params['export']))
 				header('Content-Length: '.strlen($content));
 				header('Content-Disposition: attachment; filename="'.$fn.'"');
 				echo $content;
-					exit;
+				exit;
 			}
 		}
 		$params = array('message'=>$this->PrettyMessage('error_zip',FALSE));
