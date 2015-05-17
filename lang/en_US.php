@@ -39,6 +39,7 @@ $lang['error_system']='Something is not working correctly. Please advise your si
 $lang['error_zip']='Zip file creation failed';
 $lang['export']='Export';
 
+$lang['field_label'] = 'Store results for later browsing';
 $lang['first']='first';
 $lang['friendlyname']='Forms Data Browser';
 
@@ -160,6 +161,7 @@ add/edit/delete/export records.</p>
 </ul></p>
 <p>For example, the following represents the default settings:
 <pre>%s</pre>
+<p>A light-colored version of each sort-icon is provided, for use with dark themes.</p>
 <h3>Requirements</h3>
 <ul>
 <li>CMS Made Simple 1.9+</li>
