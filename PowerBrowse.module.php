@@ -119,7 +119,7 @@ class PowerBrowse extends CMSModule
 
 	function GetVersion()
 	{
-		return '0.7';
+		return '0.1';
 	}
 
 	function GetAuthor()
@@ -318,7 +318,7 @@ class PowerBrowse extends CMSModule
 	*/
 	protected function LockCache($token)
 	{
-		$mc =& $this->mcache; 
+		$mc =& $this->mcache;
 		$stored = $mc->get($this->lockid);
 		if($stored)
 			return ($stored === $token);
