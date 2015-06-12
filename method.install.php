@@ -83,8 +83,8 @@ else
 $this->SetPreference('uploads_path',$ud);
 
 //install our disposer
-$fp = cms_join_path($this->GetModulePath(),'lib','class.pwfDispositionFormBrowser.php');
-$pfmod->RegisterField($fp,$this->Lang('field_label'));
+$fp = cms_join_path($this->GetModulePath(),'lib','class.pwfFormBrowser.php');
+$pfmod->RegisterField($fp);
 unset($pfmod);
 
 ?>
