@@ -5,19 +5,50 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-class pwfDispositionFormBrowser extends pwfFieldBase
+class pwfFormBrowser extends pwfFieldBase
 {
+	var $ModName = 'PowerBrowse';
+	var $MenuKey = 'field_label'; //lang key for fields-menu label, used by PowerForms
+	var $mymodule; //used also by PowerForms, do not rename
+
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->HideLabel = 1;
+		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
-		$this->NeedsDiv = 0;
-		$this->NonRequirableField = TRUE;
-		$this->Type = 'DispositionFormBrowser';
-		$this->sortable = FALSE;
+		$this->IsSortable = FALSE;
+		$this->Type = 'FormBrowser';
+		$this->mymodule = cms_utils::get_module($this->ModName);
+	}
+
+	function Load($id,&$params)
+	{
+		//TODO
+		return FALSE;
+	}
+
+	function Store($deep=FALSE)
+	{
+		//TODO
+		return FALSE;
+	}
+
+	function GetHumanReadableValue($as_string=TRUE)
+	{
+		$ret = '[Form Browser]'; //by convention, not translated
+		if($as_string)
+			return $ret;
+		else
+			return array($ret);
+	}
+
+	function AdminPopulate($id)
+	{
+		list($main,$adv) = AdminPopulateCommon($id,FALSE);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	/*
@@ -27,22 +58,26 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 		'data' => array in which each key = formfield id, corresponding value = array(field identifier, field value)
 		)
 	*/
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
-		$formdata = array(
-			21=>array('identifier1'=>'value1'),
-			22=>array('identifier2'=>'value2'),
-			10=>array('identifier3'=>'some other value')); //TODO func($this->Value) ?
-		$contents = array(
-			'formid' => $this->formdata->Id,
-			'submitted' => time(),
-			'data' => $formdata;
-		);
-		$mod = cms_utils::get_module('PowerBrowse');
-		$token = md5(mt_rand(1,1000000).reset(reset($formdata))); //almost absolutely unique
+		$browsedata = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->IsInput) //TODO is a browsable field
+				$browsedata[$one->Id] = array($one->Name => $one->Value);
+		}
+		unset($one);
+		if(!$browsedata)
+			return array(TRUE,'');
+
+		$token = md5(mt_rand(1,1000000).reset(reset($browsedata))); //almost absolutely unique
+		$mod =& $this->mymodule;
 		while(!$mod->Locker($token))
 			usleep(mt_rand(10000,50000));
-		$mod->queue[] = $contents;
+		$mod->queue[] = array(
+			'formid' => $this->formdata->Id,
+			'submitted' => time(),
+			'data' => $browsedata);
 		$mod->UnLocker();
 		if(!$mod->running)
 		{
@@ -82,7 +117,8 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 				curl_close($ch);
 			}
 		}
-		array(TRUE,'');
+		unset($mod);
+		return array(TRUE,'');
 	}
 }
 
