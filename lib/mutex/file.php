@@ -4,25 +4,25 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class Mutex_file extends MutexBase implements Mutex
+class pwbrMutex_file implements pwbrMutex
 {
 	var $pause;
 	var $maxtries;
 	var $fp; //lock-file path
 	var $fh; //file handle
 
-	function __construct(&$mod,$timeout=200,$tries=200) //TODO $mod
+	function __construct(&$mod,$timeout=200,$tries=200)
 	{
 		$ud = pwbrUtils::GetUploadsPath($mod)
 		if($ud == FALSE)
-			throw new Exception("Error TODO");
+			throw new Exception('Error getting file lock');
 		if(!function_exists('flock'))
-			throw new Exception("Error TODO");
+			throw new Exception('Error getting file lock');
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';
 		if(!file_exists($dir))
 		{
 			if(!@mkdir($dir) && !file_exists($dir)) 
-				throw new Exception("Error TODO");
+				throw new Exception('Error getting file lock');
 		}
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
@@ -55,7 +55,7 @@ class Mutex_file extends MutexBase implements Mutex
 	function unlock()
 	{
 		if(!flock($this->fh,LOCK_UN))
-			throw new Exception("Error unlocking mutex");
+			throw new Exception('Error unlocking mutex');
 		fclose($this->fh);
 	}
 

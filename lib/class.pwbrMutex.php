@@ -1,5 +1,5 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PowerBrowse
 # Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -26,22 +26,21 @@ class pwbrMutex
 		else
 			$storage = 'auto';
 		if(strpos($storage,'auto') !== FALSE)
-			$storage = 'memcache,file,database';
+			$storage = 'memcache,semaphore,file,database';
 
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
-		require($path.'MutexBase.php');
 
 		$types = explode(',',$storage);
 		foreach($types as $one)
 		{
 			$one = trim($one);
 			require($path.$one.'.php');
-			$class = 'Mutex_'.$one;
+			$class = 'pwbrMutex_'.$one;
 			try
 			{
-				$module->cache = new $class($settings);
-				return $module->cache;
+				$module->mutex = new $class($module);
+				return $module->mutex;
 			}
 			catch(Exception $e) {}
 		}

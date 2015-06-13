@@ -17,9 +17,13 @@ $funcs = new pwbrRecordStore();
 //something sufficiently unique and which can't coincide with a SaveFormData() token
 $token = uniqid('pwbrQ.'.mt_rand(100,1000100),FALSE);
 $this->running = TRUE; //flag that Q is being processed now
-
-while(!$this->Locker($token))
-	usleep(60000); //bit longer than SaveFormData() timeout
+$mx = pwbrMutex::Get($this);
+if(!$mx || !$mx->lock($token))
+{
+	$this->running = FALSE;
+	//TODO fail with error report
+	exit;
+}
 
 while($data = reset($this->queue))
 {
@@ -34,14 +38,14 @@ while($data = reset($this->queue))
 
 	unset($this->queue[$datakey],$data);
 
-	$this->UnLocker();
+	$mx->unlock();
 	do
 	{
 		usleep(mt_rand(10000,60000));
-	} while(!$this->Locker($token));
+	} while(!$mx->lock($token));
 }
 
-$this->UnLocker();
+$mx->unlock();
 $this->running = FALSE;
 
 //fwrite($fh,"Q has been processed\n");

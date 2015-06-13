@@ -19,33 +19,16 @@
 
 class PowerBrowse extends CMSModule
 {
-	private $faketex = FALSE; //fake mutex for serializing
-	private $mcache = FALSE; //memcache to use as mutex for serializing queue access
-	private $lockid = FALSE; //memcache key
 	private $mh; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
+	protected $mutex = NULL; //object for serialising access, setup @ 1st use
 	protected $running = FALSE; //whether the queue-processor is active
 	protected $queue = array();
-	protected $Locker;
-	protected $UnLocker;
 
 	function __construct()
 	{
 		parent::__construct();
-		if(class_exists('Memcache'))
-		{
-			$this->mcache = new Memcache;
-			$this->mcache->connect($config['root_url'],11211);
-			$this->lockid = uniqid('pwbr',TRUE);
-			$this->Locker = 'LockCache';
-			$this->UnLocker = 'UnLockCache';
-		}
-		else
-		{
-			$this->Locker = 'LockFake';
-			$this->UnLocker = 'UnLockFake';
-		}
 		$this->mh = curl_multi_init();
 		//cmsms 1.10+ also has ->create_url();
 		//bogus frontend link (i.e. no admin login needed)
@@ -57,14 +40,14 @@ class PowerBrowse extends CMSModule
 	
 	function __destruct()
 	{
-		if(is_object($this->mcache))
-			$this->mcache->delete($this->lockid); //just in case ...
 		if($this->ch)
 		{
 			curl_multi_remove_handle($this->mh,$this->ch);
 			curl_close($this->ch);
 		}
 		curl_multi_close($this->mh);
+		if($this->mutex)
+			$this->mutex->reset();
 //		parent::__destruct();
 	}
 	
@@ -309,113 +292,6 @@ class PowerBrowse extends CMSModule
 		$smarty = cmsms()->GetSmarty();
 		$smarty->assign('inner_nav',$navstr);
 	}
-
-	/**
-	Lock:
-	@token: sufficiently-unique identifier of the calling process
-	Returns: boolean, whether the lock was obtained
-	This is a mutex-equivalent. Atomic. May block if multiple servers are in play.
-	*/
-	protected function LockCache($token)
-	{
-		$mc =& $this->mcache;
-		$stored = $mc->get($this->lockid);
-		if($stored)
-			return ($stored === $token);
-		if(!$mc->add($this->lockid,$token)) //only nominally atomic
-			return FALSE;
-		$cas_token = 0.0;
-		if($mc->get($this->lockid,NULL,$cas_token) !== $token)
-		{
-			while(!$mc->cas($cas_token,$this->lockid,$token) || 
-				   $mc->getResultCode() != Memcached::RES_SUCCESS)
-			{
-				$stored = $mc->get($this->lockid);  //reset last access for CAS
-				usleep(mt_rand(1000,100000));
-			}
-		}
-	}
-
-	protected function UnLockCache()
-	{
-		$this->mcache->delete($this->lockid);
-	}
-
-	protected function LockFake($token)
-	{
-		//TODO find some way that's more-atomic and also generally available
-		list($was,$this->faketex) = array($this->faketex,$token);
-		if($was !== $token && $was !== FALSE)
-		{
-			$this->faketex = $was;
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	protected function UnLockFake()
-	{
-		$this->faketex = FALSE;
-	}
-
-	/**
-	SaveFormData:
-	Adds @contents to the save-queue.
-	For use by PowerForms module, when saving the contents of a submitted form
-	Field identifiers and values in the data are not necessarily unique
-	@contents: reference to array (
-		'formid' => form identifier
-		'submitted' => timestamp representing when the form was submitted
-		'data' => array in which each key = formfield id, corresponding value = array(field identifier, field value)
-		)
-	*/
-/*MIGRATED TO POWERFORMS CLASS	function SaveFormData(&$contents)
-	{
-		$token = md5(mt_rand(1,1000000).reset(reset($contents['data']))); //almost absolutely unique
-		while(!$this->Locker($token))
-			usleep(mt_rand(10000,50000));
-		$this->queue[] = $contents;
-		$this->UnLocker();
-		if(!$this->running)
-		{
-			//initiate async queue processing
-			if($this->ch)
-			{
-				while(curl_multi_info_read($this->mh))
-					usleep(20000);
-				curl_multi_remove_handle($this->mh,$this->ch);
-				curl_close($this->ch);
-				$this->ch = FALSE;
-			}
-
-			$ch = curl_init($this->Qurl);
-			curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
-			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
-			curl_setopt($ch,CURLOPT_FORBID_REUSE,TRUE);
-			curl_setopt($ch,CURLOPT_FRESH_CONNECT,TRUE);
-			curl_setopt($ch,CURLOPT_HEADER,FALSE);
-			curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
-			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
-
-			curl_multi_add_handle($this->mh,$ch);
-			$runcount = 0;
-			do
-			{
-				$mrc = curl_multi_exec($this->mh,$runcount);
-			} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
-//			if($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-			if($runcount)
-			{
-				$this->ch = $ch; //cache for later cleanup
-			}
-			else
-			{
-				curl_multi_remove_handle($this->mh,$ch);
-				curl_close($ch);
-			}
-		}
-	}
-*/
 }
 
 ?>
