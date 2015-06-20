@@ -15,7 +15,7 @@ class pwbrMutex_semaphore implements pwbrMutex
 		if(!function_exists('sem_get'))
 			throw new Exception('Error geting semaphore');
 		$fp = dirname(__FILE__).'pwbr';
-		$key = ftok($fp) % 101 + mt_random(1000000,10000000);
+		$key = ftok($fp) % 101 + PHP_INT_MAX / 2;
 		$this->instance = sem_get($key,1);
 		if($this->instance === FALSE)
 			throw new Exception('Error geting semaphore');
