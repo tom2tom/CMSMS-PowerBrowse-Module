@@ -183,9 +183,7 @@ $(document).ready(function(){
  });
 });
 function select_all(cb) {
- var st = $(cb).attr('checked');
- if(!st) st = false;
- $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',st);
+ $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
 }
 
 EOS;

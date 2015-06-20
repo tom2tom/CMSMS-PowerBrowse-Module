@@ -171,9 +171,7 @@ EOS;
 		{
 			$jsfuncs[] = <<<EOS
 function select_all(cb) {
- var st = $(cb).attr('checked');
- if(!st) st = false;
- $('input[name="{$id}sel[]"][type="checkbox"]').attr('checked',st);
+ $('input[name="{$id}sel[]"][type="checkbox"]').attr('checked',cb.checked);
 }
 
 EOS;

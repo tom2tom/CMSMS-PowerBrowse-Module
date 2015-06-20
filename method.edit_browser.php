@@ -129,8 +129,7 @@ function set_tab() {
  $('#{$id}active_tab').val(active.attr('id'));
 }
 function select_all(cb) {
- var keep,target,boxes,st = $(cb).attr('checked');
- if(!st) st = false;
+ var keep,target,boxes,st;
  switch (cb.name) {
   case '{$id}allshow':
     keep = true;
@@ -143,7 +142,8 @@ function select_all(cb) {
   default:
     return;
  }
- boxes=$('#listfields > tbody').find('input[name="{$id}'+target+'"]');
+ boxes = $('#listfields > tbody').find('input[name="{$id}'+target+'"]');
+ st = cb.checked;
  boxes.attr('checked',st);
  if(keep && !st) {
   $(boxes[0]).attr('checked',true);
