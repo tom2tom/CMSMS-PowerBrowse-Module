@@ -6,6 +6,59 @@
 
 class pwbrUtils
 {
+	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
+	private static $instance = NULL; //'instance' object for mutex class, if needed
+
+	/**
+	GetMutex:
+	@storage: optional cache-type name, one (or more, ','-separated) of
+		auto,memcache,semaphore,file,database, default = 'auto'
+	Returns: mutex-object or NULL
+	*/
+	public static function GetMutex($storage = 'auto')
+	{
+		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
+		require($path.'interface.Mutex.php');
+
+		if(self::mxtype)
+		{
+			$one = self::mxtype;
+			require($path.$one.'.php');
+			$class = 'pwbrMutex_'.$one;
+			$mutex = new $class(self::instance);
+			return $mutex;
+		}
+		else
+		{
+			if($storage)
+				$storage = strtolower($storage);
+			else
+				$storage = 'auto';
+			if(strpos($storage,'auto') !== FALSE)
+				$storage = 'memcache,semaphore,file,database';
+
+			$types = explode(',',$storage);
+			foreach($types as $one)
+			{
+				$one = trim($one);
+				$class = 'pwbrMutex_'.$one;
+				try
+				{
+					require($path.$one.'.php');
+					$mutex = new $class();
+					self::$mxtype = $one;
+					if(isset($mutex->instance))
+						self::instance =& $mutex->instance;
+					else
+						self::instance = NULL;
+					return $mutex;
+				}
+				catch(Exception $e) {}
+			}
+			return NULL;
+		}
+	}
+
 	/**
 	GetBrowserNameFromID:
 	@browser_id: browser identifier
