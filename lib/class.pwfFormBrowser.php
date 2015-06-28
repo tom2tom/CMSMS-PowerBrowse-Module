@@ -69,15 +69,16 @@ class pwfFormBrowser extends pwfFieldBase
 		if(!$browsedata)
 			return array(TRUE,'');
 
-		$token = md5(mt_rand(1,1000000).reset(reset($browsedata))); //almost absolutely unique
 		$mod =& $this->mymodule;
-		while(!$mod->Locker($token))
-			usleep(mt_rand(10000,50000));
+		$token = abs(crc32($mod->GetName().'Qmutex')); //same token as in action.run_queue.php
+		$mx = pwbrUtils::GetMutex();
+		if(!$mx || !$mx->lock($token))
+			return array(FALSE,$mod->Lang('error_lock'));
 		$mod->queue[] = array(
 			'formid' => $this->formdata->Id,
 			'submitted' => time(),
 			'data' => $browsedata);
-		$mod->UnLocker();
+		$mx->unlock($token);
 		if(!$mod->running)
 		{
 			//initiate async queue processing

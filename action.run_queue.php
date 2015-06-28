@@ -14,21 +14,22 @@ $pre = cms_db_prefix();
 $sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 $pass = $this->GetPreference('default_phrase');
 $funcs = new pwbrRecordStore();
-//something sufficiently unique and which can't coincide with a SaveFormData() token
-$token = uniqid('pwbrQ.'.mt_rand(100,1000100),FALSE);
+$token = abs(crc32($this->GetName().'Qmutex')); //same token as in pwfFormBrowser::Dispose()
 $this->running = TRUE; //flag that Q is being processed now
-$mx = pwbrMutex::Get($this);
+$mx = pwbrUtils::GetMutex();
 if(!$mx || !$mx->lock($token))
 {
 	$this->running = FALSE;
-	//TODO fail with error report
+	//TODO fail with error report $this->Lang('error_lock')
 	exit;
 }
 
 while($data = reset($this->queue))
 {
 	$datakey = key($this->queue);
-	$browsers = $db->GetCol($sql,array($data['formid']));
+//	each Q-item = array('formid'=>$this->formdata->Id,'submitted'=>time(),'data'=>$browsedata)
+	$form_id = (int)$data['formid'];
+	$browsers = $db->GetCol($sql,array($form_id));
 	if($browsers)
 	{
 		$stamp = (int)$data['submitted'];
@@ -38,14 +39,14 @@ while($data = reset($this->queue))
 
 	unset($this->queue[$datakey],$data);
 
-	$mx->unlock();
+	$mx->unlock($token);
 	do
 	{
 		usleep(mt_rand(10000,60000));
 	} while(!$mx->lock($token));
 }
 
-$mx->unlock();
+$mx->unlock($token);
 $this->running = FALSE;
 
 //fwrite($fh,"Q has been processed\n");

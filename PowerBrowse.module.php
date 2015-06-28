@@ -22,7 +22,6 @@ class PowerBrowse extends CMSModule
 	private $mh; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
-	protected $mutex = NULL; //object for serialising access, setup @ 1st use
 	protected $running = FALSE; //whether the queue-processor is active
 	protected $queue = array();
 
