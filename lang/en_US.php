@@ -32,6 +32,7 @@ $lang['error_data']='Cannot process stored data';
 $lang['error_database']='Cannot find requested data';
 $lang['error_export']='A problem occurred during the export process.'; //how vague is that !!
 $lang['error_failed']='The requested operation failed to complete';
+$lang['error_lock']='Error. Unable to obtain exclusive access';
 $lang['error_missing']='Cannot find it';
 $lang['error_module']='The PowerForms module is missing. Please advise your site administrator.';
 $lang['error_noform']='Cannot find a requested form. Please advise your site administrator.';
