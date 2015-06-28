@@ -6,16 +6,13 @@
 
 interface pwbrMutex
 {
-	function __construct(&$module,$timeout=200,$tries=0);
-
-	function timeout($msec=200);
+	function __construct(&$instance,$timeout=200,$tries=0);
 
 	function lock($token);
 
-	function unlock();
+	function unlock($token);
 
 	function reset();
-
 }
 
 ?>

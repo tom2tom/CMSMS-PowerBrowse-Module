@@ -10,22 +10,22 @@ class pwbrMutex_semaphore implements pwbrMutex
 	var $maxtries;
 	var $instance;
 
-	function __construct(&$mod,$timeout=200,$tries=200)
+	function __construct(&$instance,$timeout=200,$tries=200)
 	{
-		if(!function_exists('sem_get'))
-			throw new Exception('Error geting semaphore');
-		$fp = dirname(__FILE__).'pwbr';
-		$key = ftok($fp) % 101 + PHP_INT_MAX / 2;
-		$this->instance = sem_get($key,1);
-		if($this->instance === FALSE)
-			throw new Exception('Error geting semaphore');
+		if($instance)
+			$this->instance = $instance;
+		else
+		{
+			if(!function_exists('sem_get'))
+				throw new Exception('No semaphore available');
+			$fp = dirname(__FILE__).get_class();
+			$key = ftok($fp) % 101 + PHP_INT_MAX / 2;
+			$this->instance = sem_get($key,1);
+			if($this->instance === FALSE)
+				throw new Exception('Error getting semaphore');
+		}
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-	}
-
-	function timeout($msec=200)
-	{
-		$this->pause = $usec;
 	}
 
 	function lock($token)
@@ -40,17 +40,17 @@ class pwbrMutex_semaphore implements pwbrMutex
 		return FALSE; //failed
 	}
 		
-	function unlock()
+	function unlock($token)
 	{
 		if(!sem_release($this->instance))
 			throw new Exception('Error unlocking mutex');
 	}
 
 	//as of 2014, "sem_remove() shouldn't be part of a normal cleanup/teardown
-		and should be called very rarely due to bugs in the implementation"
+	//	and should be called very rarely due to bugs in the implementation"
 	function reset()
 	{
-		$this->unlock();
+		$this->unlock('');
 	}
 
 ?>

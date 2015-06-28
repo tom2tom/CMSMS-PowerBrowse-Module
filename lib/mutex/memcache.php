@@ -9,68 +9,60 @@ class pwbrMutex_memcache implements pwbrMutex
 	var $pause;
 	var $maxtries;
 	var $instance;
-	var $lockid;
 
-	function __construct(&$mod,$timeout=50,$tries=0)
+	function __construct(&$instance,$timeout=50,$tries=0)
 	{
-		if(class_exists('Memcache') && function_exists('memcache_connect'))
-		{
-			$this->pause = $timeout;
-			$this->maxtries = $tries;
-			$this->instance = new Memcache;
-			$config = cmsms()->GetConfig();
-			$this->instance->connect($config['root_url'],11211);
-			$this->lockid = uniqid('pwbr',TRUE);
-		}
+		if($instance)
+			$this->instance = $instance;
 		else
-			throw new Exception('no memcache storage');
-	}
-
-	function timeout($msec=50)
-	{
-		$this->pause = $usec;
+		{
+			if(class_exists('Memcache') && function_exists('memcache_connect'))
+				$this->instance = new Memcache;
+			else
+				throw new Exception('no memcache storage');
+		}
+		$config = cmsms()->GetConfig();
+		$this->instance->connect($config['root_url'],11211);
+		$this->pause = $timeout;
+		$this->maxtries = $tries;
 	}
 
 	function lock($token)
 	{
+		$token .= 'pwbr.lock'
 		$count = 0;
 		do
 		{
-			if($this->instance->add($this->lockid,$token)) //only nominally atomic
+			if($this->instance->add($token,$token)) //only nominally atomic
 			{
 				$cas_token = 0.0;
-				if($this->instance->get($this->lockid,NULL,$cas_token) !== $token)
+				if($this->instance->get($token,NULL,$cas_token) !== $token)
 				{
 					$mc =& $this->instance;
-					while(!$mc->cas($cas_token,$this->lockid,$token) || 
+					while(!$mc->cas($cas_token,$token,$token) || 
 						   $mc->getResultCode() != Memcached::RES_SUCCESS)
 					{
-						$stored = $mc->get($this->lockid);  //reset last access for CAS
+						$stored = $mc->get($token);  //reset last access for CAS
 						usleep($this->pause);
 					}
 				}
 				return TRUE;
 			}
-			elseif $this->instance->get($this->lockid) === $token)
+			elseif $this->instance->get($token) === $token)
 				return TRUE;
 			usleep($this->pause);
 		} while($this->maxtries == 0 || $count++ < $this->maxtries);
 		return FALSE;
 	}
 
-	function unlock()
+	function unlock($token)
 	{
-		$this->instance->delete($this->lockid);
+		$this->instance->delete($token.'pwbr.lock');
 	}
 
 	function reset()
 	{
-		$this->instance->delete($this->lockid);
-/*		$this->instance = new Memcache;
-		$config = cmsms()->GetConfig();
-		$this->instance->connect($config['root_url'],11211);
-		$this->lockid = uniqid('pwbr',TRUE);
-*/
+		$this->instance->flush();
 	}
 }
 

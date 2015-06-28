@@ -8,48 +8,46 @@ class pwbrMutex_database implements pwbrMutex
 {
 	var $pause;
 	var $maxtries;
-	var $dbhandle;
 	var $table;
 
-	function __construct(&$mod,$timeout=500,$tries=200)
+	function __construct(&$instance,$timeout=500,$tries=200)
 	{
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-		$this->dbhandle = cmsms()->GetDb();
 		$this->table = cms_db_prefix().'module_pwbr_flock'; 
-	}
-
-	function timeout($usec=500)
-	{
-		$this->pause = $usec;
 	}
 
 	function lock($token)
 	{
+		$flid = abs(crc32($token.'pwbr.lock'));
+		$db = cmsms()->GetDb();
+		$stamp = $db->sysTimeStamp;
+		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','$stamp.')';
 		$count = 0;
 		do
 		{
-			$stamp = $this->dbhandle->sysTimeStamp;
-			$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES (1,'.$stamp.')';
-			if($this->dbhandle->Execute($sql))
+			if($db->Execute($sql))
 				return TRUE; //success
 /*TODO		$sql = 'SELECT flock_id FROM '.$this->table.' WHERE flock < '.$stamp + 15;
-			if($this->dbhandle->GetOne($sql))
-				$this->dbhandle->Execute('DELETE FROM '.$this->table);
+			if($db->GetOne($sql))
+				$db->Execute('DELETE FROM '.$this->table);
 */
 			usleep($this->pause);
 		} while(/*$this->maxtries == 0 || */$count++ < $this->maxtries)
 		return FALSE; //failed
 	}
 
-	function unlock()
+	function unlock($token)
 	{
-		$this->dbhandle->Execute('DELETE FROM '.$this->table);
+		$flid = abs(crc32($token.'pwbr.lock'));
+		$db = cmsms()->GetDb();
+		$db->Execute('DELETE FROM '.$this->table.' WHERE flock_id='.$flid);
 	}
 
 	function reset()
 	{
-		$this->dbhandle->Execute('DELETE FROM '.$this->table);
+		$db = cmsms()->GetDb();
+		$db->Execute('DELETE FROM '.$this->table);
 	}
 }
 
