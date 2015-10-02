@@ -20,12 +20,12 @@ class pwbrUtils
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
 
-		if(self::mxtype)
+		if(self::$mxtype)
 		{
-			$one = self::mxtype;
+			$one = self::$mxtype;
 			require($path.$one.'.php');
 			$class = 'pwbrMutex_'.$one;
-			$mutex = new $class(self::instance);
+			$mutex = new $class(self::$instance);
 			return $mutex;
 		}
 		else
@@ -48,9 +48,9 @@ class pwbrUtils
 					$mutex = new $class();
 					self::$mxtype = $one;
 					if(isset($mutex->instance))
-						self::instance =& $mutex->instance;
+						self::$instance =& $mutex->instance;
 					else
-						self::instance = NULL;
+						self::$instance = NULL;
 					return $mutex;
 				}
 				catch(Exception $e) {}
