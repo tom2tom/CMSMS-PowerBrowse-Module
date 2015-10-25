@@ -29,7 +29,7 @@ class pwbrMutex_memcache implements pwbrMutex
 
 	function lock($token)
 	{
-		$token .= 'pwbr.lock'
+		$token .= 'pwbr.lock';
 		$count = 0;
 		do
 		{
@@ -39,7 +39,7 @@ class pwbrMutex_memcache implements pwbrMutex
 				if($this->instance->get($token,NULL,$cas_token) !== $token)
 				{
 					$mc =& $this->instance;
-					while(!$mc->cas($cas_token,$token,$token) || 
+					while(!$mc->cas($cas_token,$token,$token) ||
 						   $mc->getResultCode() != Memcached::RES_SUCCESS)
 					{
 						$stored = $mc->get($token);  //reset last access for CAS
@@ -48,7 +48,7 @@ class pwbrMutex_memcache implements pwbrMutex
 				}
 				return TRUE;
 			}
-			elseif $this->instance->get($token) === $token)
+			elseif ($this->instance->get($token) === $token)
 				return TRUE;
 			usleep($this->pause);
 		} while($this->maxtries == 0 || $count++ < $this->maxtries);

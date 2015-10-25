@@ -29,17 +29,17 @@ class pwbrMutex_semaphore implements pwbrMutex
 	}
 
 	function lock($token)
-	{	
+	{
 		$count = 0;
 		do
 		{
 			if(sem_acquire($this->instance))
 				return TRUE;
 			usleep($this->pause);
-		} while($this->maxtries == 0 || $count++ < $this->maxtries)
+		} while($this->maxtries == 0 || $count++ < $this->maxtries);
 		return FALSE; //failed
 	}
-		
+
 	function unlock($token)
 	{
 		if(!sem_release($this->instance))
@@ -52,5 +52,5 @@ class pwbrMutex_semaphore implements pwbrMutex
 	{
 		$this->unlock('');
 	}
-
+}
 ?>

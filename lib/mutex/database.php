@@ -14,7 +14,7 @@ class pwbrMutex_database implements pwbrMutex
 	{
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-		$this->table = cms_db_prefix().'module_pwbr_flock'; 
+		$this->table = cms_db_prefix().'module_pwbr_flock';
 	}
 
 	function lock($token)
@@ -22,7 +22,7 @@ class pwbrMutex_database implements pwbrMutex
 		$flid = abs(crc32($token.'pwbr.lock'));
 		$db = cmsms()->GetDb();
 		$stamp = $db->sysTimeStamp;
-		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','$stamp.')';
+		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
 		do
 		{
@@ -33,7 +33,7 @@ class pwbrMutex_database implements pwbrMutex
 				$db->Execute('DELETE FROM '.$this->table);
 */
 			usleep($this->pause);
-		} while(/*$this->maxtries == 0 || */$count++ < $this->maxtries)
+		} while(/*$this->maxtries == 0 || */$count++ < $this->maxtries);
 		return FALSE; //failed
 	}
 
