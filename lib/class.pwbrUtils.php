@@ -46,14 +46,17 @@ class pwbrUtils
 				{
 					require($path.$one.'.php');
 					$mutex = new $class();
-					self::$mxtype = $one;
-					if(isset($mutex->instance))
-						self::$instance =& $mutex->instance;
-					else
-						self::$instance = NULL;
-					return $mutex;
 				}
-				catch(Exception $e) {}
+				catch(Exception $e)
+				{
+					continue;
+				}
+				self::$mxtype = $one;
+				if(isset($mutex->instance))
+					self::$instance =& $mutex->instance;
+				else
+					self::$instance = NULL;
+				return $mutex;
 			}
 			return NULL;
 		}
