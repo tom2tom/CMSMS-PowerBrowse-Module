@@ -19,6 +19,7 @@
 
 class PowerBrowse extends CMSModule
 {
+	public $before20;
 	private $mh; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
@@ -29,6 +30,8 @@ class PowerBrowse extends CMSModule
 	{
 		parent::__construct();
 		$this->mh = curl_multi_init();
+		global $CMS_VERSION;
+		$this->before20 = (version_compare ($CMS_VERSION, '2.0') < 0);
 		//cmsms 1.10+ also has ->create_url();
 		//bogus frontend link (i.e. no admin login needed)
 		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
