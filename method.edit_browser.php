@@ -88,7 +88,8 @@ if($fields)
 
 	$mc = 0;
 	$previd	= -10;
-	$theme = cmsms()->variables['admintheme'];
+	$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
+		cms_utils::get_theme_object();
 	$iconup = $theme->DisplayImage('icons/system/arrow-u.gif',$this->Lang('up'),'','','systemicon');
 	$icondn = $theme->DisplayImage('icons/system/arrow-d.gif',$this->Lang('down'),'','','systemicon');
 

@@ -51,7 +51,9 @@ $colsorts = array();
 $smarty->assign('colnames',$colnames);
 $smarty->assign('colsorts',$colsorts);
 
-$theme = cmsms()->variables['admintheme'];
+$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
+	cms_utils::get_theme_object();
+
 $js = array(); //script accumulator
 		
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';

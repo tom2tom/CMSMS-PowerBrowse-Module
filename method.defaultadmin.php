@@ -27,7 +27,8 @@ $smarty->assign('message',(isset($params['message']))?$params['message']:'');
 $smarty->assign('start_browsersform',$this->CreateFormStart($id,'multi_browser',$returnid));
 $smarty->assign('end_form',$this->CreateFormEnd());
 
-$theme = $gCms->variables['admintheme'];
+$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
+	cms_utils::get_theme_object();
 
 $fb = $this->GetModuleInstance('FormBuilder');
 if($this->GetPreference('oldmodule_data',0))
