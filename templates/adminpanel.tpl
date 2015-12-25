@@ -1,5 +1,5 @@
 {if !empty($message)}<p>{$message}</p>{/if}
-{$start_tabs}
+{$tabs_header}
 {$start_browsers_tab}
 {$start_browsersform}
 {if $browser_count > 0}
@@ -64,8 +64,9 @@
 {$end_form}
 {$end_tab}
 {/if}
-
-{$end_tabs}
+{$tabs_footer}
+{if !empty($jsincs)}{foreach from=$jsincs item=file}{$file}
+{/foreach}{/if}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[
