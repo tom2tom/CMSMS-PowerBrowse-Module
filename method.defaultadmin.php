@@ -6,7 +6,11 @@
 
 $iseditor = $this->CheckPermission('Modify Any Page');
 
-$jsfuncs = array(); //script accumulator
+//script accumulators
+$jsfuncs = array();
+$jsloads = array();
+$jsincs = array();
+$baseurl = $this->GetModuleURLPath();
 
 $tab = $this->GetActiveTab($params);
 
@@ -18,10 +22,10 @@ if($canadmin)
 	$smarty->assign('start_settings_tab',$this->StartTab('settings'));
 }
 $t .= $this->endtabheaders().$this->starttabcontent();
-$smarty->assign('start_tabs',$t);
+$smarty->assign('tabs_header',$t);
 $smarty->assign('start_browsers_tab',$this->StartTab('browsers'));
-$smarty->assign('end_tab',$this->EndTab());
-$smarty->assign('end_tabs',$this->EndTabContent());
+$smarty->assign('tabs_footer',$this->EndTabContent());
+$smarty->assign('end_tab',$this->EndTab()); //CMSMS 2+ can't cope if this is before EndTabContent() !!
 
 $smarty->assign('message',(isset($params['message']))?$params['message']:'');
 $smarty->assign('start_browsersform',$this->CreateFormStart($id,'multi_browser',$returnid));
@@ -272,6 +276,24 @@ if($canadmin)
 		$configs[] = $oneset;
 	}
 
+	$t = $this->GetPreference('masterpass');
+	if($t)
+		$t = pwbrUtils::unfusc($t);
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_password');
+	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass',
+		'cloakpw',$id.'passwd','','',50,3,'','','style="height:3em;"'));
+	$configs[] = $oneset;
+
+	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery.inputcloak.min.js"></script>';
+	$jsloads[] =<<<EOS
+ $('#{$id}passwd').inputCloak({
+  type:'see4',
+  symbol:'\u2022'
+ });
+
+EOS;
+
 	$smarty->assign('configs',$configs);
 
 	$jsfuncs[] = <<<EOS
@@ -296,6 +318,16 @@ else
 $smarty->assign('pmod',(($canmod)?1:0));
 $smarty->assign('pdev',(($iseditor)?1:0));
 
+if($jsloads)
+{
+	$jsfuncs[] = '
+$(document).ready(function() {
+';
+	$jsfuncs = array_merge($jsfuncs,$jsloads);
+	$jsfuncs[] = '});
+';
+}
 $smarty->assign('jsfuncs',$jsfuncs);
+$smarty->assign('jsincs',$jsincs);
 
 ?>
