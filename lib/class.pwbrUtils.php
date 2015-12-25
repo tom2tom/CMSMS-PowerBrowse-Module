@@ -161,7 +161,7 @@ class pwbrUtils
 	@based: optional boolean, whether to base64_encode the encrypted value, default TRUE
 	Returns: encrypted @value, or just @value if it's empty
 	*/
-	function encrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
+	public static function encrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
 	{
 		if($value)
 		{
@@ -190,7 +190,7 @@ class pwbrUtils
 	@based: optional boolean, whether to base64_decode the value, default TRUE
 	Returns: decrypted @value, or just @value if it's empty
 	*/
-	function decrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
+	public static function decrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
 	{
 		if($value)
 		{
@@ -216,7 +216,7 @@ class pwbrUtils
 	@str: string or FALSE
 	obfuscate @str
 	*/
-	function fusc($str)
+	public static function fusc($str)
 	{
 		if($str)
 		{
@@ -231,7 +231,7 @@ class pwbrUtils
 	@str: string or FALSE
 	de-obfuscate @str
 	*/
-	function unfusc($str)
+	public static function unfusc($str)
 	{
 		if($str)
 		{
