@@ -4,23 +4,26 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwrMutex_database implements pwriMutex
+class Mutex_database implements iMutex
 {
-	var $pause;
-	var $maxtries;
-	var $table;
+	private $pause;
+	private $maxtries;
+	private $table;
 
-	function __construct(&$instance=NULL,$timeout=500,$tries=200)
+	function __construct($config)
 	{
-		$this->pause = $timeout;
-		$this->maxtries = $tries;
-		$this->table = cms_db_prefix().'module_pwbr_flock'; //TODO generalise
+		if(!empty($config['table']))
+			$this->table = $config['table'];
+		else
+			throw new Exception('no database cache');
+		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 500;
+		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
 
 	function lock($token)
 	{
 		$db = cmsms()->GetDb();
-		$flid = abs(crc32($token.'pwr.lock'));
+		$flid = abs(crc32($token.'.mx.lock'));
 		$stamp = $db->sysTimeStamp;
 		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
@@ -43,7 +46,7 @@ class pwrMutex_database implements pwriMutex
 	function unlock($token)
 	{
 		$db = cmsms()->GetDb();
-		$sql = 'DELETE FROM '.$this->table.' WHERE flock_id='.abs(crc32($token.'pwr.lock'));
+		$sql = 'DELETE FROM '.$this->table.' WHERE flock_id='.abs(crc32($token.'.mx.lock'));
 		while(1)
 		{
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');

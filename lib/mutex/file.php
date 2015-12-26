@@ -4,36 +4,41 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwrMutex_file implements pwriMutex
+class Mutex_file implements iMutex
 {
-	var $pause;
-	var $maxtries;
-	var $fp; //lock-file directory path (with trailing separator)
-	var $fh; //opened-file handle
+	private $pause;
+	private $maxtries;
+	private $fp; //lock-file directory path (with trailing separator)
+	private $fh; //opened-file handle
 
-	function __construct(&$instance=NULL,$timeout=200,$tries=200)
+	function __construct($config)
 	{
 		if(!function_exists('flock'))
 			throw new Exception('Error getting file lock');
-		$mod = cms_utils::get_module('PowerBrowse');
-		$ud = pwbrUtils::GetUploadsPath($mod);
-		if($ud == FALSE)
-			throw new Exception('Error getting file lock');
+		if(!empty($config['updir']))
+			$ud = $config['updir'];
+		else
+		{
+			$sysconfig = cmsms()->GetConfig();
+			$ud = $sysconfig['uploads_path'];
+			if($ud == FALSE)
+				throw new Exception('Error getting file lock');
+		}
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';
-		if(!file_exists($dir))
+		if(!is_dir($dir))
 		{
 			if(!@mkdir($dir) && !file_exists($dir))
 				throw new Exception('Error getting file lock');
 		}
-		$this->pause = $timeout;
-		$this->maxtries = $tries;
 		$this->fp = $dir.DIRECTORY_SEPARATOR;
+		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 500;
+		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 		//TODO .htaccess for $dir
 	}
 
 	function lock($token)
 	{
-		$fp = $this->fp.$token.'pwr.lock';
+		$fp = $this->fp.$token.'.mx.lock';
 		touch($fp,time());
 		$this->fh = fopen($fp,'r');
 		if($this->fh === FALSE)
@@ -59,7 +64,7 @@ class pwrMutex_file implements pwriMutex
 	{
 		$this->unlock('');
 		if(is_dir(dirname($this->fp)))
-			unlink($this->fp.'*pwr.lock');
+			unlink($this->fp.'*.mx.lock');
 	}
 }
 
