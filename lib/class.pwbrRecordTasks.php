@@ -9,6 +9,7 @@ class pwbrRecordTasks
 	/**
 	DeleteRecord:
 	@record_id: single identifier or array of such
+	Returns: boolean indicating success
 	*/
 	public function DeleteRecord($record_id)
 	{
@@ -25,7 +26,7 @@ class pwbrRecordTasks
 			$sql .= '=?';
 			$args = array($record_id);
 		}
-		$db->Execute($sql,$args);
+		return pwbrUtils::SafeExec($sql,$args);
 	}
 }
 

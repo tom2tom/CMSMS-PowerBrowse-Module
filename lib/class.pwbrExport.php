@@ -54,7 +54,7 @@ class pwbrExport
 		{
 			$sql = 'SELECT record_id FROM '.$pre.
 			'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
-			$all = $db->GetCol($sql,array($browser_id));
+			$all = pwbrUtils::SafeGet($sql,array($browser_id),'col');
 		}
 		elseif($record_id)
 		{

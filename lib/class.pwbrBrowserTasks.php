@@ -69,7 +69,8 @@ class pwbrBrowserTasks
 		if(!$db->Execute($sql, array($browser_id)))
 			return FALSE;
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-		$db->Execute($sql, array($browser_id));
+		if(!pwbrUtils::SafeExec($sql, array($browser_id)))
+			return FALSE;
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_field WHERE browser_id=?';
 		$db->Execute($sql, array($browser_id));
 		return TRUE;
@@ -130,7 +131,7 @@ class pwbrBrowserTasks
 			trim($params['browser_name']);
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser VALUES (?,?,?,?,?,?,?)',array_values($row));
 
-		$list = $db->GetArray('SELECT browser_id,name,shown,sorted,order_by FROM '.
+		$list = $db->GetAll('SELECT browser_id,name,shown,sorted,order_by FROM '.
 		$pre.'module_pwbr_field WHERE browser_id=?',array($browser_id));
 		if($list)
 		{

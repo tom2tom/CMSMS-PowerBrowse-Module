@@ -45,7 +45,7 @@ class pwbrRecordLoad
 			$db = cmsms()->GetDb();
 		if(!$pre)
 			$pre = cms_db_prefix();
-		$row = $db->GetRow(
+		$row = pwbrUtils::SafeGet(
 		'SELECT submitted,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 		array($record_id));
 		if($row)

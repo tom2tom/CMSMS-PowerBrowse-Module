@@ -24,12 +24,13 @@ class pwbrRecordStore
 	@data: reference to array of plaintext form-data to be stored
 	@db: reference to database connection object
 	@pre: table-names prefix
+	Returns: boolean indicating success
 	*/
 	public function Insert($browser_id,$form_id,$stamp,&$data,&$mod,&$db,$pre)
 	{
 		$when = date('Y-m-d H:i:s',$stamp);
 		$cont = self::Encrypt($mod,serialize($data));
-		$db->Execute('INSERT INTO '.$pre.
+		return pwbrUtils::SafeExec('INSERT INTO '.$pre.
 		'module_pwbr_record (browser_id,form_id,submitted,contents) VALUES (?,?,?,?)',
 			array($browser_id,$form_id,$when,$cont));
 	}
@@ -40,12 +41,13 @@ class pwbrRecordStore
 	@data: reference to array of plaintext form-data to be stored
 	@db: reference to database connection object
 	@pre: table-names prefix
+	Returns: boolean indicating success
 	*/
 	public function Update($record_id,&$data,&$mod,&$db,$pre)
 	{
 		$when = date('Y-m-d H:i:s');
 		$cont = self::Encrypt($mod,serialize($data));
-		$db->Execute('UPDATE '.$pre.
+		return pwbrUtils::SafeExec('UPDATE '.$pre.
 		'module_pwbr_record SET submitted=?,contents=? WHERE record_id=?',
 			array($when,$cont,$record_id));
 	}
