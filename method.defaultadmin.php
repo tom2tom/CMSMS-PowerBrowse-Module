@@ -281,8 +281,8 @@ if($canadmin)
 		$t = pwbrUtils::unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
-	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass',
-		'cloakpw',$id.'passwd','','',50,3,'','','style="height:3em;"'));
+	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','',
+		$id.'passwd','','',50,3,'','','style="height:3em;"');
 	$configs[] = $oneset;
 
 	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery.inputcloak.min.js"></script>';
