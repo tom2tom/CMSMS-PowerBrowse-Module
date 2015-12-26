@@ -11,7 +11,7 @@ if(isset($params['import']))
 	if($this->CheckAccess('modify') || $this->CheckAccess('admin'))
 	{
 		$funcs = new pwbrTransition();
-		$funcs->ImportFormBrowsers();
+		$funcs->ImportFormBrowsers($this);
 	}
 	$this->Redirect($id,'defaultadmin');
 }

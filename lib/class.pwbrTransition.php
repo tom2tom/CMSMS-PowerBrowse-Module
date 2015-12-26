@@ -20,7 +20,7 @@ class pwbrTransition
 		return $db->GetAll($sql);
 	}
 
-	function ImportFormBrowsers()
+	function ImportFormBrowsers(&$mod)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -38,7 +38,7 @@ class pwbrTransition
 				$bid = $db->GenID($pre.'module_pwbr_browser_seq');
 				$db->Execute($sql,array($bid,-$row['form_id'],$row['name'],$row['formname'])); //form id < 0 signals FormBuilder form
 				$renums[$bid] = (int)$row['browser_id'];
-				self::Get_Data($db,$pre,$row['browser_id'],$bid,$row['form_id']);
+				self::Get_Data($mod,$db,$pre,$row['browser_id'],$bid,$row['form_id']);
 			}
 			foreach($renums as $new=>$old)
 			{
@@ -147,10 +147,9 @@ $vals = array (size=whatever)
   1 =>
   and so on
 */
-	function Get_Data(&$db,$pre,$oldbid,$newbid,$oldfid)
+	function Get_Data(&$mod,&$db,$pre,$oldbid,$newbid,$oldfid)
 	{
 		$mod = cms_utils::get_module('PowerBrowse');
-		$pass = $mod->GetPreference('default_phrase');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
 		$fb = cms_utils::get_module('FormBuilder');
 		$flds = array();
@@ -163,7 +162,7 @@ $vals = array (size=whatever)
 			$fields = array();
 			foreach($one->fields as $fid=>$fval)
 				$fields[-$fid] = array($names[$fid],$fval);//id < 0 signals FormBuilder field
-			$funcs->Insert($newbid,$newfid,$one->submitted_date,$fields,$pass,$db,$pre);
+			$funcs->Insert($newbid,$newfid,$one->submitted_date,$fields,$mod,$db,$pre);
 		}
 		unset($one);
 	}
