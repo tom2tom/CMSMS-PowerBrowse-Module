@@ -20,6 +20,7 @@
 class PowerBrowse extends CMSModule
 {
 	public $before20;
+	public $havemcrypt;
 	private $mh; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
@@ -31,8 +32,8 @@ class PowerBrowse extends CMSModule
 		parent::__construct();
 		$this->mh = curl_multi_init();
 		global $CMS_VERSION;
-		$this->before20 = (version_compare ($CMS_VERSION, '2.0') < 0);
-		//cmsms 1.10+ also has ->create_url();
+		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
+		$this->havemcrypt = function_exists('mcrypt_encrypt');
 		//bogus frontend link (i.e. no admin login needed)
 		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
 		//strip the (trailing) fake returnid, hence use the default
@@ -130,7 +131,7 @@ class PowerBrowse extends CMSModule
 
 	function GetDependencies()
 	{
-		return array('PowerForms'=>'0.7');
+		return array('PowerForms'=>'0.1');
 	}
 
 	function MinimumCMSVersion()
@@ -138,11 +139,10 @@ class PowerBrowse extends CMSModule
 		return '1.9'; //CHECKME class auto-loading needed
 	}
 
-	function MaximumCMSVersion()
+/*	function MaximumCMSVersion()
 	{
-		return '1.19.99';
 	}
-
+*/
 	function IsPluginModule()
 	{
 		return TRUE;
