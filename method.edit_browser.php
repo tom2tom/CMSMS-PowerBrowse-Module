@@ -77,7 +77,7 @@ $smarty->assign('input_pagerows',
 $smarty->assign('help_pagerows',$this->Lang('help_pagerows'));
 
 $sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
-$fields = $db->GetArray($sql,array($params['browser_id']));
+$fields = $db->GetAll($sql,array($params['browser_id']));
 if($fields)
 {
 	$smarty->assign('title_data',$this->Lang('title_data'));

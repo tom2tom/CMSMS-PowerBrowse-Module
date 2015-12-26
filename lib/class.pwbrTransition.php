@@ -27,7 +27,7 @@ class pwbrTransition
 		$sql = 'SELECT B.browser_id,B.form_id,B.name,F.name AS formname FROM '.$pre.
 		'module_fbr_browser B LEFT JOIN '.$pre.
 		'module_fb_form F ON B.form_id = F.form_id ORDER BY B.browser_id';
-		$olds = $db->GetArray($sql);
+		$olds = $db->GetAll($sql);
 		if($olds)
 		{
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
@@ -52,7 +52,7 @@ class pwbrTransition
 		$sql = 'SELECT * FROM '.$pre.'module_fbr_browser_attr WHERE browser_id=?
 AND (name=\'admin_list_fields\' OR name=\'admin_rows_per_page\')
 ORDER BY browser_attr_id';
-		$data = $db->GetArray($sql,array($oldbid));
+		$data = $db->GetAll($sql,array($oldbid));
 		if($data)
 		{
 			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
