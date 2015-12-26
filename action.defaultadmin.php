@@ -13,14 +13,17 @@ if($canadmin)
 {
 	if(isset($params['submit']))
 	{
-/*		$t = trim($params['default_phrase']);
-		$old = $this->GetPreference('default_phrase');
-		if($t != $old)
+		$old = $this->GetPreference('masterpass');
+		if($old)
+			$old = pwbrUtils::unfusc($oldpw);
+		$t = trim($params['masterpass']);
+		if($old != $t)
 		{
-TODO re-encrypt all stored data
-			$this->SetPreference('default_phrase',$t);
+			//TODO re-encrypt all stored data
+			if($t)
+				$t = pwbrUtils::fusc($t);
+			$this->SetPreference('masterpass',$t);
 		}
-*/
 		$this->SetPreference('export_file',!empty($params['export_file']));
 		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
 		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
