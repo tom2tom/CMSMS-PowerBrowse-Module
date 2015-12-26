@@ -123,6 +123,7 @@ $lang['title_owned_forms'] = 'Enable user-specific browsing';
 $lang['title_records']='Submissions';
 $lang['title_related_form']='Related form';
 $lang['title_pagerows']='Default rows-per-page';
+$lang['title_password']='Pass-phrase for securing sensitive data';
 $lang['title_sort']='Sortable';
 $lang['title_strip_on_export']='Strip HTML tags on export';
 $lang['title_submit_when']='Submitted';
