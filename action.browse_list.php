@@ -68,20 +68,22 @@ $rows = array();
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
 
-	$pass = $this->GetPreference('default_phrase');
 	$funcs = new pwbrRecordLoad();
 	foreach($data as &$one)
 	{
 		$fields = array();
-		$submission = $funcs->Decrypt($one['contents'],$pass);
-		//include data for fields named in $colnames
-		foreach($submission as &$sub) //TODO any use for field index?
+		$submission = $funcs->Decrypt($this,$one['contents']);
+		if($submission)
 		{
-			$indx = array_search($sub[0],$colnames);
-			if ($indx !== FALSE)
-				$fields[$indx] = $sub[1];
+			//include data for fields named in $colnames
+			foreach($submission as &$sub) //TODO any use for field index?
+			{
+				$indx = array_search($sub[0],$colnames);
+				if ($indx !== FALSE)
+					$fields[$indx] = $sub[1];
+			}
+			unset($sub);
 		}
-		unset($sub);
 		if($fields)
 		{
 			$rid = (int)$one['record_id'];

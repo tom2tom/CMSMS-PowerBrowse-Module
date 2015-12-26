@@ -9,10 +9,8 @@
 //$token = uniqid('pwbrDEBUG.'.mt_rand(100,1000100),FALSE); //for debugging
 //$fh = fopen("/tmp/{$token}.txt",'c');
 
-global $db;
 $pre = cms_db_prefix();
 $sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
-$pass = $this->GetPreference('default_phrase');
 $funcs = new pwbrRecordStore();
 $token = abs(crc32($this->GetName().'Qmutex')); //same token as in pwfFormBrowser::Dispose()
 $this->running = TRUE; //flag that Q is being processed now
@@ -34,7 +32,7 @@ while($data = reset($this->queue))
 	{
 		$stamp = (int)$data['submitted'];
 		foreach($browsers as $browser_id)
-			$funcs->Insert($browser_id,$form_id,$stamp,$data['data'],$pass,$db,$pre);
+			$funcs->Insert($browser_id,$form_id,$stamp,$data['data'],$this,$db,$pre);
 	}
 
 	unset($this->queue[$datakey],$data);

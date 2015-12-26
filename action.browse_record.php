@@ -9,21 +9,21 @@ if(!($this->CheckAccess('admin') || $this->CheckAccess('view'))) exit;
 
 if(isset($params['cancel']))
 	$this->Redirect($id,'browse_list',$returnid,$params);
+
+$pre = cms_db_prefix();
 if(isset($params['submit']))
 {
 	$collapsed = array();
 	//TODO field identifiers in the saved data
 	foreach($params['field'] as $k=>$name)
 		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
-	$pass = $this->GetPreference('default_phrase');
 	$funcs = new pwbrRecordStore();
-	$funcs->Update($params['record_id'],$collapsed,$pass,$db,cms_db_prefix());
+	$funcs->Update($params['record_id'],$collapsed,$this,$db,$pre);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
 $funcs = new pwbrRecordLoad();
-$pass = $this->GetPreference('default_phrase');
-list($when,$data) = $funcs->Load($params['record_id'],$pass,$this);
+list($when,$data) = $funcs->Load($params['record_id'],$this,$db,$pre);
 if(!$when)
 {
 	$params['message']= $this->PrettyMessage('error_data',FALSE);

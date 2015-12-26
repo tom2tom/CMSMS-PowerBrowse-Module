@@ -100,10 +100,9 @@ class pwbrExport
 
 		if($all)
 		{
-			$pass = $mod->GetPreference('default_phrase');
 			$funcs = new pwbrRecordLoad();
 			//header line
-			$data = $funcs->Load($all[0],$pass,$mod,$db,$pre);
+			$data = $funcs->Load($all[0],$mod,$db,$pre);
 			if(!$data[0])
 				return FALSE;
 			$names = array();				
@@ -122,7 +121,7 @@ class pwbrExport
 			//data lines(s)
 			foreach($all as $one)
 			{
-				$data = $funcs->Load($one,$pass,$mod,$db,$pre);
+				$data = $funcs->Load($one,$mod,$db,$pre);
 				if(!$data[0])
 					continue;	//decryption error
 				$outstr .= str_replace($sep,$r,$data[0]);
