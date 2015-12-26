@@ -69,7 +69,7 @@ $this->CreatePermission('ModifyPwBrowsers',$this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData',$this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData',$this->Lang('perm_see'));
 
-$this->SetPreference('masterpass',uniqid('Suck it up, crackers! Try to guess '));
+$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
 $this->SetPreference('export_file',0);
 $this->SetPreference('export_file_encoding','ISO-8859-1');
 $this->SetPreference('list_cssfile','');
