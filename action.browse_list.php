@@ -36,7 +36,7 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = $db->GetArray($sql,array($params['browser_id']));
+$data = $db->GetAll($sql,array($params['browser_id']));
 $colnames = array();
 $colsorts = array();
 //if($data) //REDUNDANT - NEVER COME HERE, OTHERWISE
@@ -57,7 +57,7 @@ $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 $js = array(); //script accumulator
 		
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = $db->GetArray($sql,array($params['browser_id']));
+$data = pwbrUtils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
 //if($data)
 //{

@@ -4,29 +4,32 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwbrMutex_database implements pwbrMutex
+class pwrMutex_database implements pwriMutex
 {
 	var $pause;
 	var $maxtries;
 	var $table;
 
-	function __construct(&$instance,$timeout=500,$tries=200)
+	function __construct(&$instance=NULL,$timeout=500,$tries=200)
 	{
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-		$this->table = cms_db_prefix().'module_pwbr_flock';
+		$this->table = cms_db_prefix().'module_pwbr_flock'; //TODO generalise
 	}
 
 	function lock($token)
 	{
-		$flid = abs(crc32($token.'pwbr.lock'));
 		$db = cmsms()->GetDb();
+		$flid = abs(crc32($token.'pwr.lock'));
 		$stamp = $db->sysTimeStamp;
 		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
 		do
 		{
-			if($db->Execute($sql))
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
 				return TRUE; //success
 /*TODO		$sql = 'SELECT flock_id FROM '.$this->table.' WHERE flock < '.$stamp + 15;
 			if($db->GetOne($sql))
@@ -39,17 +42,31 @@ class pwbrMutex_database implements pwbrMutex
 
 	function unlock($token)
 	{
-		$flid = abs(crc32($token.'pwbr.lock'));
 		$db = cmsms()->GetDb();
-		$db->Execute('DELETE FROM '.$this->table.' WHERE flock_id='.$flid);
+		$sql = 'DELETE FROM '.$this->table.' WHERE flock_id='.abs(crc32($token.'pwr.lock'));
+		while(1)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
+				return;
+		}
 	}
 
 	function reset()
 	{
 		$db = cmsms()->GetDb();
-		$db->Execute('DELETE FROM '.$this->table);
+		$sql = 'DELETE FROM '.$this->table;
+		while(1)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
+				return;
+		}
 	}
 }
 
 ?>
-

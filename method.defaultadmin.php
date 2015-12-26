@@ -57,7 +57,7 @@ else
 		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
 	}
 	$sql .= ' ORDER BY BR.name';
-	$browsers = $db->GetArray($sql);
+	$browsers = pwbrUtils::SafeGet($sql,FALSE);
 }
 if($browsers)
 {
