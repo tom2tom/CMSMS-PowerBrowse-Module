@@ -64,6 +64,89 @@ class pwbrUtils
 		}
 	}
 
+
+	/**
+	SafeGet:
+	Execute SQL command(s) with minimal chance of data-race
+	@sql: SQL command
+	@args: array of arguments for @sql
+	@mode: optional type of get - 'one','row','col','assoc' or 'all', default 'all'
+	Returns: boolean indicating successful completion
+	*/
+	public static function SafeGet($sql,$args,$mode='all')
+	{
+		$db = cmsms()->GetDb();
+		$nt = 10;
+		while($nt > 0)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			switch($mode)
+			{
+			 case 'one':
+				$ret = $db->GetOne($sql,$args);
+				break;
+			 case 'row':
+				$ret = $db->GetRow($sql,$args);
+				break;
+			 case 'col':
+				$ret = $db->GetCol($sql,$args);
+				break;
+			 case 'assoc':
+				$ret = $db->GetAssoc($sql,$args);
+				break;
+			 default:
+				$ret = $db->GetAll($sql,$args);
+				break;
+			}
+			if($db->CompleteTrans())
+				return $ret;
+			else
+				$nt--;
+		}
+		return FALSE;
+	}
+
+	/**
+	SafeExec:
+	Execute SQL command(s) with minimal chance of data-race
+	@sql: SQL command, or array of them
+	@args: array of arguments for @sql, or array of them
+	Returns: boolean indicating successful completion
+	*/
+	public static function SafeExec($sql,$args)
+	{
+		$db = cmsms()->GetDb();
+		$nt = 10;
+		while($nt > 0)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
+			$db->StartTrans();
+			if(is_array($sql))
+			{
+				foreach($sql as $i=>$cmd)
+					$db->Execute($cmd,$args[$i]);
+			}
+			else
+				$db->Execute($sql,$args);
+			if($db->CompleteTrans())
+				return TRUE;
+			else
+				$nt--;
+		}
+		return FALSE;
+	}
+
+	/**
+	GetBrowserIDForRecord:
+	@record_id: record identifier
+	*/
+	public static function GetBrowserIDForRecord($record_id)
+	{
+		$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_pwbr_record WHERE record_id=?';
+		return self::SafeGet($sql,array($record_id),'one');
+	}
+
 	/**
 	GetBrowserNameFromID:
 	@browser_id: browser identifier
@@ -73,17 +156,6 @@ class pwbrUtils
 		$db = cmsms()->GetDb();
 		$sql = 'SELECT name FROM '.cms_db_prefix().'module_pwbr_browser WHERE browser_id=?';
 		return $db->GetOne($sql,array($browser_id));
-	}
-
-	/**
-	GetBrowserIDForRecord:
-	@record_id: record identifier
-	*/
-	public static function GetBrowserIDForRecord($record_id)
-	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_pwbr_record WHERE record_id=?';
-		return $db->GetOne($sql,array($record_id));
 	}
 
 	/**
