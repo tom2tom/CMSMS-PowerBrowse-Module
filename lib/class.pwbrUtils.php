@@ -13,21 +13,42 @@ class pwbrUtils
 
 	/**
 	GetMutex:
+	@mod: reference to PowerForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
 		auto,memcache,semaphore,file,database, default = 'auto'
 	Returns: mutex-object or NULL
 	*/
-	public static function GetMutex($storage = 'auto')
+	public static function GetMutex(&$mod,$storage='auto')
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
-		require($path.'interface.pwriMutex.php');
+		require($path.'interface.Mutex.php');
+/*
+		if(!self::$mxtype && isset($_SESSION['pwrmxtype']))
+			self::$mxtype = $_SESSION['pwrmxtype'];
+		if(!self::$instance && isset($_SESSION['pwrmxinstance']))
+			self::$instance = $_SESSION['pwrmxinstance'];
+*/
+		$settings = array(
+			'memcache'=>array(
+				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
+				),
+			'semaphore'=>array(
+				'instance'=>((self::$mxtype=='semaphore')?self::$instance:NULL)
+				),
+			'file'=>array(
+				'updir'=>self::GetUploadsPath($mod)
+				),
+			'database'=>array(
+				'table'=>cms_db_prefix().'module_pwbr_flock'
+				)
+		);
 
 		if(self::$mxtype)
 		{
 			$one = self::$mxtype;
 			require($path.$one.'.php');
-			$class = 'pwrMutex_'.$one;
-			$mutex = new $class(self::$instance);
+			$class = 'Mutex_'.$one;
+			$mutex = new $class($settings[$one]);
 			return $mutex;
 		}
 		else
@@ -43,27 +64,28 @@ class pwbrUtils
 			foreach($types as $one)
 			{
 				$one = trim($one);
-				$class = 'pwrMutex_'.$one;
+				$class = 'Mutex_'.$one;
 				try
 				{
 					require($path.$one.'.php');
-					$mutex = new $class();
+					$mutex = new $class($settings[$one]);
 				}
 				catch(Exception $e)
 				{
 					continue;
 				}
 				self::$mxtype = $one;
+//				$_SESSION['pwrmxtype'] = $one;
 				if(isset($mutex->instance))
 					self::$instance =& $mutex->instance;
 				else
 					self::$instance = NULL;
+//				$_SESSION['pwrmxinstance'] = self::$instance;
 				return $mutex;
 			}
 			return NULL;
 		}
 	}
-
 
 	/**
 	SafeGet:
