@@ -71,7 +71,7 @@ class pwfFormBrowser extends pwfFieldBase
 
 		$mod =& $this->mymodule;
 		$token = abs(crc32($mod->GetName().'Qmutex')); //same token as in action.run_queue.php
-		$mx = pwbrUtils::GetMutex();
+		$mx = pwbrUtils::GetMutex($mod);
 		if(!$mx || !$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 		$mod->queue[] = array(

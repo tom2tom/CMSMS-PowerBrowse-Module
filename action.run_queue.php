@@ -14,7 +14,7 @@ $sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 $funcs = new pwbrRecordStore();
 $token = abs(crc32($this->GetName().'Qmutex')); //same token as in pwfFormBrowser::Dispose()
 $this->running = TRUE; //flag that Q is being processed now
-$mx = pwbrUtils::GetMutex();
+$mx = pwbrUtils::GetMutex($this);
 if(!$mx || !$mx->lock($token))
 {
 	$this->running = FALSE;
