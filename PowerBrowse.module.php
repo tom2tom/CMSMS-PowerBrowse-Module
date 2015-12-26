@@ -1,7 +1,7 @@
 <?php
 #------------------------------------------------------------------------
 # This is CMS Made Simple module: PowerBrowse
-# Copyright (C) 2011-2015 Tom Phane <@>
+# Copyright (C) 2011-2016 Tom Phane <@>
 # Derived in part from FormBrowser module, copyright (C) 2006-2011, Samuel Goldstein <sjg@cmsmodules.com>
 # This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerbrowse
 #

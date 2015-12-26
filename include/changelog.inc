@@ -1,5 +1,11 @@
 <ul>
-<li>Version 0.7 - May 2015
+<li>Version 0.2 - Jan 2016
+<ul>
+<li>upgrade to work with CMSMS 2+</li>
+<li>password management</li>
+</ul>
+</li>
+<li>Version 0.1 - May 2015
 <ul>
 <li>upgrade to work with CMSMS 1.11, 1.12</li>
 <li>omit lots of superfluous stuff</li>

@@ -180,7 +180,7 @@ add/edit/delete/export records.</p>
 <li>perhaps you might have some success emailing the author directly.</li>
 </ul>
 <h3>Copyright and license</h3>
-<p>Copyright &copy; 2011-2015, Tom Phane &lt;tpgww@onepost.net&gt;.<br />
+<p>Copyright &copy; 2011-2016, Tom Phane &lt;tpgww@onepost.net&gt;.<br />
 Derived in part from FormBrowser module, copyright &copy; 2006-2011, Samuel Goldstein &lt;sjg@cmsmodules.com&gt;.<br />
 All rights reserved.</p>
 <p>This module has been released under the <a href="http://www.gnu.org/licenses/licenses.html#AGPL">GNU Affero General Public License</a> version 3. The module must not be used otherwise than in accordance with that licence.</p>
