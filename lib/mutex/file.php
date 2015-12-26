@@ -4,14 +4,14 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwbrMutex_file implements pwbrMutex
+class pwrMutex_file implements pwriMutex
 {
 	var $pause;
 	var $maxtries;
 	var $fp; //lock-file directory path (with trailing separator)
 	var $fh; //opened-file handle
 
-	function __construct(&$instance,$timeout=200,$tries=200)
+	function __construct(&$instance=NULL,$timeout=200,$tries=200)
 	{
 		if(!function_exists('flock'))
 			throw new Exception('Error getting file lock');
@@ -33,7 +33,7 @@ class pwbrMutex_file implements pwbrMutex
 
 	function lock($token)
 	{
-		$fp = $this->fp.$token.'pwbr.lock';
+		$fp = $this->fp.$token.'pwr.lock';
 		touch($fp,time());
 		$this->fh = fopen($fp,'r');
 		if($this->fh === FALSE)
@@ -59,7 +59,7 @@ class pwbrMutex_file implements pwbrMutex
 	{
 		$this->unlock('');
 		if(is_dir(dirname($this->fp)))
-			unlink($this->fp.'*pwbr.lock');
+			unlink($this->fp.'*pwr.lock');
 	}
 }
 

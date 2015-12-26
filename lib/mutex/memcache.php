@@ -4,13 +4,13 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwbrMutex_memcache implements pwbrMutex
+class pwrMutex_memcache implements pwriMutex
 {
 	var $pause;
 	var $maxtries;
 	var $instance;
 
-	function __construct(&$instance,$timeout=50,$tries=0)
+	function __construct(&$instance=NULL,$timeout=50,$tries=0)
 	{
 		if($instance)
 			$this->instance = $instance;
@@ -29,7 +29,7 @@ class pwbrMutex_memcache implements pwbrMutex
 
 	function lock($token)
 	{
-		$token .= 'pwbr.lock';
+		$token .= 'pwr.lock';
 		$count = 0;
 		do
 		{
@@ -57,7 +57,7 @@ class pwbrMutex_memcache implements pwbrMutex
 
 	function unlock($token)
 	{
-		$this->instance->delete($token.'pwbr.lock');
+		$this->instance->delete($token.'pwr.lock');
 	}
 
 	function reset()

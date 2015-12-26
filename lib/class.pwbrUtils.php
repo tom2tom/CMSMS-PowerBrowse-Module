@@ -20,13 +20,13 @@ class pwbrUtils
 	public static function GetMutex($storage = 'auto')
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
-		require($path.'interface.Mutex.php');
+		require($path.'interface.pwriMutex.php');
 
 		if(self::$mxtype)
 		{
 			$one = self::$mxtype;
 			require($path.$one.'.php');
-			$class = 'pwbrMutex_'.$one;
+			$class = 'pwrMutex_'.$one;
 			$mutex = new $class(self::$instance);
 			return $mutex;
 		}
@@ -43,7 +43,7 @@ class pwbrUtils
 			foreach($types as $one)
 			{
 				$one = trim($one);
-				$class = 'pwbrMutex_'.$one;
+				$class = 'pwrMutex_'.$one;
 				try
 				{
 					require($path.$one.'.php');

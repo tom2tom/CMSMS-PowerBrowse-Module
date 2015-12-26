@@ -4,13 +4,13 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwbrMutex_semaphore implements pwbrMutex
+class pwrMutex_semaphore implements pwriMutex
 {
 	var $pause;
 	var $maxtries;
 	var $instance;
 
-	function __construct(&$instance,$timeout=200,$tries=200)
+	function __construct(&$instance=NULL,$timeout=200,$tries=200)
 	{
 		if($instance)
 			$this->instance = $instance;
