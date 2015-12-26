@@ -4,9 +4,9 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-interface pwriMutex
+interface iMutex
 {
-	function __construct(&$instance=NULL,$timeout=200,$tries=0);
+	function __construct($config=array());
 
 	function lock($token);
 
