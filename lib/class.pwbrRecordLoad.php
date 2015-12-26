@@ -7,40 +7,40 @@
 class pwbrRecordLoad
 {
 	/*
-	This function derived from work by Josh Hartman and others.
-	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
+	@mod: reference to PowerBrowse module object
+	@source: string to be decrypted
+	@getstruct: optional boolean, whether to unserialize decrypted value, default TRUE
 	Must be compatible with pwbrRecordStore::Encrypt()
 	*/
-	public function Decrypt($source,$pass_phrase)
+	public function Decrypt(&$mod,$source,$getstruct=TRUE)
 	{
-		$decrypt = explode('|', $source.'|');
-		$decoded = base64_decode($decrypt[0]);
-		$iv = base64_decode($decrypt[1]);
-		if(strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC))
-			return FALSE;
-		$key = hash('sha256',$pass_phrase);
-		$decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128,substr($key,32),$decoded,MCRYPT_MODE_CBC,$iv));
-		$mac = substr($decrypted,-64);
-		$decrypted = substr($decrypted,0,-64);
-		$calcmac = hash_hmac('sha256',$decrypted,substr($key,-32));
-		if($calcmac !== $mac)
-			return FALSE;
-		$decrypted = unserialize($decrypted);
-		return $decrypted;
+		if($source)
+		{
+			$decrypted = pwbrUtils::decrypt_value($mod,$source,FALSE,FALSE);
+			if($decrypted)
+			{
+				if($getstruct)
+					return unserialize($decrypted);
+				else
+					return $decrypted;
+			}
+		}
+		return '';
 	}
 
 	/**
 	Load:
 	@record_id: identifier of record to retrieve
-	@pass: refrence to password for data decryption, or FALSE
-	@mod: optional reference to PowerBrowse module (for error message), default NULL
+	@mod: optional reference to PowerBrowse module object, default NULL
 	@db: optional reference to database connection object, default NULL
 	@pre: optional table-names prefix, default ''
 	Returns: 2-member array, in which 1st is submissiondate/time or FALSE,
 		2nd is array of data or error message
 	*/
-	public function Load($record_id,&$pass,&$mod=NULL,&$db=NULL,$pre='')
+	public function Load($record_id,&$mod=NULL,&$db=NULL,$pre='')
 	{
+		if(!$mod)
+			$mod = cms_utils::get_module('PowerBrowse');
 		if(!$db)
 			$db = cmsms()->GetDb();
 		if(!$pre)
@@ -50,9 +50,7 @@ class pwbrRecordLoad
 		array($record_id));
 		if($row)
 		{
-			$formdata = ($pass) ?
-				self::Decrypt($row['contents'],$pass):
-				unserialize($row['contents']);
+			$formdata = self::Decrypt($mod,$row['contents']);
 			if($formdata)
 				return array($row['submitted'],$formdata);
 			$errkey = 'error_data';
@@ -61,8 +59,6 @@ class pwbrRecordLoad
 		{
 			$errkey = 'error_database';
 		}
-		if(!$mod)
-			$mod = cms_utils::get_module('PowerBrowse');
 		return array(FALSE,$mod->PrettyMessage($errkey,FALSE));
 	}
 }
