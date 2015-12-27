@@ -58,13 +58,6 @@ $db->CreateSequence($pre.'module_pwbr_record_seq');
 $sqlarray = $dict->CreateIndexSQL('idx_recordbrowser',$pre.'module_pwbr_record','browser_id');
 $dict->ExecuteSQLArray($sqlarray);
 
-$flds = "
-	flock_id I KEY,
-	flock T
-";
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_flock',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-
 $this->CreatePermission('ModifyPwBrowsers',$this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData',$this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData',$this->Lang('perm_see'));
