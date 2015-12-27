@@ -16,7 +16,7 @@ class pwbrRecordLoad
 	{
 		if($source)
 		{
-			$decrypted = pwbrUtils::decrypt_value($mod,$source,FALSE,FALSE);
+			$decrypted = pwbrUtils::decrypt_value($mod,$source);
 			if($decrypted)
 			{
 				if($getstruct)

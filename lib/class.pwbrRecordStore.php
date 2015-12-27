@@ -13,7 +13,7 @@ class pwbrRecordStore
 	*/
 	private function Encrypt(&$mod,$source)
 	{
-		return pwbrUtils::encrypt_value($mod,$source,FALSE,FALSE);
+		return pwbrUtils::encrypt_value($mod,$source);
 	}
 
 	/**
