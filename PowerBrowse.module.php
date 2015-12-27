@@ -21,11 +21,9 @@ class PowerBrowse extends CMSModule
 {
 	public $before20;
 	public $havemcrypt;
-	private $mh; //curl_multi handle for async queue processing
+	private $mh = NULL; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
-	protected $running = FALSE; //whether the queue-processor is active
-	protected $queue = array();
 
 	function __construct()
 	{
@@ -48,9 +46,8 @@ class PowerBrowse extends CMSModule
 			curl_multi_remove_handle($this->mh,$this->ch);
 			curl_close($this->ch);
 		}
-		curl_multi_close($this->mh);
-		if($this->mutex)
-			$this->mutex->reset();
+		if($this->mh)
+			curl_multi_close($this->mh);
 //		parent::__destruct();
 	}
 	
