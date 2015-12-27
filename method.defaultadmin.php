@@ -16,7 +16,7 @@ $tab = $this->GetActiveTab($params);
 
 $t = $this->starttabheaders().
 	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
-if($canadmin)
+if($padmin)
 {
 	$t .= $this->settabheader('settings',$this->lang('tab_settings'),($tab == 'settings'));
 	$smarty->assign('start_settings_tab',$this->StartTab('settings'));
@@ -51,7 +51,7 @@ else
 	$sql = 'SELECT BR.*,COALESCE (R.count,0) AS record_count FROM '.$pre.
 'module_pwbr_browser BR LEFT JOIN (SELECT form_id,COUNT(*) as count FROM '.$pre.
 'module_pwbr_record GROUP BY form_id) R ON BR.form_id=R.form_id';
-	if(!$canadmin && $this->GetPreference('owned_forms'))
+	if(!$padmin && $this->GetPreference('owned_forms'))
 	{
 		$uid = get_userid(false);
 		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
@@ -82,7 +82,7 @@ if($browsers)
 		$oneset->recordcount = $num;
 		$bid = (int)$one['browser_id'];
 		$fid = (int)$one['form_id'];
-		if($canmod)
+		if($pmod)
 		{
 			$oneset->name = $this->CreateLink($id,'edit_browser','',
 				$one['name'],array('form_id'=>$fid,'browser_id'=>$bid));
@@ -110,7 +110,7 @@ if($browsers)
 			$oneset->editlink = '';
 			if($num > 0)
 			{
-				if($canadmin) $oneset->adminlink = $this->CreateLink($id,'browse_list','',
+				if($padmin) $oneset->adminlink = $this->CreateLink($id,'browse_list','',
 					$icon_admin,
 					array('form_id'=>$fid,'browser_id'=>$bid));
 				else $oneset->adminlink = $this->CreateLink($id,'browse_list','',
@@ -195,7 +195,7 @@ else
 	$smarty->assign('browser_count',0);
 }
 
-if($canadmin || $canmod)
+if($padmin || $pmod)
 {
 	$smarty->assign('addlink',$this->CreateLink($id,'add_browser','',
 		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_browser'),'','','systemicon'),
@@ -210,7 +210,7 @@ if($canadmin || $canmod)
 				'title="'.$this->Lang('tip_import_browsers').'"'));
 }
 
-if($canadmin)
+if($padmin)
 {
 	$smarty->assign('start_settingsform',$this->CreateFormStart($id,'defaultadmin',$returnid));
 
@@ -315,7 +315,7 @@ else
 {
 	$smarty->assign('pconfig',0);
 }
-$smarty->assign('pmod',(($canmod)?1:0));
+$smarty->assign('pmod',(($pmod)?1:0));
 $smarty->assign('pdev',(($iseditor)?1:0));
 
 if($jsloads)
