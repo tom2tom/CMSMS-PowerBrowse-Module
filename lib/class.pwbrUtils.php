@@ -6,86 +6,7 @@
 
 class pwbrUtils
 {
-	const ENC_ROUNDS = 10000;
-
-	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
-	private static $instance = NULL; //'instance' object for mutex class, if needed
-
-	/**
-	GetMutex:
-	@mod: reference to PowerForms module object
-	@storage: optional cache-type name, one (or more, ','-separated) of
-		auto,memcache,semaphore,file,database, default = 'auto'
-	Returns: mutex-object or NULL
-	*/
-	public static function GetMutex(&$mod,$storage='auto')
-	{
-		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
-		require($path.'interface.Mutex.php');
-/*
-		if(!self::$mxtype && isset($_SESSION['pwrmxtype']))
-			self::$mxtype = $_SESSION['pwrmxtype'];
-		if(!self::$instance && isset($_SESSION['pwrmxinstance']))
-			self::$instance = $_SESSION['pwrmxinstance'];
-*/
-		$settings = array(
-			'memcache'=>array(
-				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
-				),
-			'semaphore'=>array(
-				'instance'=>((self::$mxtype=='semaphore')?self::$instance:NULL)
-				),
-			'file'=>array(
-				'updir'=>self::GetUploadsPath($mod)
-				),
-			'database'=>array(
-				'table'=>cms_db_prefix().'module_pwbr_flock'
-				)
-		);
-
-		if(self::$mxtype)
-		{
-			$one = self::$mxtype;
-			require($path.$one.'.php');
-			$class = 'Mutex_'.$one;
-			$mutex = new $class($settings[$one]);
-			return $mutex;
-		}
-		else
-		{
-			if($storage)
-				$storage = strtolower($storage);
-			else
-				$storage = 'auto';
-			if(strpos($storage,'auto') !== FALSE)
-				$storage = 'memcache,semaphore,file,database';
-
-			$types = explode(',',$storage);
-			foreach($types as $one)
-			{
-				$one = trim($one);
-				$class = 'Mutex_'.$one;
-				try
-				{
-					require($path.$one.'.php');
-					$mutex = new $class($settings[$one]);
-				}
-				catch(Exception $e)
-				{
-					continue;
-				}
-				self::$mxtype = $one;
-//				$_SESSION['pwrmxtype'] = $one;
-				if(isset($mutex->instance))
-					self::$instance =& $mutex->instance;
-				else
-					self::$instance = NULL;
-//				$_SESSION['pwrmxinstance'] = self::$instance;
-				return $mutex;
-			}
-			return NULL;
-		}
-	}
+	const ENC_ROUNDS = 1000;
 
 	/**
 	SafeGet:
@@ -252,10 +173,10 @@ class pwbrUtils
 	@mod: reference to current module object
 	@value: string to encrypted, may be empty
 	@passwd: optional password string, default FALSE (meaning use the module-default)
-	@based: optional boolean, whether to base64_encode the encrypted value, default TRUE
+	@based: optional boolean, whether to base64_encode the encrypted value, default FALSE
 	Returns: encrypted @value, or just @value if it's empty
 	*/
-	public static function encrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
+	public static function encrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
 	{
 		if($value)
 		{
@@ -281,10 +202,10 @@ class pwbrUtils
 	@mod: reference to current module object
 	@value: string to decrypted, may be empty
 	@passwd: optional password string, default FALSE (meaning use the module-default)
-	@based: optional boolean, whether to base64_decode the value, default TRUE
+	@based: optional boolean, whether to base64_decode the value, default FALSE
 	Returns: decrypted @value, or just @value if it's empty
 	*/
-	public static function decrypt_value(&$mod,$value,$passwd=FALSE,$based=TRUE)
+	public static function decrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
 	{
 		if($value)
 		{
