@@ -1,8 +1,8 @@
 <ul>
-<li>Version 0.2 - Jan 2016
+<li>FormBrowser fork - September 2011
 <ul>
-<li>upgrade to work with CMSMS 2+</li>
-<li>password management</li>
+<li>upgrade to work with CMSMS 1.10</li>
+<li>many small refinements, including new default templates</li>
 </ul>
 </li>
 <li>Version 0.1 - May 2015
@@ -14,10 +14,10 @@
 <li>revised interface with companion builder module (incompatible with older versions)</li>
 </ul>
 </li>
-<li>Initial fork - September 2011
+<li>Version 0.2 - Jan 2016
 <ul>
-<li>upgrade to work with CMSMS 1.10</li>
-<li>many small refinements, including new default templates</li>
+<li>upgrade to work with CMSMS 2+</li>
+<li>password management</li>
 </ul>
 </li>
 </ul>
