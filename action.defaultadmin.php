@@ -25,7 +25,7 @@ if($padmin)
 			if($rst)
 			{
 				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
-				while(!rst->EOF)
+				while(!$rst->EOF)
 				{
 					$val = pwbrUtils::decrypt_value($mod,$rst->fields[1],$old);
 					$val = pwbrUtils::encrypt_value($mod,$val,$t);
