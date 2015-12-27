@@ -168,7 +168,7 @@ add/edit/delete/export records.</p>
 <ul>
 <li>CMS Made Simple 1.9+</li>
 <li>PHP 5.2+</li>
-<li>PHP extensions mbstring, curl, zip. Also Memcache if possible!</li>
+<li>PHP extensions mbstring, curl, zip. Also memcache, if possible!</li>
 <li>TODO</li>
 </ul>
 <h3>Support</h3>
