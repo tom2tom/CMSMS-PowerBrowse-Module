@@ -166,10 +166,9 @@ add/edit/delete/export records.</p>
 <p>A light-colored version of each sort-icon is provided, for use with dark themes.</p>
 <h3>Requirements</h3>
 <ul>
-<li>CMS Made Simple 1.9+</li>
+<li>CMS Made Simple 1.10+</li>
 <li>PHP 5.2+</li>
-<li>PHP extensions mbstring, curl, zip. Also memcache, if possible!</li>
-<li>TODO</li>
+<li>PHP extension mbstring (used when exporting)</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.</p>
