@@ -14,43 +14,22 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License (www.gnu.org/licenses/licenses.html#AGPL)
-# for more details
+# for more details.
 #-----------------------------------------------------------------------
 
 class PowerBrowse extends CMSModule
 {
 	public $before20;
 	public $havemcrypt;
-	private $mh = NULL; //curl_multi handle for async queue processing
-	private $ch = FALSE; //cached curl handle for unfinished process
-	private $Qurl;
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->mh = curl_multi_init();
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
 		$this->havemcrypt = function_exists('mcrypt_encrypt');
-		//bogus frontend link (i.e. no admin login needed)
-		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
-		//strip the (trailing) fake returnid, hence use the default
-		$sep = strpos($url,'&amp;');
-		$this->Qurl = substr($url,0,$sep);
 	}
-	
-	function __destruct()
-	{
-		if($this->ch)
-		{
-			curl_multi_remove_handle($this->mh,$this->ch);
-			curl_close($this->ch);
-		}
-		if($this->mh)
-			curl_multi_close($this->mh);
-//		parent::__destruct();
-	}
-	
+
 	function AllowAutoInstall()
 	{
 		return FALSE;
@@ -59,6 +38,11 @@ class PowerBrowse extends CMSModule
 	function AllowAutoUpgrade()
 	{
 		return FALSE;
+	}
+
+	function AllowSmartyCaching()
+	{
+		return FALSE; //no frontend use
 	}
 
 	function InstallPostMessage()
@@ -133,7 +117,7 @@ class PowerBrowse extends CMSModule
 
 	function MinimumCMSVersion()
 	{
-		return '1.9'; //CHECKME class auto-loading needed
+		return '1.10'; //class auto-loading needed in PowerForms
 	}
 
 /*	function MaximumCMSVersion()
@@ -157,29 +141,34 @@ class PowerBrowse extends CMSModule
 
 	function GetAdminSection()
 	{
-		return 'content';
+		return 'extensions';
 	}
 
 	function VisibleToAdminUser()
 	{
-		$v = $this->CheckPermission('ViewPwFormData');
-		if(!$v) $v = $this->CheckPermission('ModifyPwFormData');
-		if(!$v) $v = $this->CheckPermission('ModifyPwBrowsers');
-		return $v;
+		return self::CheckAccess();
 	}
 
-	function GetHeaderHTML()
+/*	function GetHeaderHTML()
 	{
 	}
-
+*/
 	function AdminStyle()
 	{
-		$fn = cms_join_path(dirname(__FILE__),'css','module.css');
+		$fn = cms_join_path(dirname(__FILE__),'css','module-admin.css');
 		return ''.@file_get_contents($fn);
 	}
 
 	function SuppressAdminOutput(&$request)
 	{
+/*		$adbg = $_SERVER;
+		$this->Crash()
+		if(isset($_SERVER['QUERY_STRING']))
+		{
+			if(strpos($_SERVER['QUERY_STRING'],'export') !== FALSE)
+				return TRUE;
+		}
+*/
 		if(isset($request['mact']))
 		{
 			if(strpos($request['mact'],',export'))//export_browser or export_record
@@ -203,8 +192,8 @@ class PowerBrowse extends CMSModule
 	//setup for pre-1.10
 	function SetParameters()
 	{
-		$this->InitializeAdmin();
-		$this->InitializeFrontend();
+		self::InitializeAdmin();
+		self::InitializeFrontend();
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
@@ -223,25 +212,23 @@ class PowerBrowse extends CMSModule
 
 	function CheckAccess($permission='')
 	{
-		$allow = 0;
 		switch($permission)
 		{
-		case '':  // any form-browse-related permission
-			$a1 = $this->CheckPermission('ModifyPwBrowsers');
-			$a2 = $this->CheckPermission('ModifyPwFormData');
-			$a3 = $this->CheckPermission('ViewPwFormData');
-			$allow = ($a1 || $a2 || $a3);
+		 case '':  // any module permission
+			$allow = $this->CheckPermission('ViewPwFormData');
+			if (!$allow) $allow = $this->CheckPermission('ModifyPwFormData');
+			if (!$allow) $allow = $this->CheckPermission('ModifyPwBrowsers');
 			break;
-		case 'modify':
-			$allow = $this->CheckPermission('ModifyPwBrowsers');
-			break;
-		case 'admin':
-			$allow = $this->CheckPermission('ModifyPwFormData');
-			break;
-		case 'view':
+		 case 'view':
 			$allow = $this->CheckPermission('ViewPwFormData');
 			break;
-		default:
+		 case 'modify':
+			$allow = $this->CheckPermission('ModifyPwFormData');
+			break;
+		 case 'admin':
+			$allow = $this->CheckPermission('ModifyPwBrowsers');
+			break;
+		 default:
 			$allow = 0;
 			break;
 		}
