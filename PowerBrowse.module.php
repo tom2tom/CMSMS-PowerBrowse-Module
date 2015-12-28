@@ -13,8 +13,8 @@
 # This module is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License (www.gnu.org/licenses/licenses.html#AGPL)
-# for more details.
+# GNU Affero General Public License for more details.
+# Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 #-----------------------------------------------------------------------
 
 class PowerBrowse extends CMSModule
@@ -40,24 +40,10 @@ class PowerBrowse extends CMSModule
 		return FALSE;
 	}
 
+	//for 1.11+
 	function AllowSmartyCaching()
 	{
 		return FALSE; //no frontend use
-	}
-
-	function InstallPostMessage()
-	{
-		return $this->Lang('postinstall');
-	}
-
-	function UninstallPreMessage()
-	{
-		return $this->Lang('confirm_uninstall');
-	}
-
-	function UninstallPostMessage()
-	{
-		return $this->Lang('postuninstall');
 	}
 
 	function GetName()
@@ -99,11 +85,6 @@ class PowerBrowse extends CMSModule
 		return 'tpgww@onepost.net';
 	}
 
-	function GetAdminDescription()
-	{
-		return $this->Lang('admindescription');
-	}
-
 	function GetChangeLog()
 	{
 		$fn = cms_join_path(dirname(__FILE__),'include','changelog.inc');
@@ -124,6 +105,21 @@ class PowerBrowse extends CMSModule
 	{
 	}
 */
+	function InstallPostMessage()
+	{
+		return $this->Lang('postinstall');
+	}
+
+	function UninstallPreMessage()
+	{
+		return $this->Lang('confirm_uninstall');
+	}
+
+	function UninstallPostMessage()
+	{
+		return $this->Lang('postuninstall');
+	}
+
 	function IsPluginModule()
 	{
 		return TRUE;
@@ -144,6 +140,11 @@ class PowerBrowse extends CMSModule
 		return 'extensions';
 	}
 
+	function GetAdminDescription()
+	{
+		return $this->Lang('admindescription');
+	}
+
 	function VisibleToAdminUser()
 	{
 		return self::CheckAccess();
@@ -161,21 +162,21 @@ class PowerBrowse extends CMSModule
 
 	function SuppressAdminOutput(&$request)
 	{
-/*		$adbg = $_SERVER;
-		$this->Crash()
 		if(isset($_SERVER['QUERY_STRING']))
 		{
+//$adbg = $_SERVER;
+//$this->Crash();
 			if(strpos($_SERVER['QUERY_STRING'],'export') !== FALSE)
 				return TRUE;
 		}
-*/
-		if(isset($request['mact']))
+/*		if(isset($request['mact']))
 		{
 			if(strpos($request['mact'],',export'))//export_browser or export_record
 				return TRUE;
 			if(isset($request['m1_export']))
 				return TRUE;
 		}
+*/
 		return FALSE;
 	}
 
