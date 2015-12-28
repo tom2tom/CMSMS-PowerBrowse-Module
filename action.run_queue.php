@@ -6,49 +6,70 @@
 
 //action to be asynchronously initiated by curl, to run the data-save queue
 
-//$token = uniqid('pwbrDEBUG.'.mt_rand(100,1000100),FALSE); //for debugging
-//$fh = fopen("/tmp/{$token}.txt",'c');
-
+try
+{
+	$cache = pwfUtils::GetCache()
+}
+catch Exception ($e)
+{
+	echo $this->Lang('error_system');
+	exit;
+}
+try
+{
+	$mx = pwfUtils::GetMutex($this);
+}
+catch Exception ($e)
+{
+	echo $this->Lang('error_system');
+	exit;
+}
 $pre = cms_db_prefix();
 $sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 $funcs = new pwbrRecordStore();
 $token = abs(crc32($this->GetName().'Qmutex')); //same token as in pwfFormBrowser::Dispose()
-$this->running = TRUE; //flag that Q is being processed now
-$mx = pwbrUtils::GetMutex($this);
-if(!$mx || !$mx->lock($token))
+$cache->driver_set('pwbrQrunning',TRUE,1200); flag that Q is being processed, 20-minute max retention
+if(!$mx->lock($token))
 {
-	$this->running = FALSE;
-	//TODO fail with error report $this->Lang('error_lock')
+	$cache->driver_delete('pwbrQrunning');
+	echo $this->Lang('error_lock');
 	exit;
 }
 
-while($data = reset($this->queue))
+$queue = $cache->driver_get('pwbrQarray');
+if($queue)
 {
-	$datakey = key($this->queue);
-//	each Q-item = array('formid'=>$this->formdata->Id,'submitted'=>time(),'data'=>$browsedata)
-	$form_id = (int)$data['formid'];
-	$browsers = $db->GetCol($sql,array($form_id));
-	if($browsers)
+	$cache->driver_delete('pwbrQarray');
+	while($data = reset($queue))
 	{
-		$stamp = (int)$data['submitted'];
-		foreach($browsers as $browser_id)
-			$funcs->Insert($browser_id,$form_id,$stamp,$data['data'],$this,$db,$pre);
+		$datakey = key($queue);
+		//each Q-item = array('formid'=>$this->formdata->Id,'submitted'=>time(),'data'=>$browsedata)
+		$form_id = (int)$data['formid'];
+		$browsers = $db->GetCol($sql,array($form_id));
+		if($browsers)
+		{
+			$stamp = (int)$data['submitted'];
+			foreach($browsers as $browser_id)
+				$funcs->Insert($browser_id,$form_id,$stamp,$data['data'],$this,$db,$pre);
+		}
+		unset($queue[$datakey],$data);
+
+		//allow update by PowerForms disposer
+		$mx->unlock($token);
+		do
+		{
+			usleep(mt_rand(10000,60000));
+		} while(!$mx->lock($token));
+		$q2 = $cache->driver_get('pwbrQarray');
+		if($q2)
+		{
+			$cache->driver_delete('pwbrQarray');
+			$queue = array_merge($queue,$q2);
+		}
 	}
-
-	unset($this->queue[$datakey],$data);
-
-	$mx->unlock($token);
-	do
-	{
-		usleep(mt_rand(10000,60000));
-	} while(!$mx->lock($token));
 }
-
 $mx->unlock($token);
-$this->running = FALSE;
-
-//fwrite($fh,"Q has been processed\n");
-//fclose($fh);
+$cache->driver_delete('pwbrQrunning');
 
 exit;
 

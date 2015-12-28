@@ -59,6 +59,24 @@ class pwfFormBrowser extends pwfFieldBase
 	*/
 	function Dispose($id,$returnid)
 	{
+		$mod =& $this->mymodule;
+		try
+		{
+			$cache = pwfUtils::GetCache()
+		}
+		catch Exception ($e)
+		{
+			return array(FALSE,$mod->Lang('error_system'));
+		}
+		try
+		{
+			$mx = pwfUtils::GetMutex($mod);
+		}
+		catch Exception ($e)
+		{
+			return array(FALSE,$mod->Lang('error_system'));
+		}
+	
 		$browsedata = array();
 		foreach($this->formdata->Fields as &$one)
 		{
@@ -69,17 +87,19 @@ class pwfFormBrowser extends pwfFieldBase
 		if(!$browsedata)
 			return array(TRUE,'');
 
-		$mod =& $this->mymodule;
 		$token = abs(crc32($mod->GetName().'Qmutex')); //same token as in action.run_queue.php
-		$mx = pwbrUtils::GetMutex($mod);
-		if(!$mx || !$mx->lock($token))
+		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
-		$mod->queue[] = array(
+		$queue = $cache->driver_get('pwbrQarray');
+		if(!$queue)
+			$queue = array();
+		$queue[] = array(
 			'formid' => $this->formdata->Id,
 			'submitted' => time(),
 			'data' => $browsedata);
+		$cache->driver_set('pwbrQarray',$queue,0); //no expiry
 		$mx->unlock($token);
-		if(!$mod->running)
+		if(!$cache->driver_get('pwbrQrunning'))
 		{
 			//initiate async queue processing
 			if($mod->ch)
