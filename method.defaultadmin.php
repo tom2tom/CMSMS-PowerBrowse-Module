@@ -6,12 +6,6 @@
 
 $iseditor = $this->CheckPermission('Modify Any Page');
 
-//script accumulators
-$jsfuncs = array();
-$jsloads = array();
-$jsincs = array();
-$baseurl = $this->GetModuleURLPath();
-
 $tab = $this->GetActiveTab($params);
 
 $t = $this->starttabheaders().
@@ -33,6 +27,11 @@ $smarty->assign('end_form',$this->CreateFormEnd());
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
+//script accumulators
+$jsfuncs = array();
+$jsloads = array();
+$jsincs = array();
+$baseurl = $this->GetModuleURLPath();
 
 $fb = $this->GetModuleInstance('FormBuilder');
 if($this->GetPreference('oldmodule_data',0))
@@ -281,8 +280,8 @@ if($padmin)
 		$t = pwbrUtils::unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
-	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','',
-		$id.'passwd','','',50,3,'','','style="height:3em;"');
+	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',
+		$id.'passwd','','',40,2);
 	$configs[] = $oneset;
 
 	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery.inputcloak.min.js"></script>';
