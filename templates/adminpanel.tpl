@@ -3,8 +3,8 @@
 {$start_browsers_tab}
 {$start_browsersform}
 {if $browser_count > 0}
-<div class="pbr_overflow">
- <table class="leftwards pagetable">
+<div class="pageinput pbr_overflow">
+ <table class="pagetable leftwards">
   <thead><tr>
 	<th>{$title_browser_name}</th>
 {if $pdev}<th>{$title_related_form}</th>{/if}

@@ -7,7 +7,7 @@
 		<div class="pbr_browsenav">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}&nbsp;({$pageof})&nbsp;&nbsp;{$rowchanger}</div>
 	{/if}
 	{$start_form}
-		<div class="pbr_overflow">
+		<div class="pageinput pbr_overflow">
 			 <table id="submissions" class="pagetable leftwards">
 			  <thead><tr>
 				<th class="{ldelim}sss:'isoDate'{rdelim}">{$title_submit_when}</th>

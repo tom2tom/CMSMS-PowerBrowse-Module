@@ -16,7 +16,7 @@
   <p class="pagetext" style="margin-top:0;">{$title_pagerows}:</p>
   <p class="pageinput">{$input_pagerows}<br />{$help_pagerows}</p>
   <p class="pagetext">{$title_data}:</p>
- <div class="pbr_overflow">
+ <div class="pageinput pbr_overflow">
  <table id="listfields" class="pagetable leftwards drag">
  <thead><tr>
   <th>{$title_name}</th>
