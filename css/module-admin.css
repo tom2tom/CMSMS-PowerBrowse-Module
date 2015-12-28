@@ -11,12 +11,21 @@ div.pbr_overflow {overflow:auto;}
 span.pbr_order { display:none; visibility:hidden; }
 //.pbr_help { display:none; }
 table.leftwards {
-margin-left:5%;
-width:auto;
-table-layout:auto;
+ margin-left:0;
+ width:auto;
+ table-layout:auto;
 }
 table.rightwards {
-margin-right:5%;
-width:auto;
-table-layout:auto;
+ margin-right:0;
+ width:auto;
+ table-layout:auto;
+}
+textarea.cloaked {
+ font-family:auto;
+ font-family:inherit;
+ font-size:1.2em;
+// font-size:inherit;
+ line-height:1.1;
+ width:40em;
+ height:2.4em;
 }
