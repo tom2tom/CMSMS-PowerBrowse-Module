@@ -50,33 +50,8 @@ class pwfFormBrowser extends pwfFieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	/*
-	Add form data to the save-queue : array (
-		'formid' => form identifier
-		'submitted' => timestamp representing when the form was submitted
-		'data' => array in which each key = formfield id, corresponding value = array(field identifier, field value)
-		)
-	*/
 	function Dispose($id,$returnid)
 	{
-		$mod = &$this->mymodule;
-		try
-		{
-			$cache = pwfUtils::GetCache();
-		}
-		catch (Exception $e)
-		{
-			return array(FALSE,$mod->Lang('error_system'));
-		}
-		try
-		{
-			$mx = pwfUtils::GetMutex($mod);
-		}
-		catch (Exception $e)
-		{
-			return array(FALSE,$mod->Lang('error_system'));
-		}
-
 		$browsedata = array();
 		foreach($this->formdata->Fields as &$one)
 		{
@@ -87,55 +62,18 @@ class pwfFormBrowser extends pwfFieldBase
 		if(!$browsedata)
 			return array(TRUE,'');
 
-		$token = abs(crc32($mod->GetName().'Qmutex')); //same token as in action.run_queue.php
-		if(!$mx->lock($token))
-			return array(FALSE,$mod->Lang('error_lock'));
-		$queue = $cache->get('pwbrQarray');
-		if(!$queue)
-			$queue = array();
-		$queue[] = array(
-			'formid' => $this->formdata->Id,
-			'submitted' => time(),
-			'data' => $browsedata);
-		$cache->set('pwbrQarray',$queue,0); //no expiry
-		$mx->unlock($token);
-		if(!$cache->get('pwbrQrunning'))
+		$mod = &$this->mymodule;
+		$db = cmsms()->GetDb();
+		$pre = cms_db_prefix();
+		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
+		$form_id = $this->formdata->Id;
+		$browsers = $db->GetCol($sql,array($form_id));
+		if($browsers)
 		{
-			//initiate async queue processing
-			if($mod->ch)
-			{
-				while(curl_multi_info_read($mod->mh))
-					usleep(20000);
-				curl_multi_remove_handle($mod->mh,$mod->ch);
-				curl_close($mod->ch);
-				$mod->ch = FALSE;
-			}
-
-			$ch = curl_init($mod->Qurl);
-			curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
-			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
-			curl_setopt($ch,CURLOPT_FORBID_REUSE,TRUE);
-			curl_setopt($ch,CURLOPT_FRESH_CONNECT,TRUE);
-			curl_setopt($ch,CURLOPT_HEADER,FALSE);
-			curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
-			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
-
-			curl_multi_add_handle($mod->mh,$ch);
-			$runcount = 0;
-			do
-			{
-				$mrc = curl_multi_exec($mod->mh,$runcount);
-			} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
-//			if($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-			if($runcount)
-			{
-				$mod->ch = $ch; //cache for later cleanup
-			}
-			else
-			{
-				curl_multi_remove_handle($mod->mh,$ch);
-				curl_close($ch);
-			}
+			$stamp = time();
+			$funcs = new pwbrRecordStore();
+			foreach($browsers as $browser_id)
+				$funcs->Insert($browser_id,$form_id,$stamp,$browsedata,$mod,$db,$pre);
 		}
 		unset($mod);
 		return array(TRUE,'');
