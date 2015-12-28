@@ -48,9 +48,6 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwbr_record');
 $dict->ExecuteSQLArray($sqlarray);
 $db->DropSequence($pre.'module_pwbr_record_seq');
 
-$sqlarray = $dict->DropTableSQL($pre.'module_pwbr_flock');
-$dict->ExecuteSQLArray($sqlarray);
-
 // remove permissions
 $this->RemovePermission('ModifyPwBrowsers');
 $this->RemovePermission('ModifyPwFormData');
