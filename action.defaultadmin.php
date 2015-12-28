@@ -13,36 +13,6 @@ if($padmin)
 {
 	if(isset($params['submit']))
 	{
-		$old = $this->GetPreference('masterpass');
-		if($old)
-			$old = pwbrUtils::unfusc($oldpw);
-		$t = trim($params['masterpass']);
-		if($old != $t)
-		{
-			//re-encrypt all stored records
-			$pre = cms_db_prefix();
-			$rst = $db->Execute('SELECT record_id,contents FROM '.$pre.'module_pwbr_record');
-			if($rst)
-			{
-				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
-				while(!$rst->EOF)
-				{
-					$val = pwbrUtils::decrypt_value($mod,$rst->fields[1],$old);
-					$val = pwbrUtils::encrypt_value($mod,$val,$t);
-					if(!pwbrUtils::SafeExec($sql,array($val,$rst->fields[0])))
-					{
-						//TODO handle error
-					}
-					if(!$rst->MoveNext())
-						break;
-				}
-				$rst->Close();
-			}
-
-			if($t)
-				$t = pwbrUtils::fusc($t);
-			$this->SetPreference('masterpass',$t);
-		}
 		$this->SetPreference('export_file',!empty($params['export_file']));
 		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
 		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
@@ -66,6 +36,36 @@ if($padmin)
 				$t = '';
 		}
 		$this->SetPreference('uploads_path',$t);
+		$old = $this->GetPreference('masterpass');
+		if($old)
+			$old = pwbrUtils::unfusc($oldpw);
+		$t = trim($params['masterpass']);
+		if($old != $t)
+		{
+			//re-encrypt all stored records
+			$pre = cms_db_prefix();
+			$rst = $db->Execute('SELECT record_id,contents FROM '.$pre.'module_pwbr_record');
+			if($rst)
+			{
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
+				while(!$rst->EOF)
+				{
+					$val = pwbrUtils::decrypt_value($this,$rst->fields[1],$old);
+					$val = pwbrUtils::encrypt_value($this,$val,$t);
+					if(!pwbrUtils::SafeExec($sql,array($val,$rst->fields[0])))
+					{
+						//TODO handle error
+					}
+					if(!$rst->MoveNext())
+						break;
+				}
+				$rst->Close();
+			}
+
+			if($t)
+				$t = pwbrUtils::fusc($t);
+			$this->SetPreference('masterpass',$t);
+		}
 
 		$params['message'] = $this->PrettyMessage('prefs_updated');
 		$params['active_tab'] = 'settings';
