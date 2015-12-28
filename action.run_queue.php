@@ -8,9 +8,9 @@
 
 try
 {
-	$cache = pwfUtils::GetCache()
+	$cache = pwfUtils::GetCache();
 }
-catch Exception ($e)
+catch (Exception $e)
 {
 	echo $this->Lang('error_system');
 	exit;
@@ -19,7 +19,7 @@ try
 {
 	$mx = pwfUtils::GetMutex($this);
 }
-catch Exception ($e)
+catch (Exception $e)
 {
 	echo $this->Lang('error_system');
 	exit;
@@ -28,18 +28,18 @@ $pre = cms_db_prefix();
 $sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 $funcs = new pwbrRecordStore();
 $token = abs(crc32($this->GetName().'Qmutex')); //same token as in pwfFormBrowser::Dispose()
-$cache->driver_set('pwbrQrunning',TRUE,1200); flag that Q is being processed, 20-minute max retention
+$cache->set('pwbrQrunning',TRUE,1200); //flag that Q is being processed, 20-minute max retention
 if(!$mx->lock($token))
 {
-	$cache->driver_delete('pwbrQrunning');
+	$cache->delete('pwbrQrunning');
 	echo $this->Lang('error_lock');
 	exit;
 }
 
-$queue = $cache->driver_get('pwbrQarray');
+$queue = $cache->get('pwbrQarray');
 if($queue)
 {
-	$cache->driver_delete('pwbrQarray');
+	$cache->delete('pwbrQarray');
 	while($data = reset($queue))
 	{
 		$datakey = key($queue);
@@ -60,16 +60,17 @@ if($queue)
 		{
 			usleep(mt_rand(10000,60000));
 		} while(!$mx->lock($token));
-		$q2 = $cache->driver_get('pwbrQarray');
-		if($q2)
+
+		$newq = $cache->get('pwbrQarray');
+		if($newq)
 		{
-			$cache->driver_delete('pwbrQarray');
-			$queue = array_merge($queue,$q2);
+			$cache->delete('pwbrQarray');
+			$queue = array_merge($queue,$newq);
 		}
 	}
 }
 $mx->unlock($token);
-$cache->driver_delete('pwbrQrunning');
+$cache->delete('pwbrQrunning');
 
 exit;
 
