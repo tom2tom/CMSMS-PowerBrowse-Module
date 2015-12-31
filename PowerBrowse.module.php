@@ -132,7 +132,7 @@ class PowerBrowse extends CMSModule
 
 	function LazyLoadAdmin()
 	{
-		return FALSE;
+		return TRUE;
 	}
 
 	function GetAdminSection()
