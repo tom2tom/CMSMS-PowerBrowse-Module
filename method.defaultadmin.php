@@ -284,7 +284,7 @@ if($padmin)
 		$id.'passwd','','',40,2);
 	$configs[] = $oneset;
 
-	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery.inputcloak.min.js"></script>';
+	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery-inputCloak.min.js"></script>';
 	$jsloads[] =<<<EOS
  $('#{$id}passwd').inputCloak({
   type:'see4',
