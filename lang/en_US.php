@@ -40,7 +40,7 @@ $lang['error_system']='Something is not working correctly. Please advise your si
 $lang['error_zip']='Zip file creation failed';
 $lang['export']='Export';
 
-$lang['field_label'] = 'Store results for later browsing';
+$lang['field_label']='Store results for later browsing';
 $lang['first']='first';
 $lang['friendlyname']='Forms Data Browser';
 
