@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-//Setup tabbed page to edit a browser's parameters
+//setup tabbed page to edit a browser's parameters
 
 $this->BuildNav($id,$returnid,$params);
 if(!empty($params['message']))
@@ -16,14 +16,12 @@ $smarty->assign('tabs_start',$this->StartTabHeaders().
 	$this->EndTabHeaders() . $this->StartTabContent());
 
 $smarty->assign(array(
- 'hidden'=>array(
-	$this->CreateInputHidden($id,'browser_id',$params['browser_id']),
-	$this->CreateInputHidden($id,'active_tab','')
-	),
  'start_form'=>$this->CreateFormStart($id,'edit_browser',$returnid),
  'end_form'=>$this->CreateFormEnd(),
+ 'hidden'=>$this->CreateInputHidden($id,'browser_id',$params['browser_id']).
+	$this->CreateInputHidden($id,'active_tab',''),
  'tabs_end'=>$this->EndTabContent(),
- 'tab_end'=>$this->EndTab(), //must be after EndTabContent()
+ 'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
  'maintab_start'=>$this->StartTab('maintab'),
  'listtab_start'=>$this->StartTab('listtab')
 ));
