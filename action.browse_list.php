@@ -19,6 +19,21 @@ $smarty->assign('pmod',(($pmod)?1:0));
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
 
+$baseurl = $this->GetModuleURLPath();
+//replace href attribute in existing stylesheet link (early in page-processing)
+$cssfile = $this->GetPreference('list_cssfile');
+$u = ($cssfile) ?
+	pwbrUtils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
+	$baseurl.'/css/list-view.css';
+$t = <<<EOS
+<script type="text/javascript">
+//<![CDATA[
+ document.getElementById('adminstyler').setAttribute('href',"{$u}");
+//]]>
+</script>
+EOS;
+$smarty->assign('cssscript',$t);
+
 $this->BuildNav($id,$returnid,$params);
 $smarty->assign('start_form',
 	$this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
@@ -54,8 +69,11 @@ $smarty->assign('colsorts',$colsorts);
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
 
-$js = array(); //script accumulator
-		
+//script accumulators
+$jsincs = array();
+$jsfuncs = array();
+$jsloads = array();
+
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = pwbrUtils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
@@ -119,8 +137,10 @@ if($rcount)
 {
 	if($pagerows && $rcount>$pagerows)
 	{
-		$smarty->assign('hasnav',1);
 		//setup for SSsort
+		$curpg='<span id="cpage">1</span>';
+		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
+
 		$choices = array(strval($pagerows) => $pagerows);
 		$f = ($pagerows < 4) ? 5 : 2;
 		$n = $pagerows * $f;
@@ -130,21 +150,18 @@ if($rcount)
 		if($n < $rcount)
 			$choices[strval($n)] = $n;
 		$choices[$this->Lang('all')] = 0;
-		$smarty->assign('rowchanger',
-			$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,
-			'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows'));
-		$curpg='<span id="cpage">1</span>';
-		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
-		$smarty->assign('pageof',$this->Lang('pageof',$curpg,$totpg));
-		$smarty->assign('first',
-		'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>');
-		$smarty->assign('prev',
-		'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>');
-		$smarty->assign('next',
-		'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>');
-		$smarty->assign('last',
-		'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>');
-		$js[] = <<<EOS
+		
+		$smarty->assign(array(
+		 'hasnav'=>1,
+		 'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
+		 'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
+		 'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
+		 'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
+		 'pageof'=>$this->Lang('pageof',$curpg,$totpg),
+		 'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
+		));
+
+		$jsfuncs[] = <<<EOS
 function pagefirst() {
  $.SSsort.movePage($('#submissions')[0],false,true);
 }
@@ -170,8 +187,11 @@ EOS;
 
 	if($rcount > 1)
 	{
-		$js[] = <<<EOS
-$(document).ready(function(){
+		$jsincs[] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery.metadata.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/include/jquery.SSsort.min.js"></script>
+EOS;
+		$jsloads[] = <<<EOS
  $('#submissions').addClass('table_sort').SSsort({
   sortClass: 'SortAble',
   ascClass: 'SortUp',
@@ -185,19 +205,9 @@ $(document).ready(function(){
   currentid: 'cpage',
   countid: 'tpage'
  });
-});
-function select_all(cb) {
- $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
-}
 
 EOS;
-		$smarty->assign('header_checkbox',
-			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"'));
-	}
-	else
-		$smarty->assign('header_checkbox','');
-
-/*	$js[] = <<< EOS
+/*		$jsfuncs[] = <<<EOS
  $.SSsort.addParser({
   id: 'textinput',
   is: function(s,node) {
@@ -213,7 +223,19 @@ EOS;
 
 EOS;
 */
-	$js[] = <<<EOS
+		$jsfuncs[] = <<<EOS
+function select_all(cb) {
+ $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
+}
+
+EOS;
+		$smarty->assign('header_checkbox',
+			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"'));
+	}
+	else
+		$smarty->assign('header_checkbox',NULL);
+
+	$jsfuncs[] = <<<EOS
 function sel_count() {
  var cb = $('input[name="{$id}sel[]"]:checked');
  return cb.length;
@@ -260,15 +282,16 @@ if($pmod)
 			'browser_id'=>$bid)));
 }
 
-$myurl = $this->GetModuleURLPath();
-$smarty->assign('modurl',$myurl);
-$cssfile = $this->GetPreference('list_cssfile');
-$t = ($cssfile) ?
-	pwbrUtils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
-	$myurl.'/css/list-view.css';
-$smarty->assign('cssurl',$t);
-
-$smarty->assign('jsfuncs',$js);
+if($jsloads)
+{
+	$jsfuncs[] = '$(document).ready(function() {
+';
+	$jsfuncs = array_merge($jsfuncs,$jsloads);
+	$jsfuncs[] = '});
+';
+}
+$smarty->assign('jsfuncs',$jsfuncs);
+$smarty->assign('jsincs',$jsincs);
 
 echo $this->ProcessTemplate('browse_list.tpl');
 

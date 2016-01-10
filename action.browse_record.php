@@ -52,7 +52,7 @@ if(isset($params['edit']))
 		$title = $one[0];
 		$value = $one[1];
 		$len = strlen($value);
-		$newline = strpos($value,"\n") !== FALSE || strpos($value,"<br") !== FALSE;
+		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
 		if($len > 50 || $newline)
 		{
 			$rows = $len / 50 + $newline + 3;

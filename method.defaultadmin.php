@@ -6,6 +6,8 @@
 
 $iseditor = $this->CheckPermission('Modify Any Page');
 
+$smarty->assign('message',(isset($params['message']))?$params['message']:NULL);
+
 $tab = $this->GetActiveTab($params);
 
 $t = $this->starttabheaders().
@@ -16,14 +18,16 @@ if($padmin)
 	$smarty->assign('start_settings_tab',$this->StartTab('settings'));
 }
 $t .= $this->endtabheaders().$this->starttabcontent();
-$smarty->assign('tabs_header',$t);
-$smarty->assign('start_browsers_tab',$this->StartTab('browsers'));
-$smarty->assign('tabs_footer',$this->EndTabContent());
-$smarty->assign('end_tab',$this->EndTab()); //CMSMS 2+ can't cope if this is before EndTabContent() !!
 
-$smarty->assign('message',(isset($params['message']))?$params['message']:'');
-$smarty->assign('start_browsersform',$this->CreateFormStart($id,'multi_browser',$returnid));
-$smarty->assign('end_form',$this->CreateFormEnd());
+$smarty->assign(array(
+'tabs_header'=>$t,
+'start_browsers_tab'=>$this->StartTab('browsers'),
+'tabs_footer'=>$this->EndTabContent(),
+'end_tab'=>$this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
+
+'start_browsersform'=>$this->CreateFormStart($id,'multi_browser',$returnid),
+'end_form'=>$this->CreateFormEnd()
+));
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
@@ -319,8 +323,7 @@ $smarty->assign('pdev',(($iseditor)?1:0));
 
 if($jsloads)
 {
-	$jsfuncs[] = '
-$(document).ready(function() {
+	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
 	$jsfuncs[] = '});

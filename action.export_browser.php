@@ -11,8 +11,7 @@ $res = $funcs->Export($this,$params['browser_id']);
 if($res === TRUE)
 	exit;
 unset($funcs);
-unset($params);
+
 $this->Redirect($id,'defaultadmin',$returnid,array(
 	'message' => $this->PrettyMessage($res,FALSE)));
-
 ?>

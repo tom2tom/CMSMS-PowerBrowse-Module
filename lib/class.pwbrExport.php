@@ -33,7 +33,7 @@ class pwbrExport
 	CSV:
 	@mod: reference to current PowerBrowse module object
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
-	@record_id: index of a single reponse to process, or array of such indices,
+	@record_id: index of a single response to process, or array of such indices,
 		or FALSE to process the whole @browser_id, default=FALSE
 	@fp: handle of open file, if writing data to disk, or FALSE if constructing in memory, default = FALSE
 	@$sep: field-separator in output data, assumed single-byte ASCII, default = ','
@@ -48,7 +48,7 @@ class pwbrExport
 	*/
 	public function CSV(&$mod,$browser_id=FALSE,$record_id=FALSE,$fp = FALSE,$sep = ',')
 	{
-		global $db;
+		global $db; //$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
 		if($browser_id)
 		{
@@ -117,7 +117,7 @@ class pwbrExport
 			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
 			if($names)
 				$outstr .= $sep.implode($sep,$names);
-			$outstr .= "\n";
+			$outstr .= PHP_EOL;
 			//data lines(s)
 			foreach($all as $one)
 			{
@@ -134,7 +134,7 @@ class pwbrExport
 					$outstr .= $sep.preg_replace('/[\n\t\r]/',$sep2,$fv);
 				}
 				unset($one);
-				$outstr .= "\n";
+				$outstr .= PHP_EOL;
 				if($fp)
 				{
 					if($convert)
@@ -173,7 +173,7 @@ class pwbrExport
 			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
 			if($names)
 				$outstr .= $sep.implode($sep,$names);
-			$outstr .= "\n";
+			$outstr .= PHP_EOL;
 			
 			if($fp)
 			{
@@ -191,7 +191,6 @@ class pwbrExport
 			}
 			return $outstr; //encoding conversion upstream
 		}
-
 	}
 
 	/**
@@ -273,7 +272,6 @@ class pwbrExport
 		}
 		return 'error_export';
 	}
-
 }
 
 ?>

@@ -9,32 +9,43 @@
 $this->BuildNav($id,$returnid,$params);
 if(!empty($params['message']))
 	$smarty->assign('message',$params['message']);
-$smarty->assign('start_form',
-	$this->CreateFormStart($id,'edit_browser',$returnid));
-$smarty->assign('hidden',
-	$this->CreateInputHidden($id,'browser_id',$params['browser_id']));
 $tab = $this->GetActiveTab($params);
 $smarty->assign('tabs_start',$this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('tab_main'),($tab == 'maintab')).
 	$this->SetTabHeader('listtab',$this->Lang('tab_list'),($tab == 'listtab')).
 	$this->EndTabHeaders() . $this->StartTabContent());
-$smarty->assign('tabs_end',$this->EndTabContent());
-$smarty->assign('maintab_start',$this->StartTab('maintab'));
-$smarty->assign('listtab_start',$this->StartTab('listtab'));
-$smarty->assign('tab_end',$this->EndTab());
-$smarty->assign('end_form',$this->CreateFormEnd());
 
-$smarty->assign('hidden',$this->CreateInputHidden($id,'active_tab',''));
+$smarty->assign(array(
+ 'hidden'=>array(
+	$this->CreateInputHidden($id,'browser_id',$params['browser_id']),
+	$this->CreateInputHidden($id,'active_tab','')
+	),
+ 'start_form'=>$this->CreateFormStart($id,'edit_browser',$returnid),
+ 'end_form'=>$this->CreateFormEnd(),
+ 'tabs_end'=>$this->EndTabContent(),
+ 'tab_end'=>$this->EndTab(), //must be after EndTabContent()
+ 'maintab_start'=>$this->StartTab('maintab'),
+ 'listtab_start'=>$this->StartTab('listtab')
+));
+
+//script accumulators
+$jsincs = array();
+$jsfuncs = array();
+$jsloads = array();
+$baseurl = $this->GetModuleURLPath();
 
 //======= MAIN TAB ========
 
 $pre = cms_db_prefix();
 $row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?',array($params['browser_id']));
-$smarty->assign('title_form_name', $this->Lang('title_form_name'));
-$smarty->assign('form_name',$row['form_name']);
-$smarty->assign('title_browser_name',$this->Lang('title_browser_name'));
-$smarty->assign('input_browser_name',
-	$this->CreateInputText($id,'browser_name',$row['name'],50,256));
+
+$smarty->assign(array(
+ 'title_form_name'=>$this->Lang('title_form_name'),
+ 'form_name'=>$row['form_name'],
+ 'title_browser_name'=>$this->Lang('title_browser_name'),
+ 'input_browser_name'=>$this->CreateInputText($id,'browser_name',$row['name'],50,256)
+));
+
 if($this->GetPreference('owned_forms'))
 {
 	$sel = array('&lt;'.$this->Lang('all').'&gt;' => 0);
@@ -43,10 +54,10 @@ if($this->GetPreference('owned_forms'))
 	//except the current user, so we replicate its backend operation here
 	$sql = 'SELECT DISTINCT U.user_id,U.username,U.first_name,U.last_name
 FROM '.$pre.'users U
-INNER JOIN '.$pre.'user_groups UG ON U.user_id = UG.user_id
-INNER JOIN '.$pre.'group_perms GP ON GP.group_id = UG.group_id
-INNER JOIN '.$pre.'permissions P ON P.permission_id = GP.permission_id
-INNER JOIN '.$pre.'groups GR ON GR.group_id = UG.group_id
+JOIN '.$pre.'user_groups UG ON U.user_id = UG.user_id
+JOIN '.$pre.'group_perms GP ON GP.group_id = UG.group_id
+JOIN '.$pre.'permissions P ON P.permission_id = GP.permission_id
+JOIN '.$pre.'groups GR ON GR.group_id = UG.group_id
 WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND
 P.permission_name IN("ModifyPwBrowsers","ModifyPwFormData")
 ORDER BY U.last_name,U.first_name';
@@ -69,8 +80,6 @@ ORDER BY U.last_name,U.first_name';
 
 //======= DISPLAY TAB ==========
 
-$js = array(); //script accumulator
-
 $smarty->assign('title_pagerows',$this->Lang('title_pagerows'));
 $smarty->assign('input_pagerows',
 	$this->CreateInputText($id,'browser_pagerows',$row['pagerows'],5));
@@ -80,11 +89,13 @@ $sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY orde
 $fields = $db->GetAll($sql,array($params['browser_id']));
 if($fields)
 {
-	$smarty->assign('title_data',$this->Lang('title_data'));
-	$smarty->assign('title_name',$this->Lang('title_field_identity'));
-	$smarty->assign('title_display',$this->Lang('title_display'));
-	$smarty->assign('title_sort',$this->Lang('title_sort'));
-	$smarty->assign('title_move',$this->Lang('title_move'));
+	$smarty->assign(array(
+	 'title_data'=>$this->Lang('title_data'),
+	 'title_name'=>$this->Lang('title_field_identity'),
+	 'title_display'=>$this->Lang('title_display'),
+	 'title_sort'=>$this->Lang('title_sort'),
+	 'title_move'=>$this->Lang('title_move')
+	));
 
 	$mc = 0;
 	$previd	= -10;
@@ -124,33 +135,10 @@ if($fields)
 
 	if($rc > 1)
 	{
-		$js[] =<<<EOS
-function set_tab() {
- var active = $('#page_tabs > .active');
- $('#{$id}active_tab').val(active.attr('id'));
-}
-function select_all(cb) {
- var keep,target,boxes,st;
- switch (cb.name) {
-  case '{$id}allshow':
-    keep = true;
-    target = 'shown[]';
-    break;
-  case '{$id}allsort':
-    keep = false;
-    target = 'sortable[]';
-    break;
-  default:
-    return;
- }
- boxes = $('#listfields > tbody').find('input[name="{$id}'+target+'"]');
- st = cb.checked;
- boxes.attr('checked',st);
- if(keep && !st) {
-  $(boxes[0]).attr('checked',true);
- }
-}
-$(document).ready(function() {
+		$jsincs[] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
+EOS;
+		$jsloads[] = <<<EOS
  $('.updown').css('display','none');
  $('.dndhelp').css('display','block');
  $('#listfields').addClass('table_drag').tableDnD({
@@ -177,32 +165,71 @@ $(document).ready(function() {
 	var to = now.indexOf('hover');
 	$(this).attr('class', now.substring(0,to));
  });
-});
 
 EOS;
-		$smarty->assign('select_all1',
-			$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'));
-		$smarty->assign('select_all2',
-			$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'));
-		$smarty->assign('help_order',$this->Lang('help_order'));
-		$smarty->assign('help_dnd',$this->Lang('help_dnd')); 
+		$jsfuncs[] =<<<EOS
+function select_all(cb) {
+ var keep,target,boxes,st;
+ switch (cb.name) {
+  case '{$id}allshow':
+    keep = true;
+    target = 'shown[]';
+    break;
+  case '{$id}allsort':
+    keep = false;
+    target = 'sortable[]';
+    break;
+  default:
+    return;
+ }
+ boxes = $('#listfields > tbody').find('input[name="{$id}'+target+'"]');
+ st = cb.checked;
+ boxes.attr('checked',st);
+ if(keep && !st) {
+  $(boxes[0]).attr('checked',true);
+ }
+}
+
+EOS;
+		$smarty->assign(array(
+		 'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
+		 'select_all2'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
+		 'help_order'=>$this->Lang('help_order'),
+		 'help_dnd'=>$this->Lang('help_dnd')
+		));
 	}
 }
 else
 {
-	$smarty->assign('nofields',$this->Lang('nofields'));
-	$smarty->assign('rcount',0);
+	$smarty->assign(array(
+	 'nofields',$this->Lang('nofields'),
+	 'rcount',0
+	));
 }
 
-$smarty->assign('save',
-	$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'));
-$smarty->assign('apply',
-	$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),
-		'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'));
-$smarty->assign('cancel',
-	$this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'),'onclick="set_tab();"'));
+$jsfuncs[] = <<<EOS
+function set_tab() {
+ var active = $('#page_tabs > .active');
+ $('#{$id}active_tab').val(active.attr('id'));
+}
 
-$smarty->assign('modurl',$this->GetModuleURLPath()); //for including js files
-$smarty->assign('jsfuncs',$js);
+EOS;
+
+if($jsloads)
+{
+	$jsfuncs[] = '$(document).ready(function() {
+';
+	$jsfuncs = array_merge($jsfuncs,$jsloads);
+	$jsfuncs[] = '});
+';
+}
+
+$smarty->assign(array(
+ 'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
+ 'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
+ 'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"'),
+ 'jsincs'=>$jsincs
+ 'jsfuncs'=>$jsfuncs
+));
 
 ?>
