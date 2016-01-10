@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="{$cssurl}" />
+{if isset($cssscript)}{$cssscript}{/if}
 {if !empty($inner_nav)}<div class="pbr_innernav">{$inner_nav}</div><br />{/if}
 {if !empty($message)}<h3>{$message}</h3><br />{/if}
 <h2 style="margin-left:5%;">{$browser_title}</h2>
@@ -45,10 +45,12 @@
 {if $pmod}<p class="pageinput">{$iconlinkadd}&nbsp;{$textlinkadd}</p>{/if}
 <div style="clear:right;"></div>
 
-<script type="text/javascript" src="{$modurl}/include/jquery.metadata.min.js"></script>
-<script type="text/javascript" src="{$modurl}/include/jquery.SSsort.min.js"></script>
+{if isset($jsincs)}{foreach from=$jsincs item=file}{$file}{/foreach}
+{/if}
+{if isset($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[
 {foreach from=$jsfuncs item=func}{$func}{/foreach}
 //]]>
 </script>
+{/if}

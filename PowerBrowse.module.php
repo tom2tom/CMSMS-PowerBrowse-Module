@@ -19,15 +19,15 @@
 
 class PowerBrowse extends CMSModule
 {
+	public $havemcrypt;	//whether password encryption is supported
 	public $before20;
-	public $havemcrypt;
 
 	function __construct()
 	{
 		parent::__construct();
+		$this->havemcrypt = function_exists('mcrypt_encrypt');
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
-		$this->havemcrypt = function_exists('mcrypt_encrypt');
 	}
 
 	function AllowAutoInstall()
@@ -150,6 +150,10 @@ class PowerBrowse extends CMSModule
 		return self::CheckAccess();
 	}
 
+/*	function AdminStyle()
+	{
+	}
+*/
 	function GetHeaderHTML()
 	{
 		$url = $this->GetModuleURLPath();
@@ -160,10 +164,6 @@ class PowerBrowse extends CMSModule
 EOS;
 	}
 
-/*	function AdminStyle()
-	{
-	}
-*/
 	function SuppressAdminOutput(&$request)
 	{
 		if(isset($_SERVER['QUERY_STRING']))

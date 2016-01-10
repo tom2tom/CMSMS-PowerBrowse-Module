@@ -46,9 +46,12 @@
   <p class="pageinput" style="margin-top:10px;">{$save} {$cancel} {$apply}</p>
 {$end_form}
 
-<script type="text/javascript" src="{$modurl}/include/jquery.tablednd.min.js"></script>
+{if isset($jsincs)}{foreach from=$jsincs item=file}{$file}{/foreach}
+{/if}
+{if isset($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[
 {foreach from=$jsfuncs item=func}{$func}{/foreach}
 //]]>
 </script>
+{/if}
