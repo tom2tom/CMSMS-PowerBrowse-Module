@@ -63,7 +63,7 @@ class PowerBrowse extends CMSModule
 		if($cont)
 		{
 			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm','~\s?//.*$~m'),array('',''),$cont);
-			$example = str_replace(array("\n\n","\n","\t"),array('<br />','<br />',' '),trim($example));
+			$example = str_replace(array(PHP_EOL.PHP_EOL,PHP_EOL,"\t"),array('<br />','<br />',' '),trim($example));
 		}
 		else
 			$example = $this->Lang('error_missing');
@@ -153,7 +153,11 @@ class PowerBrowse extends CMSModule
 	function GetHeaderHTML()
 	{
 		$url = $this->GetModuleURLPath();
-		return '<link rel="stylesheet" type="text/css" id="adminstyler" href="'.$url.'/css/admin.css" />';
+		//the 2nd link is for dynamic style-changes, via js at runtime
+		return <<<EOS
+<link rel="stylesheet" type="text/css" href="{$url}/css/admin.css" />
+<link rel="stylesheet" type="text/css" id="adminstyler" href="#" />
+EOS;
 	}
 
 /*	function AdminStyle()
