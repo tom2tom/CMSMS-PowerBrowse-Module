@@ -131,6 +131,7 @@ class pwbrUtils
 	/**
 	GetUploadsPath:
 	@mod: reference to current PowerBrowse module object
+	Returns: absolute path string or false
 	*/
 	public static function GetUploadsPath(&$mod)
 	{
@@ -150,11 +151,13 @@ class pwbrUtils
 	/**
 	GetUploadsUrl:
 	@mod: reference to current PowerBrowse module object
+	Returns: absolute url string or false
 	*/
 	public static function GetUploadsUrl(&$mod)
 	{
 		$config = cmsms()->GetConfig();
-		$up = $config['uploads_url'];
+		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url':'ssl_uploads_url';
+		$up = $config[$key];
 		if($up)
 		{
 			$rp = $mod->GetPreference('uploads_path');
