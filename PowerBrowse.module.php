@@ -150,16 +150,16 @@ class PowerBrowse extends CMSModule
 		return self::CheckAccess();
 	}
 
-/*	function GetHeaderHTML()
+	function GetHeaderHTML()
+	{
+		$url = $this->GetModuleURLPath();
+		return '<link rel="stylesheet" type="text/css" id="adminstyler" href="'.$url.'/css/admin.css" />';
+	}
+
+/*	function AdminStyle()
 	{
 	}
 */
-	function AdminStyle()
-	{
-		$fn = cms_join_path(dirname(__FILE__),'css','module-admin.css');
-		return ''.@file_get_contents($fn);
-	}
-
 	function SuppressAdminOutput(&$request)
 	{
 		if(isset($_SERVER['QUERY_STRING']))
