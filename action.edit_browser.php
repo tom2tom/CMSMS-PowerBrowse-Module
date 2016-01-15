@@ -29,7 +29,7 @@ elseif(isset($params['apply']))
 	$params['message'] = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
 }
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.edit_browser.php';
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.edit_browser.php';
 
 echo $this->ProcessTemplate('edit_browser.tpl');
 

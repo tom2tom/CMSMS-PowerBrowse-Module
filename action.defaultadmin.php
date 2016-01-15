@@ -76,7 +76,7 @@ if($padmin)
 	}
 }
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.defaultadmin.php';
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
 echo $this->ProcessTemplate('adminpanel.tpl');
 
