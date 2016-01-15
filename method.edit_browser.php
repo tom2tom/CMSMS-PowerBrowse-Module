@@ -226,7 +226,7 @@ $smarty->assign(array(
  'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
  'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
  'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"'),
- 'jsincs'=>$jsincs
+ 'jsincs'=>$jsincs,
  'jsfuncs'=>$jsfuncs
 ));
 
