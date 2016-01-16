@@ -259,6 +259,39 @@ class pwbrUtils
 		return '';
 	}
 
+	/**
+	ProcessTemplate:
+	@mod: reference to current PowerBrowse module object
+	@tplname: template identifier
+	@tplvars: associative array of template variables
+	@cache: optional boolean, default TRUE
+	Returns: string, processed template
+	*/
+	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=TRUE)
+	{
+		global $smarty;
+		if($mod->before20)
+		{
+			$smarty->assign($tplvars);
+			echo $mod->ProcessTemplate($tplname);
+		}
+		else
+		{
+			if($cache)
+			{
+				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
+				$compile_id = NULL; //TODO md5('pwf|'.$tplname.current lang
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,compile_id,$smarty);
+				if(!$tpl->isCached())
+					$tpl->assign($tplvars);
+			}
+			else
+			{
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
+			}
+			$tpl->display();
+		}
+	}
 }
 
 ?>
