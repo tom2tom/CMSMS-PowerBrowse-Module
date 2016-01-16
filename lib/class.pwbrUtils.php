@@ -279,8 +279,9 @@ class pwbrUtils
 		{
 			if($cache)
 			{
-				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
-				$compile_id = NULL; //TODO md5('pwf|'.$tplname.current lang
+				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
+				$lang = CmsNlsOperations::get_current_language();
+				$compile_id = md5('pwbr'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,compile_id,$smarty);
 				if(!$tpl->isCached())
 					$tpl->assign($tplvars);
