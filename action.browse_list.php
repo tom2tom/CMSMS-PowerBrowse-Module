@@ -13,8 +13,9 @@ elseif($this->CheckAccess('view'))
 else
 	exit;
 
-$smarty->assign('pconfig',(($pconfig)?1:0));
-$smarty->assign('pmod',(($pmod)?1:0));
+$tplvars = array();
+$tplvars['pconfig'] = (($pconfig)?1:0);
+$tplvars['pmod'] = (($pmod)?1:0);
 
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
@@ -32,21 +33,21 @@ $t = <<<EOS
 //]]>
 </script>
 EOS;
-$smarty->assign('cssscript',$t);
+$tplvars['cssscript'] = $t;
 
-$this->BuildNav($id,$returnid,$params);
-$smarty->assign('start_form',
+$this->BuildNav($id,$returnid,$params,$tplvars);
+$tplvars['start_form'] =
 	$this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
-		array('browser_id'=>$bid,'form_id'=>$fid)));
-$smarty->assign('end_form',$this->CreateFormEnd());
+		array('browser_id'=>$bid,'form_id'=>$fid));
+$tplvars['end_form'] = $this->CreateFormEnd();
 
 if(!empty($params['message']))
-	$smarty->assign('message',$params['message']);
+	$tplvars['message'] = $params['message'];
 
 $pre = cms_db_prefix();
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 $data = $db->GetRow($sql,array($bid));
-$smarty->assign('browser_title',$data['name']);
+$tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
@@ -63,8 +64,8 @@ $colsorts = array();
 	}
 	unset($one);
 //}
-$smarty->assign('colnames',$colnames);
-$smarty->assign('colsorts',$colsorts);
+$tplvars['colnames'] = $colnames;
+$tplvars['colsorts'] = $colsorts;
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
@@ -79,7 +80,7 @@ $data = pwbrUtils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
 //if($data)
 //{
-	$smarty->assign('title_submit_when',$this->Lang('title_submit_when'));
+	$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 
 	$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
 	$icon_edit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
@@ -131,7 +132,7 @@ $rows = array();
 	unset($one);
 //}
 
-$smarty->assign('rows',$rows);
+$tplvars['rows'] = $rows;
 $rcount = count($rows);
 if($rcount)
 {
@@ -150,16 +151,16 @@ if($rcount)
 		if($n < $rcount)
 			$choices[strval($n)] = $n;
 		$choices[$this->Lang('all')] = 0;
-		
-		$smarty->assign(array(
-		 'hasnav'=>1,
-		 'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
-		 'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
-		 'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
-		 'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
-		 'pageof'=>$this->Lang('pageof',$curpg,$totpg),
-		 'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
-		));
+
+		$tplvars = $tplvars + array(
+			'hasnav'=>1,
+			'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
+			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
+			'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
+			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
+			'pageof'=>$this->Lang('pageof',$curpg,$totpg),
+			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
+		);
 
 		$jsfuncs[] = <<<EOS
 function pagefirst() {
@@ -182,7 +183,7 @@ EOS;
 	}
 	else
 	{
-		$smarty->assign('hasnav',0);
+		$tplvars['hasnav'] = 0;
 	}
 
 	if($rcount > 1)
@@ -229,11 +230,11 @@ function select_all(cb) {
 }
 
 EOS;
-		$smarty->assign('header_checkbox',
-			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"'));
+		$tplvars['header_checkbox'] =
+			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
 	}
 	else
-		$smarty->assign('header_checkbox',NULL);
+		$tplvars['header_checkbox'] = NULL;
 
 	$jsfuncs[] = <<<EOS
 function sel_count() {
@@ -253,33 +254,31 @@ function confirm_selected(msg) {
 
 EOS;
 	if($this->CheckAccess('view') || $this->CheckAccess('admin'))
-		$smarty->assign('export',$this->CreateInputSubmit($id,'export',$this->Lang('export'),
+		$tplvars['export'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 		'title="'.$this->Lang('tip_export_selected_records').
-		'"  onclick="return any_selected();"'));
+		'"  onclick="return any_selected();"');
 	if($pmod)
-		$smarty->assign('delete',$this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
+		$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 		'title="'.$this->Lang('tip_delete_selected_records').
-		'" onclick="return confirm_selected(\''.$this->Lang('confirm_delete_sel').'\');"'));
+		'" onclick="return confirm_selected(\''.$this->Lang('confirm_delete_sel').'\');"');
 }
 else
 {
-	$smarty->assign('norecords',$this->Lang('norecords'));
+	$tplvars['norecords'] = $this->Lang('norecords');
 }
 
 if($pmod)
 {
 	$t = $this->Lang('title_add_record');
 	$icon_add = $theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon');
-	$smarty->assign('iconlinkadd',
-		$this->CreateLink($id,'add_record','',
+	$tplvars['iconlinkadd'] = $this->CreateLink($id,'add_record','',
 			$icon_add,
 			array('form_id'=>$fid,
-			'browser_id'=>$bid)));
-	$smarty->assign('textlinkadd',
-		$this->CreateLink($id,'add_record','',
+			'browser_id'=>$bid));
+	$tplvars['textlinkadd'] = $this->CreateLink($id,'add_record','',
 			$t,
 			array('form_id'=>$fid,
-			'browser_id'=>$bid)));
+			'browser_id'=>$bid));
 }
 
 if($jsloads)
@@ -290,9 +289,9 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-$smarty->assign('jsfuncs',$jsfuncs);
-$smarty->assign('jsincs',$jsincs);
+$tplvars['jsfuncs'] = $jsfuncs;
+$tplvars['jsincs'] = $jsincs;
 
-echo $this->ProcessTemplate('browse_list.tpl');
+pwbrUtils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
 
 ?>

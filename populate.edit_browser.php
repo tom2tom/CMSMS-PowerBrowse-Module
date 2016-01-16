@@ -6,25 +6,25 @@
 
 //setup tabbed page to edit a browser's parameters
 
-$this->BuildNav($id,$returnid,$params);
+$this->BuildNav($id,$returnid,$params,$tplvars);
 if(!empty($params['message']))
-	$smarty->assign('message',$params['message']);
+	$tplvars['message'] = $params['message'];
 $tab = $this->GetActiveTab($params);
-$smarty->assign('tabs_start',$this->StartTabHeaders().
+$tplvars['tabs_start'] = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('tab_main'),($tab == 'maintab')).
 	$this->SetTabHeader('listtab',$this->Lang('tab_list'),($tab == 'listtab')).
-	$this->EndTabHeaders() . $this->StartTabContent());
+	$this->EndTabHeaders() . $this->StartTabContent();
 
-$smarty->assign(array(
- 'start_form'=>$this->CreateFormStart($id,'edit_browser',$returnid),
- 'end_form'=>$this->CreateFormEnd(),
- 'hidden'=>$this->CreateInputHidden($id,'browser_id',$params['browser_id']).
-	$this->CreateInputHidden($id,'active_tab',''),
- 'tabs_end'=>$this->EndTabContent(),
- 'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
- 'maintab_start'=>$this->StartTab('maintab'),
- 'listtab_start'=>$this->StartTab('listtab')
-));
+$tplvars = $tplvars + array(
+	'start_form'=>$this->CreateFormStart($id,'edit_browser',$returnid),
+	'end_form'=>$this->CreateFormEnd(),
+	'hidden'=>$this->CreateInputHidden($id,'browser_id',$params['browser_id']).
+		$this->CreateInputHidden($id,'active_tab',''),
+	'tabs_end'=>$this->EndTabContent(),
+	'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
+	'maintab_start'=>$this->StartTab('maintab'),
+	'listtab_start'=>$this->StartTab('listtab')
+);
 
 //script accumulators
 $jsincs = array();
@@ -37,12 +37,12 @@ $baseurl = $this->GetModuleURLPath();
 $pre = cms_db_prefix();
 $row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?',array($params['browser_id']));
 
-$smarty->assign(array(
- 'title_form_name'=>$this->Lang('title_form_name'),
- 'form_name'=>$row['form_name'],
- 'title_browser_name'=>$this->Lang('title_browser_name'),
- 'input_browser_name'=>$this->CreateInputText($id,'browser_name',$row['name'],50,256)
-));
+$tplvars = $tplvars + array(
+	'title_form_name'=>$this->Lang('title_form_name'),
+	'form_name'=>$row['form_name'],
+	'title_browser_name'=>$this->Lang('title_browser_name'),
+	'input_browser_name'=>$this->CreateInputText($id,'browser_name',$row['name'],50,256)
+);
 
 if($this->GetPreference('owned_forms'))
 {
@@ -71,29 +71,29 @@ ORDER BY U.last_name,U.first_name';
 		}
 		$rs->Close();
 	}
-	$smarty->assign('title_browser_owner',$this->Lang('title_browser_owner'));
-	$smarty->assign('input_browser_owner',
-		$this->CreateInputDropdown($id,'browser_owner',$sel,-1,$row['owner']));
+	$tplvars['title_browser_owner'] = $this->Lang('title_browser_owner');
+	$tplvars['input_browser_owner'] =
+		$this->CreateInputDropdown($id,'browser_owner',$sel,-1,$row['owner']);
 }
 
 //======= DISPLAY TAB ==========
 
-$smarty->assign('title_pagerows',$this->Lang('title_pagerows'));
-$smarty->assign('input_pagerows',
-	$this->CreateInputText($id,'browser_pagerows',$row['pagerows'],5));
-$smarty->assign('help_pagerows',$this->Lang('help_pagerows'));
+$tplvars['title_pagerows'] = $this->Lang('title_pagerows');
+$tplvars['input_pagerows'] =
+	$this->CreateInputText($id,'browser_pagerows',$row['pagerows'],5);
+$tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
 $sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
 $fields = $db->GetAll($sql,array($params['browser_id']));
 if($fields)
 {
-	$smarty->assign(array(
-	 'title_data'=>$this->Lang('title_data'),
-	 'title_name'=>$this->Lang('title_field_identity'),
-	 'title_display'=>$this->Lang('title_display'),
-	 'title_sort'=>$this->Lang('title_sort'),
-	 'title_move'=>$this->Lang('title_move')
-	));
+	$tplvars = $tplvars + array(
+		'title_data'=>$this->Lang('title_data'),
+		'title_name'=>$this->Lang('title_field_identity'),
+		'title_display'=>$this->Lang('title_display'),
+		'title_sort'=>$this->Lang('title_sort'),
+		'title_move'=>$this->Lang('title_move')
+	);
 
 	$mc = 0;
 	$previd	= -10;
@@ -127,9 +127,9 @@ if($fields)
 	}
 	unset($one);
 
-	$smarty->assign('fields',$formatted);
+	$tplvars['fields'] = $formatted;
 	$rc = count($fields);
-	$smarty->assign('rcount',$rc);
+	$tplvars['rcount'] = $rc;
 
 	if($rc > 1)
 	{
@@ -189,20 +189,20 @@ function select_all(cb) {
 }
 
 EOS;
-		$smarty->assign(array(
-		 'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
-		 'select_all2'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
-		 'help_order'=>$this->Lang('help_order'),
-		 'help_dnd'=>$this->Lang('help_dnd')
-		));
+		$tplvars = $tplvars + array(
+			'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
+			'select_all2'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
+			'help_order'=>$this->Lang('help_order'),
+			'help_dnd'=>$this->Lang('help_dnd')
+		);
 	}
 }
 else
 {
-	$smarty->assign(array(
-	 'nofields',$this->Lang('nofields'),
-	 'rcount',0
-	));
+	$tplvars = $tplvars + array(
+		'nofields',$this->Lang('nofields'),
+		'rcount',0
+	);
 }
 
 $jsfuncs[] = <<<EOS
@@ -222,12 +222,12 @@ if($jsloads)
 ';
 }
 
-$smarty->assign(array(
- 'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
- 'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
- 'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"'),
- 'jsincs'=>$jsincs,
- 'jsfuncs'=>$jsfuncs
-));
+$tplvars = $tplvars + array(
+	'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
+	'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
+	'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"'),
+	'jsincs'=>$jsincs,
+	'jsfuncs'=>$jsfuncs
+);
 
 ?>

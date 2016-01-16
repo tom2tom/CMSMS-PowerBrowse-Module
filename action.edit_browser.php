@@ -6,7 +6,7 @@
 
 if(!$this->CheckAccess('modify')) exit;
 
-if(isset($params['cancel'])) 
+if(isset($params['cancel']))
 {
 	unset($params);
 	$this->Redirect($id,'defaultadmin');
@@ -29,8 +29,10 @@ elseif(isset($params['apply']))
 	$params['message'] = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
 }
 
+$tplvars = array();
+
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.edit_browser.php';
 
-echo $this->ProcessTemplate('edit_browser.tpl');
+pwbrUtils::ProcessTemplate($this,'edit_browser.tpl',$tplvars);
 
 ?>

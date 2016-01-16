@@ -6,7 +6,7 @@
 
 $iseditor = $this->CheckPermission('Modify Any Page');
 
-$smarty->assign('message',(isset($params['message']))?$params['message']:NULL);
+$tplvars['message'] = (isset($params['message']))?$params['message']:NULL;
 
 $tab = $this->GetActiveTab($params);
 
@@ -15,19 +15,19 @@ $t = $this->starttabheaders().
 if($padmin)
 {
 	$t .= $this->settabheader('settings',$this->lang('tab_settings'),($tab == 'settings'));
-	$smarty->assign('start_settings_tab',$this->StartTab('settings'));
+	$tplvars['start_settings_tab'] = $this->StartTab('settings');
 }
 $t .= $this->endtabheaders().$this->starttabcontent();
 
-$smarty->assign(array(
-'tabs_header'=>$t,
-'start_browsers_tab'=>$this->StartTab('browsers'),
-'tabs_footer'=>$this->EndTabContent(),
-'end_tab'=>$this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
+$tplvars = $tplvars + array(
+	'tabs_header'=>$t,
+	'start_browsers_tab'=>$this->StartTab('browsers'),
+	'tabs_footer'=>$this->EndTabContent(),
+	'end_tab'=>$this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
 
-'start_browsersform'=>$this->CreateFormStart($id,'multi_browser',$returnid),
-'end_form'=>$this->CreateFormEnd()
-));
+	'start_browsersform'=>$this->CreateFormStart($id,'multi_browser',$returnid),
+	'end_form'=>$this->CreateFormEnd()
+);
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
@@ -64,10 +64,10 @@ else
 }
 if($browsers)
 {
-	$smarty->assign('title_browser_name',$this->Lang('title_browser_name'));
+	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	if($iseditor)
-		$smarty->assign('title_related_form',$this->Lang('title_related_form'));
-	$smarty->assign('title_records',$this->Lang('title_records'));
+		$tplvars['title_related_form'] = $this->Lang('title_related_form');
+	$tplvars['title_records'] = $this->Lang('title_records');
 
 	$alt = $this->Lang('inspect');
 	$icon_admin =
@@ -143,10 +143,10 @@ if($browsers)
 	unset($one);
 
 	$t = count($data);
-	$smarty->assign('browser_count',$t);
+	$tplvars['browser_count'] = $t;
 	if($t)
 	{
-		$smarty->assign('browsers',$data);
+		$tplvars['browsers'] = $data;
 
 		$jsfuncs[] = <<<EOS
 function sel_count() {
@@ -165,15 +165,15 @@ function confirm_selected(msg) {
 }
 
 EOS;
-		$smarty->assign('exportbtn',$this->CreateInputSubmit($id,'export',$this->Lang('export'),
+		$tplvars['exportbtn'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 			'title="'.$this->Lang('tip_export_selected_browsers').
-			'" onclick="return any_selected();"'));
-		$smarty->assign('clonebtn',$this->CreateInputSubmit($id,'clone',$this->Lang('clone'),
+			'" onclick="return any_selected();"');
+		$tplvars['clonebtn'] = $this->CreateInputSubmit($id,'clone',$this->Lang('clone'),
 			'title="'.$this->Lang('tip_clone_selected_browsers').
-			'" onclick="return any_selected();"'));
-		$smarty->assign('deletebtn',$this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
+			'" onclick="return any_selected();"');
+		$tplvars['deletebtn'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 			'title="'.$this->Lang('tip_delete_selected_browsers').
-			'" onclick="return confirm_selected(\''.$this->Lang('confirm').'\');"'));
+			'" onclick="return confirm_selected(\''.$this->Lang('confirm').'\');"');
 
 		if($t > 1)
 		{
@@ -187,35 +187,35 @@ EOS;
 		}
 		else
 			$t = '';
-		$smarty->assign('selectall_browsers',$t);
+		$tplvars['selectall_browsers'] = $t;
 	}
 	else
-		$smarty->assign('nobrowsers',$this->Lang('nobrowsers'));
+		$tplvars['nobrowsers'] = $this->Lang('nobrowsers');
 }
 else
 {
-	$smarty->assign('nobrowsers',$this->Lang('nobrowsers'));
-	$smarty->assign('browser_count',0);
+	$tplvars['nobrowsers'] = $this->Lang('nobrowsers');
+	$tplvars['browser_count'] = 0;
 }
 
 if($padmin || $pmod)
 {
-	$smarty->assign('addlink',$this->CreateLink($id,'add_browser','',
+	$tplvars['addlink'] = $this->CreateLink($id,'add_browser','',
 		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_browser'),'','','systemicon'),
-		array('browser_id'=>-1)));
-	$smarty->assign('addbrowser',$this->CreateLink($id,'add_browser','',
+		array('browser_id'=>-1));
+	$tplvars['addbrowser'] = $this->CreateLink($id,'add_browser','',
 		$this->Lang('title_add_browser'),
-		array('browser_id'=>-1)));
+		array('browser_id'=>-1));
 
 	if(!$this->GetPreference('oldmodule_data',0) && $fb)
-		$smarty->assign('importbtn',
+		$tplvars['importbtn'] =
 			$this->CreateInputSubmit($id,'import',$this->Lang('import_browsers'),
-				'title="'.$this->Lang('tip_import_browsers').'"'));
+				'title="'.$this->Lang('tip_import_browsers').'"');
 }
 
 if($padmin)
 {
-	$smarty->assign('start_settingsform',$this->CreateFormStart($id,'defaultadmin',$returnid));
+	$tplvars['start_settingsform'] = $this->CreateFormStart($id,'defaultadmin',$returnid);
 
 	$configs = array();
 
@@ -297,7 +297,7 @@ if($padmin)
 
 EOS;
 
-	$smarty->assign('configs',$configs);
+	$tplvars['configs'] = $configs;
 
 	$jsfuncs[] = <<<EOS
 function set_tab() {
@@ -306,20 +306,20 @@ function set_tab() {
 }
 
 EOS;
-	$smarty->assign('save',
+	$tplvars['save'] =
 		$this->CreateInputSubmit($id,'submit',$this->Lang('save'),
-		'onclick="set_tab();"'));
-	$smarty->assign('cancel',
+		'onclick="set_tab();"');
+	$tplvars['cancel'] =
 		$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),
-		'onclick="set_tab();"'));
-	$smarty->assign('pconfig',1);
+		'onclick="set_tab();"');
+	$tplvars['pconfig'] = 1;
 }
 else
 {
-	$smarty->assign('pconfig',0);
+	$tplvars['pconfig'] = 0;
 }
-$smarty->assign('pmod',(($pmod)?1:0));
-$smarty->assign('pdev',(($iseditor)?1:0));
+$tplvars['pmod'] = (($pmod)?1:0);
+$tplvars['pdev'] = (($iseditor)?1:0);
 
 if($jsloads)
 {
@@ -329,7 +329,7 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-$smarty->assign('jsfuncs',$jsfuncs);
-$smarty->assign('jsincs',$jsincs);
+$tplvars['jsfuncs'] = $jsfuncs;
+$tplvars['jsincs'] = $jsincs;
 
 ?>

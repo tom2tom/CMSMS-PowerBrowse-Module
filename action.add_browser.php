@@ -33,6 +33,8 @@ if(isset($params['submit']))
 		'browser_id'=>$browser_id));
 }
 
+$tplvars = array();
+
 if($params['browser_id'] == -1)//add browser
 {
 	$funcs = new pwfBrowserIface('PowerForms');
@@ -49,52 +51,46 @@ if($params['browser_id'] == -1)//add browser
 		$message = $this->PrettyMessage('noforms',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
 	}
-	$smarty->assign('hidden',$this->CreateInputHidden($id,'browser_id',-1));
-	$smarty->assign('title_form_name',$this->Lang('title_form_name'));
+	$tplvars['hidden'] = $this->CreateInputHidden($id,'browser_id',-1);
+	$tplvars['title_form_name'] = $this->Lang('title_form_name');
 	if (extension_loaded('intl') === TRUE)
 		collator_asort(collator_create(NULL),$formList,Collator::SORT_STRING);
 	else
 		natsort($formList);
 	$formSelect = array_flip($formList);
 	//must return $params['form_id'],$params['name']
-	$smarty->assign('input_form_name',
-		$this->CreateInputDropdown($id,'form_id',
-		array_merge(array($this->Lang('select_form')=>-1),$formSelect),-1));
-	$smarty->assign('title_browser_name',$this->Lang('title_browser_name'));
-	$smarty->assign('input_browser_name',
-		$this->CreateInputText($id,'name','',50));
+	$tplvars['input_form_name'] = $this->CreateInputDropdown($id,'form_id',
+		array_merge(array($this->Lang('select_form')=>-1),$formSelect),-1);
+	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
+	$tplvars['input_browser_name'] = $this->CreateInputText($id,'name','',50);
 	$tpl = 'add_browser.tpl';
 }
 else //clone existing browser
 {
 	$bid = (int)$params['browser_id'];
 	$fid = (int)$params['form_id'];
-	$smarty->assign('hidden',$this->CreateInputHidden($id,'browser_id',$bid).
-		$this->CreateInputHidden($id,'form_id',$fid));
-	$smarty->assign('title_form_name',$this->Lang('title_form_name'));
+	$tplvars['hidden'] = $this->CreateInputHidden($id,'browser_id',$bid).
+		$this->CreateInputHidden($id,'form_id',$fid);
+	$tplvars['title_form_name'] = $this->Lang('title_form_name');
 	$name = pwbrUtils::GetFormNameFromID($fid);
-	$smarty->assign('form_name',$name);
-	$smarty->assign('title_browser_oldname',$this->Lang('title_browser_oldname'));
+	$tplvars['form_name'] = $name;
+	$tplvars['title_browser_oldname'] = $this->Lang('title_browser_oldname');
 	$name = pwbrUtils::GetBrowserNameFromID($bid);
-	$smarty->assign('browser_oldname',$name);
-	$smarty->assign('title_browser_name',$this->Lang('title_browser_name'));
-	$smarty->assign('input_browser_name',
-		$this->CreateInputText($id,'browser_name',$name.' '.$this->Lang('copy'),50,256));
+	$tplvars['browser_oldname'] = $name;
+	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
+	$tplvars['input_browser_name'] =
+		$this->CreateInputText($id,'browser_name',$name.' '.$this->Lang('copy'),50,256);
 	$tpl = 'clone_browser.tpl';
 }
 
-$this->BuildNav($id,$returnid,$params);
-$tab = $this->GetActiveTab($params);
+$this->BuildNav($id,$returnid,$params,$tplvars);
 
-$smarty->assign('start_form',
-	$this->CreateFormStart($id,'add_browser',$returnid));
-$smarty->assign('end_form',$this->CreateFormEnd());
+$tplvars['start_form'] = $this->CreateFormStart($id,'add_browser',$returnid);
+$tplvars['end_form'] = $this->CreateFormEnd();
 
-$smarty->assign('save',
-	$this->CreateInputSubmit($id,'submit',$this->Lang('save')));
-$smarty->assign('cancel',
-	$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
+$tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
+$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
-echo $this->ProcessTemplate($tpl);
+pwbrUtils::ProcessTemplate($this,$tpl,$tplvars);
 
 ?>

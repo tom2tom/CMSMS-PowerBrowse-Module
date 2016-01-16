@@ -269,7 +269,7 @@ EOS;
 			return 'maintab';
 	}
 
-	function BuildNav($id,$returnid,&$params)
+	function BuildNav($id,$returnid,&$params,&$tplvars)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('title_browsers'));
@@ -280,8 +280,7 @@ EOS;
 			'form_id'=>$params['form_id'],
 			'browser_id'=>$params['browser_id']));
 		}
-		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('inner_nav',$navstr);
+		$tplvars['inner_nav'] = $navstr;
 	}
 }
 

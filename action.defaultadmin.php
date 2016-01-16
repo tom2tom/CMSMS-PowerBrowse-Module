@@ -76,8 +76,10 @@ if($padmin)
 	}
 }
 
+$tplvars = array();
+
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo $this->ProcessTemplate('adminpanel.tpl');
+pwbrUtils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
 
 ?>

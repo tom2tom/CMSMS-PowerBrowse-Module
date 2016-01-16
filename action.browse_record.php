@@ -30,23 +30,24 @@ if(!$when)
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-$this->BuildNav($id,$returnid,$params);
+$tplvars = array();
+$this->BuildNav($id,$returnid,$params,$tplvars);
 
-$smarty->assign('start_form',
+$tplvars['start_form'] =
 	$this->CreateFormStart($id,'browse_record',$returnid,'POST','','','',
 		array('record_id'=>$params['record_id'],
 		'browser_id'=>$params['browser_id'],
 		'form_id'=>$params['form_id'],
-		'submit_when'=>$when)));
-$smarty->assign('end_form',$this->CreateFormEnd());
+		'submit_when'=>$when));
+$tplvars['end_form'] = $this->CreateFormEnd();
 $bname = pwbrUtils::GetBrowserNameFromID($params['browser_id']);
-$smarty->assign('title_submit_when',$this->Lang('title_submit_when'));
-$smarty->assign('submit_when',$when);
+$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
+$tplvars['submit_when'] = $when;
 
 $content = array();
 if(isset($params['edit']))
 {
-	$smarty->assign('title_browser',$this->Lang('title_submitted_edit',$bname));
+	$tplvars['title_browser'] = $this->Lang('title_submitted_edit',$bname);
 	foreach($data as &$one)
 	{
 		$title = $one[0];
@@ -66,21 +67,21 @@ if(isset($params['edit']))
 			$this->CreateInputHidden($id,'field[]',$title).$input);
 	}
 	unset($one);
-	$smarty->assign('btncancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
-	$smarty->assign('btnsubmit',$this->CreateInputSubmit($id,'submit',$this->Lang('submit')));
+	$tplvars['btncancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
+	$tplvars['btnsubmit'] = $this->CreateInputSubmit($id,'submit',$this->Lang('submit'));
 }
 else //view
 {
-	$smarty->assign('title_browser',$this->Lang('title_submitted_as',$bname));
+	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
 	foreach($data as &$one)
 	{
 		$content[] = array(htmlentities($one[0]),htmlentities($one[1]));
 	}
 	unset($one);
-	$smarty->assign('btncancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('close')));
+	$tplvars['btncancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('close'));
 }
-$smarty->assign('content',$content);
+$tplvars['content'] = $content;
 
-echo $this->ProcessTemplate('browse_record.tpl');
+pwbrUtils::ProcessTemplate($this,'browse_record.tpl',$tplvars);
 
 ?>
