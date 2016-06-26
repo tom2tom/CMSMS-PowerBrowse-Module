@@ -46,8 +46,8 @@
   <p class="pageinput" style="margin-top:10px;">{$save} {$cancel} {$apply}</p>
 {$end_form}
 
-{if isset($jsincs)}{foreach from=$jsincs item=file}{$file}{/foreach}
-{/if}
+{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
+{/foreach}{/if}
 {if isset($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[

@@ -45,8 +45,8 @@
 {if $pmod}<p class="pageinput">{$iconlinkadd}&nbsp;{$textlinkadd}</p>{/if}
 <div style="clear:right;"></div>
 
-{if isset($jsincs)}{foreach from=$jsincs item=file}{$file}{/foreach}
-{/if}
+{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
+{/foreach}{/if}
 {if isset($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[
