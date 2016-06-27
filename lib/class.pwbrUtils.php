@@ -279,7 +279,7 @@ class pwbrUtils
 		if($mod->before20)
 		{
 			$smarty->assign($tplvars);
-			echo $mod->ProcessTemplate($tplname);
+			return $mod->ProcessTemplate($tplname);
 		}
 		else
 		{
@@ -296,7 +296,7 @@ class pwbrUtils
 			{
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
 			}
-			$tpl->display();
+			return $tpl->fetch();
 		}
 	}
 }

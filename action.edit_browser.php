@@ -33,6 +33,6 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.edit_browser.php';
 
-pwbrUtils::ProcessTemplate($this,'edit_browser.tpl',$tplvars);
+echo pwbrUtils::ProcessTemplate($this,'edit_browser.tpl',$tplvars);
 
 ?>

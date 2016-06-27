@@ -91,6 +91,6 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
-pwbrUtils::ProcessTemplate($this,$tpl,$tplvars);
+echo pwbrUtils::ProcessTemplate($this,$tpl,$tplvars);
 
 ?>

@@ -80,6 +80,6 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-pwbrUtils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
+echo pwbrUtils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
 
 ?>

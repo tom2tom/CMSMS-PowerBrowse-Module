@@ -292,6 +292,6 @@ if($jsloads)
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
 
-pwbrUtils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
+echo pwbrUtils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
 
 ?>

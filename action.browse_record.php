@@ -82,6 +82,6 @@ else //view
 }
 $tplvars['content'] = $content;
 
-pwbrUtils::ProcessTemplate($this,'browse_record.tpl',$tplvars);
+echo pwbrUtils::ProcessTemplate($this,'browse_record.tpl',$tplvars);
 
 ?>
