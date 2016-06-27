@@ -96,7 +96,6 @@ if($fields)
 	);
 
 	$mc = 0;
-	$previd	= -10;
 	$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 		cms_utils::get_theme_object();
 	$iconup = $theme->DisplayImage('icons/system/arrow-u.gif',$this->Lang('up'),'','','systemicon');
@@ -123,6 +122,7 @@ if($fields)
 		else
 			$oneset->up = '';
 		$mc++;
+		$previd = $fid; //i.e. always set before use
 		$formatted[] = $oneset;
 	}
 	unset($one);
