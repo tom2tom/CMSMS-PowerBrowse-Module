@@ -6,7 +6,7 @@
 
 if (!($this->CheckAccess('admin') || $this->CheckAccess('modify'))) exit;
 
-$funcs = new PowerBrowse\TODO();
+$funcs = new PowerBrowse\RecordTasks();
 $funcs->AddRecord($params['form_id'],$this->GetPreference('onchange_notices'));
 
-$this->Redirect($id,'browse_list','',$TODOrelevantbrowser);
+$this->Redirect($id,'browse_list',$returnid,$params);
