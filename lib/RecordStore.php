@@ -4,16 +4,18 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-class pwbrRecordStore
+namespace PowerBrowse;
+
+class RecordStore
 {
 	/*
 	@mod: reference to PowerBrowse module object
 	@source: string to be encrypted
-	Must be compatible with pwbrRecordLoad::Decrypt()
+	Must be compatible with RecordLoad::Decrypt()
 	*/
 	private function Encrypt(&$mod,$source)
 	{
-		return pwbrUtils::encrypt_value($mod,$source);
+		return Utils::encrypt_value($mod,$source);
 	}
 
 	/**
@@ -30,7 +32,7 @@ class pwbrRecordStore
 	{
 		$when = date('Y-m-d H:i:s',$stamp);
 		$cont = self::Encrypt($mod,serialize($data));
-		return pwbrUtils::SafeExec('INSERT INTO '.$pre.
+		return Utils::SafeExec('INSERT INTO '.$pre.
 		'module_pwbr_record (browser_id,form_id,submitted,contents) VALUES (?,?,?,?)',
 			array($browser_id,$form_id,$when,$cont));
 	}
@@ -47,11 +49,9 @@ class pwbrRecordStore
 	{
 		$when = date('Y-m-d H:i:s');
 		$cont = self::Encrypt($mod,serialize($data));
-		return pwbrUtils::SafeExec('UPDATE '.$pre.
+		return Utils::SafeExec('UPDATE '.$pre.
 		'module_pwbr_record SET submitted=?,contents=? WHERE record_id=?',
 			array($when,$cont,$record_id));
 	}
 
 }
-
-?>

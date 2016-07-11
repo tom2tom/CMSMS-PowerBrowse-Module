@@ -4,7 +4,9 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-class pwbrUtils
+namespace PowerBrowse;
+
+class Utils
 {
 	const ENC_ROUNDS = 1000;
 
@@ -24,8 +26,7 @@ class pwbrUtils
 		{
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 			$db->StartTrans();
-			switch($mode)
-			{
+			switch ($mode) {
 			 case 'one':
 				$ret = $db->GetOne($sql,$args);
 				break;
@@ -42,10 +43,9 @@ class pwbrUtils
 				$ret = $db->GetAll($sql,$args);
 				break;
 			}
-			if($db->CompleteTrans())
+			if ($db->CompleteTrans())
 				return $ret;
-			else
-			{
+			else {
 				$nt--;
 				usleep(50000);
 			}
@@ -68,17 +68,14 @@ class pwbrUtils
 		{
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
 			$db->StartTrans();
-			if(is_array($sql))
-			{
-				foreach($sql as $i=>$cmd)
+			if (is_array($sql)) {
+				foreach ($sql as $i=>$cmd)
 					$db->Execute($cmd,$args[$i]);
-			}
-			else
+			} else
 				$db->Execute($sql,$args);
-			if($db->CompleteTrans())
+			if ($db->CompleteTrans())
 				return TRUE;
-			else
-			{
+			else {
 				$nt--;
 				usleep(50000);
 			}
@@ -127,7 +124,7 @@ class pwbrUtils
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
-		if($internal)
+		if ($internal)
 			$sql = 'SELECT form_name FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 		else
 			$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -143,12 +140,11 @@ class pwbrUtils
 	{
 		$config = cmsms()->GetConfig();
 		$up = $config['uploads_path'];
-		if($up)
-		{
+		if ($up) {
 			$rp = $mod->GetPreference('uploads_path');
-			if($rp)
+			if ($rp)
 				$up .= DIRECTORY_SEPARATOR.$rp;
-			if(is_dir($up))
+			if (is_dir($up))
 				return $up;
 		}
 		return FALSE;
@@ -164,11 +160,9 @@ class pwbrUtils
 		$config = cmsms()->GetConfig();
 		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url':'ssl_uploads_url';
 		$up = $config[$key];
-		if($up)
-		{
+		if ($up) {
 			$rp = $mod->GetPreference('uploads_path');
-			if($rp)
-			{
+			if ($rp) {
 				$rp = str_replace('\\','/',$rp);
 				$up .= '/'.$rp;
 			}
@@ -187,20 +181,16 @@ class pwbrUtils
 	*/
 	public static function encrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
 	{
-		if($value)
-		{
-			if(!$passwd)
-			{
+		if ($value) {
+			if (!$passwd) {
 				$passwd = self::unfusc($mod->GetPreference('masterpass'));
 			}
-			if($passwd && $mod->havemcrypt)
-			{
+			if ($passwd && $mod->havemcrypt) {
 				$e = new Encryption(MCRYPT_BLOWFISH,MCRYPT_MODE_CBC,self::ENC_ROUNDS);
 				$value = $e->encrypt($value,$passwd);
-				if($based)
+				if ($based)
 					$value = base64_encode($value);
-			}
-			else
+			} else
 				$value = self::fusc($passwd.$value);
 		}
 		return $value;
@@ -216,20 +206,16 @@ class pwbrUtils
 	*/
 	public static function decrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
 	{
-		if($value)
-		{
-			if(!$passwd)
-			{
+		if ($value) {
+			if (!$passwd) {
 				$passwd = self::unfusc($mod->GetPreference('masterpass'));
 			}
-			if($passwd && $mod->havemcrypt)
-			{
-				if($based)
+			if ($passwd && $mod->havemcrypt) {
+				if ($based)
 					$value = base64_decode($value);
 				$e = new Encryption(MCRYPT_BLOWFISH,MCRYPT_MODE_CBC,self::ENC_ROUNDS);
 				$value = $e->decrypt($value,$passwd);
-			}
-			else
+			} else
 				$value = substr(strlen($passwd),self::unfusc($value));
 		}
 		return $value;
@@ -242,8 +228,7 @@ class pwbrUtils
 	*/
 	public static function fusc($str)
 	{
-		if($str)
-		{
+		if ($str) {
 			$s = substr(base64_encode(md5(microtime())),0,5);
 			return $s.base64_encode($s.$str);
 		}
@@ -257,8 +242,7 @@ class pwbrUtils
 	*/
 	public static function unfusc($str)
 	{
-		if($str)
-		{
+		if ($str) {
 			$s = base64_decode(substr($str,5));
 			return substr($s,5);
 		}
@@ -276,29 +260,21 @@ class pwbrUtils
 	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=TRUE)
 	{
 		global $smarty;
-		if($mod->before20)
-		{
+		if ($mod->before20) {
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
-		}
-		else
-		{
-			if($cache)
-			{
+		} else {
+			if ($cache) {
 				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwbr'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,$compile_id,$smarty);
-				if(!$tpl->isCached())
+				if (!$tpl->isCached())
 					$tpl->assign($tplvars);
-			}
-			else
-			{
+			} else {
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
 			}
 			return $tpl->fetch();
 		}
 	}
 }
-
-?>

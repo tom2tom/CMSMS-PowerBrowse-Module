@@ -5,7 +5,9 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-class pwbrExport
+namespace PowerBrowse;
+
+class Export
 {
 	/**
 	ExportName:
@@ -13,17 +15,16 @@ class pwbrExport
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
 	@record_id: index of the record to process, or array of such, or FALSE if @record_id is provided
 	*/
-	public function ExportName(&$mod,$browser_id=FALSE,$record_id=FALSE)
+	public function ExportName(&$mod, $browser_id=FALSE, $record_id=FALSE)
 	{
-		if(!$browser_id)
-		{
-			if(is_array($record_id))
+		if (!$browser_id) {
+			if (is_array($record_id))
 				$rid = reset($record_id);
 			else
 				$rid = $record_id;
-			$browser_id = pwbrUtils::GetBrowserIDForRecord($rid);
+			$browser_id = Utils::GetBrowserIDForRecord($rid);
 		}
-		$bname = pwbrUtils::GetBrowserNameFromID($browser_id);
+		$bname = Utils::GetBrowserNameFromID($browser_id);
 		$sname = preg_replace('/\W/','_',$bname);
 		$datestr = date('Y-m-d-H-i');
 		return $mod->GetName().$mod->Lang('export').'-'.$sname.'-'.$datestr.'.csv';
@@ -46,42 +47,35 @@ class pwbrExport
 	(except when the separator is '&', '#' or ';', those become %...%)
 	Returns: TRUE/string, or FALSE on error
 	*/
-	public function CSV(&$mod,$browser_id=FALSE,$record_id=FALSE,$fp = FALSE,$sep = ',')
+	public function CSV(&$mod, $browser_id=FALSE, $record_id=FALSE, $fp = FALSE, $sep = ',')
 	{
 		global $db; //$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
-		if($browser_id)
-		{
+		if ($browser_id) {
 			$sql = 'SELECT record_id FROM '.$pre.
 			'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
-			$all = pwbrUtils::SafeGet($sql,array($browser_id),'col');
-		}
-		elseif($record_id)
-		{
-			if(is_array($record_id))
+			$all = Utils::SafeGet($sql,array($browser_id),'col');
+		} elseif ($record_id) {
+			if (is_array($record_id))
 				$all = $record_id;
 			else
 				$all = array($record_id);
-		}
-		else
+		} else
 			return FALSE;
 	
-		if($fp && ini_get ('mbstring.internal_encoding') !== FALSE) //send to file, and conversion is possible
-		{
+		if ($fp && ini_get ('mbstring.internal_encoding') !== FALSE) { //send to file, and conversion is possible
 			$config = cmsms()->GetConfig();
-			if(!empty($config['default_encoding']))
+			if (!empty($config['default_encoding']))
 				$defchars = trim($config['default_encoding']);
 			else
 				$defchars = 'UTF-8';
 			$expchars = $mod->GetPreference('export_file_encoding','ISO-8859-1');
 			$convert = (strcasecmp ($expchars,$defchars) != 0);
-		}
-		else
+		} else
 			$convert = FALSE;
 
 		$sep2 = ($sep != ' ')?' ':',';
-		switch ($sep)
-		{
+		switch ($sep) {
 		 case '&':
 			$r = '%38%';
 			break;
@@ -98,93 +92,78 @@ class pwbrExport
 
 		$strip = $mod->GetPreference('strip_on_export');
 
-		if($all)
-		{
-			$funcs = new pwbrRecordLoad();
+		if ($all) {
+			$funcs = new RecordLoad();
 			//header line
 			$data = $funcs->Load($all[0],$mod,$db,$pre);
-			if(!$data[0])
+			if (!$data[0])
 				return FALSE;
 			$names = array();				
-			foreach($data[1] as &$one)
-			{
+			foreach ($data[1] as &$one) {
 				$fn = $one[0];
-				if($strip)
+				if ($strip)
 					$fn = strip_tags($fn);
 				$names[] = str_replace($sep,$r,$fn);
 			}
 			unset($one);
 			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
-			if($names)
+			if ($names)
 				$outstr .= $sep.implode($sep,$names);
 			$outstr .= PHP_EOL;
 			//data lines(s)
-			foreach($all as $one)
-			{
+			foreach ($all as $one) {
 				$data = $funcs->Load($one,$mod,$db,$pre);
-				if(!$data[0])
+				if (!$data[0])
 					continue;	//decryption error
 				$outstr .= str_replace($sep,$r,$data[0]);
-				foreach($data[1] as &$one)
-				{
+				foreach ($data[1] as &$one) {
 					$fv = $one[1];
-					if($strip)
+					if ($strip)
 						$fv = strip_tags($fv);
 					$fv = str_replace($sep,$r,$fv);
 					$outstr .= $sep.preg_replace('/[\n\t\r]/',$sep2,$fv);
 				}
 				unset($one);
 				$outstr .= PHP_EOL;
-				if($fp)
-				{
-					if($convert)
-					{
+				if ($fp) {
+					if ($convert) {
 						$conv = mb_convert_encoding($outstr, $expchars, $defchars);
 						fwrite($fp, $conv);
 						unset($conv);
-					}
-					else
-					{
+					} else {
 						fwrite($fp, $outstr);
 					}
 					$outstr = '';
 				}
 			}
-			if($fp)
+			if ($fp)
 				return TRUE;
 			else
 				return $outstr; //encoding conversion upstream
-		}
-		else
-		{
+		} else {
 			//no data, produce just a header line
 			$sql = 'SELECT name FROM '.$pre.
 			'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
 			$names = $db->GetCol($sql,array($params['browser_id']));
 			//cleanup messy field-names
-			foreach($names as $i => &$one)
-			{
-				if($strip)
+			foreach ($names as $i => &$one) {
+				if ($strip)
 					$one = strip_tags($one);
 				$one = str_replace($sep,$r,$one);
 			}
 			unset($one);
 
 			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
-			if($names)
+			if ($names)
 				$outstr .= $sep.implode($sep,$names);
 			$outstr .= PHP_EOL;
 			
-			if($fp)
-			{
-				if($convert)
-				{
+			if ($fp) {
+				if ($convert) {
 					$conv = mb_convert_encoding($outstr, $expchars, $defchars);
 					fwrite($fp, $conv);
 					unset($conv);
-				}
-				else
-				{
+				} else {
 					fwrite($fp, $outstr);
 				}
 				return TRUE;
@@ -202,26 +181,22 @@ class pwbrExport
 	At least one of @browser_id, @record_id must be provided
 	Returns: TRUE on success, or lang key for error message upon failure
 	*/
-	public function Export(&$mod,$browser_id=FALSE,$record_id=FALSE,$sep = ',')
+	public function Export(&$mod, $browser_id=FALSE, $record_id=FALSE, $sep = ',')
 	{
 		if (!($browser_id || $record_id))
 			return 'error_system';
 		$fname = $this->ExportName($mod,$browser_id,$record_id);
 
-		if($mod->GetPreference('export_file'))
-		{
-			$updir = pwbrUtils::GetUploadsPath($mod);
-			if($updir)
-			{
+		if ($mod->GetPreference('export_file')) {
+			$updir = Utils::GetUploadsPath($mod);
+			if ($updir) {
 				$filepath = $updir.DIRECTORY_SEPARATOR.$fname;
 				$fp = fopen($filepath,'w');
-				if($fp)
-				{
+				if ($fp) {
 					$success = $this->CSV($mod,$browser_id,$record_id,$fp,$sep);
 					fclose($fp);
-					if($success)
-					{
-						$url = pwbrUtils::GetUploadsUrl($mod).'/'.$fname;
+					if ($success) {
+						$url = Utils::GetUploadsUrl($mod).'/'.$fname;
 						@ob_clean();
 						@ob_clean();
 						header('Location: '.$url);
@@ -229,25 +204,19 @@ class pwbrExport
 					}
 				}
 			}
-		}
-		else
-		{
+		} else {
 			$csv = $this->CSV($mod,$browser_id,$record_id,FALSE,$sep);
-			if($csv)
-			{
+			if ($csv) {
 				$config = cmsms()->GetConfig();
-				if(!empty($config['default_encoding']))
+				if (!empty($config['default_encoding']))
 					$defchars = trim($config['default_encoding']);
 				else
 					$defchars = 'UTF-8';
 
-				if(ini_get('mbstring.internal_encoding') !== FALSE) //conversion is possible
-				{
+				if (ini_get('mbstring.internal_encoding') !== FALSE) { //conversion is possible
 					$expchars = $mod->GetPreference('export_file_encoding','ISO-8859-1');
 					$convert = (strcasecmp ($expchars,$defchars) != 0);
-				}
-				else
-				{
+				} else {
 					$expchars = $defchars;
 					$convert = FALSE;
 				}
@@ -263,7 +232,7 @@ class pwbrExport
 				header('Content-Type: text/csv; charset='.$expchars);
 				header('Content-Length: '.strlen($csv));
 				header('Content-Disposition: attachment; filename='.$fname);
-				if($convert)
+				if ($convert)
 					echo mb_convert_encoding($csv,$expchars,$defchars);
 				else
 					echo $csv;
@@ -273,5 +242,3 @@ class pwbrExport
 		return 'error_export';
 	}
 }
-
-?>

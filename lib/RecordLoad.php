@@ -4,22 +4,22 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-class pwbrRecordLoad
+namespace PowerBrowse;
+
+class RecordLoad
 {
 	/*
 	@mod: reference to PowerBrowse module object
 	@source: string to be decrypted
 	@getstruct: optional boolean, whether to unserialize decrypted value, default TRUE
-	Must be compatible with pwbrRecordStore::Encrypt()
+	Must be compatible with RecordStore::Encrypt()
 	*/
 	public function Decrypt(&$mod,$source,$getstruct=TRUE)
 	{
-		if($source)
-		{
-			$decrypted = pwbrUtils::decrypt_value($mod,$source);
-			if($decrypted)
-			{
-				if($getstruct)
+		if ($source) {
+			$decrypted = Utils::decrypt_value($mod,$source);
+			if ($decrypted) {
+				if ($getstruct)
 					return unserialize($decrypted);
 				else
 					return $decrypted;
@@ -39,28 +39,23 @@ class pwbrRecordLoad
 	*/
 	public function Load($record_id,&$mod=NULL,&$db=NULL,$pre='')
 	{
-		if(!$mod)
+		if (!$mod)
 			$mod = cms_utils::get_module('PowerBrowse');
-		if(!$db)
+		if (!$db)
 			$db = cmsms()->GetDb();
-		if(!$pre)
+		if (!$pre)
 			$pre = cms_db_prefix();
-		$row = pwbrUtils::SafeGet(
+		$row = Utils::SafeGet(
 		'SELECT submitted,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 		array($record_id));
-		if($row)
-		{
+		if ($row) {
 			$formdata = self::Decrypt($mod,$row['contents']);
-			if($formdata)
+			if ($formdata)
 				return array($row['submitted'],$formdata);
 			$errkey = 'error_data';
-		}
-		else
-		{
+		} else {
 			$errkey = 'error_database';
 		}
 		return array(FALSE,$mod->PrettyMessage($errkey,FALSE));
 	}
 }
-
-?>
