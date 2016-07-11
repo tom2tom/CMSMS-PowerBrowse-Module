@@ -9,17 +9,13 @@
 function delTree($dir)
 {
 	$files = array_diff(scandir($dir),array('.','..'));
-	if($files)
-	{
-		foreach($files as $file)
-		{
+	if ($files) {
+		foreach ($files as $file) {
 			$fp = $dir.DIRECTORY_SEPARATOR.$file;
-			if(is_dir($fp))
-			{
-			 	if(!delTree($fp))
+			if (is_dir($fp)) {
+			 	if (!delTree($fp))
 					return false;
-			}
-			else
+			} else
 				unlink($fp);
 		}
 		unset($files);
@@ -27,7 +23,7 @@ function delTree($dir)
 	return rmdir($dir);
 }
 
-if(!$this->CheckAccess('admin')) exit;
+if (!$this->CheckAccess('admin')) exit;
 
 $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
@@ -54,13 +50,11 @@ $this->RemovePermission('ModifyPwFormData');
 $this->RemovePermission('ViewPwFormData');
 
 $fp = $config['uploads_path'];
-if($fp && is_dir($fp))
-{
+if ($fp && is_dir($fp)) {
 	$ud = $this->GetPreference('uploads_dir');
-	if($ud)
-	{
+	if ($ud) {
 		$fp = $fp.DIRECTORY_SEPARATOR.$ud;
-		if($fp && is_dir($fp))
+		if ($fp && is_dir($fp))
 			delTree($fp);
 	}
 }
@@ -69,11 +63,8 @@ $this->RemovePreference();
 
 // remove disposer
 $pfmod = $this->GetModuleInstance('PowerForms');
-if($pfmod)
-{
-	$fp = cms_join_path($this->GetModulePath(),'lib','class.pwfDispositionFormBrowser.php');
+if ($pfmod) {
+	$fp = cms_join_path($this->GetModulePath(),'lib','FormBrowser.php');
 	$pfmod->DeregisterField($fp);
 	unset($pfmod);
 }
-
-?>

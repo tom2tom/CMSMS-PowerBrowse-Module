@@ -4,33 +4,28 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess()) exit;
+if (!$this->CheckAccess()) exit;
 
-if(!isset($params['sel']))
+if (!isset($params['sel']))
 	$this->Redirect($id,'browse_list'); //nothing selected
 
-if(isset($params['delete']))
-{
-	if(!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
+if (isset($params['delete'])) {
+	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
 
-	$funcs = new pwbrRecordTasks();
+	$funcs = new PowerBrowse\RecordTasks();
 	$funcs->DeleteRecord($params['sel']);
 	unset($funcs);
 	$message = $this->Lang('message_records_deleted',count($params['sel']));
 	$params['message'] = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
-}
-elseif(isset($params['export']))
-{
-	if(!$this->CheckAccess()) exit;
+} elseif (isset($params['export'])) {
+	if (!$this->CheckAccess()) exit;
 
-	$funcs = new pwbrExport();
+	$funcs = new PowerBrowse\Export();
 	$res = $funcs->Export($this,FALSE,$params['sel']);
-	if($res === TRUE)
+	if ($res === TRUE)
 		exit;
 	unset($funcs);
 	$params['message'] = $this->PrettyMessage($res,FALSE);	
 }
 
 $this->Redirect($id,'browse_list',$returnid,$params);
-
-?>

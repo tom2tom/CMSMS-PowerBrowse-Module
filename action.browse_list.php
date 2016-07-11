@@ -6,9 +6,9 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
 $pconfig = $this->CheckAccess('admin');
-if($pconfig || $this->CheckAccess('modify'))
+if ($pconfig || $this->CheckAccess('modify'))
 	$pmod = TRUE;
-elseif($this->CheckAccess('view'))
+elseif ($this->CheckAccess('view'))
 	$pmod = FALSE;
 else
 	exit;
@@ -24,16 +24,15 @@ $baseurl = $this->GetModuleURLPath();
 //replace href attribute in existing stylesheet link (early in page-processing)
 $cssfile = $this->GetPreference('list_cssfile');
 $u = ($cssfile) ?
-	pwbrUtils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
+	PowerBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
 	$baseurl.'/css/list-view.css';
-$t = <<<EOS
+$tplvars['cssscript'] = <<<EOS
 <script type="text/javascript">
 //<![CDATA[
  document.getElementById('adminstyler').setAttribute('href',"{$u}");
 //]]>
 </script>
 EOS;
-$tplvars['cssscript'] = $t;
 
 $this->BuildNav($id,$returnid,$params,$tplvars);
 $tplvars['start_form'] =
@@ -41,7 +40,7 @@ $tplvars['start_form'] =
 		array('browser_id'=>$bid,'form_id'=>$fid));
 $tplvars['end_form'] = $this->CreateFormEnd();
 
-if(!empty($params['message']))
+if (!empty($params['message']))
 	$tplvars['message'] = $params['message'];
 
 $pre = cms_db_prefix();
@@ -55,10 +54,8 @@ WHERE browser_id=? AND shown=1 ORDER BY order_by';
 $data = $db->GetAll($sql,array($params['browser_id']));
 $colnames = array();
 $colsorts = array();
-//if($data) //REDUNDANT - NEVER COME HERE, OTHERWISE
-//{
-	foreach($data as &$one)
-	{
+//if ($data) { REDUNDANT - NEVER COME HERE, OTHERWISE
+	foreach ($data as &$one) {
 		$colnames[] = $one['name'];
 		$colsorts[] = (int)$one['sorted'];
 	}
@@ -76,10 +73,9 @@ $jsfuncs = array();
 $jsloads = array();
 
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = pwbrUtils::SafeGet($sql,array($params['browser_id']));
+$data = PowerBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
-//if($data)
-//{
+//if ($data) {
 	$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 
 	$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
@@ -87,15 +83,13 @@ $rows = array();
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
 
-	$funcs = new pwbrRecordLoad();
-	foreach($data as &$one)
-	{
+	$funcs = new PowerBrowse\RecordLoad();
+	foreach ($data as &$one) {
 		$fields = array();
 		$submission = $funcs->Decrypt($this,$one['contents']);
-		if($submission)
-		{
+		if ($submission) {
 			//include data for fields named in $colnames
-			foreach($submission as &$sub) //TODO any use for field index?
+			foreach ($submission as &$sub) //TODO any use for field index?
 			{
 				$indx = array_search($sub[0],$colnames);
 				if ($indx !== FALSE)
@@ -103,8 +97,7 @@ $rows = array();
 			}
 			unset($sub);
 		}
-		if($fields)
-		{
+		if ($fields) {
 			$rid = (int)$one['record_id'];
 			$oneset = new stdClass();
 			$oneset->submitted = $one['submitted'];
@@ -113,14 +106,14 @@ $rows = array();
 			$oneset->view = $this->CreateLink($id,'browse_record','',
 				$icon_view,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
-			if($pmod)
+			if ($pmod)
 			 $oneset->edit = $this->CreateLink($id,'browse_record','',
 				$icon_edit,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid,'edit'=>1));
 			$oneset->export = $this->CreateLink($id,'export_record','',
 				$icon_export,
 				array('record_id'=>$rid,'browser_id'=>$bid));
-			if($pmod)
+			if ($pmod)
 			 $oneset->delete = $this->CreateLink($id,'delete_record','',
 				$icon_delete,
 				array('record_id'=>$rid,'browser_id'=>$bid),
@@ -134,60 +127,8 @@ $rows = array();
 
 $tplvars['rows'] = $rows;
 $rcount = count($rows);
-if($rcount)
-{
-	if($pagerows && $rcount>$pagerows)
-	{
-		//setup for SSsort
-		$curpg='<span id="cpage">1</span>';
-		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
-
-		$choices = array(strval($pagerows) => $pagerows);
-		$f = ($pagerows < 4) ? 5 : 2;
-		$n = $pagerows * $f;
-		if($n < $rcount)
-			$choices[strval($n)] = $n;
-		$n *= 2;
-		if($n < $rcount)
-			$choices[strval($n)] = $n;
-		$choices[$this->Lang('all')] = 0;
-
-		$tplvars = $tplvars + array(
-			'hasnav'=>1,
-			'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
-			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
-			'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
-			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
-			'pageof'=>$this->Lang('pageof',$curpg,$totpg),
-			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
-		);
-
-		$jsfuncs[] = <<<EOS
-function pagefirst() {
- $.SSsort.movePage($('#submissions')[0],false,true);
-}
-function pagelast() {
- $.SSsort.movePage($('#submissions')[0],true,true);
-}
-function pageforw() {
- $.SSsort.movePage($('#submissions')[0],true,false);
-}
-function pageback() {
- $.SSsort.movePage($('#submissions')[0],false,false);
-}
-function pagerows(cb) {
- $.SSsort.setCurrent($('#submissions')[0],'pagesize',parseInt(cb.value));
-}
-
-EOS;
-	}
-	else
-	{
-		$tplvars['hasnav'] = 0;
-	}
-
-	if($rcount > 1)
-	{
+if ($rcount) {
+	if ($rcount > 1) {
 		$jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.metadata.min.js"></script>
 <script type="text/javascript" src="{$baseurl}/include/jquery.SSsort.min.js"></script>
@@ -232,9 +173,55 @@ function select_all(cb) {
 EOS;
 		$tplvars['header_checkbox'] =
 			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
-	}
-	else
+	} else
 		$tplvars['header_checkbox'] = NULL;
+
+	if ($pagerows && $rcount>$pagerows) {
+		//more setup for SSsort
+		$curpg='<span id="cpage">1</span>';
+		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
+
+		$choices = array(strval($pagerows) => $pagerows);
+		$f = ($pagerows < 4) ? 5 : 2;
+		$n = $pagerows * $f;
+		if ($n < $rcount)
+			$choices[strval($n)] = $n;
+		$n *= 2;
+		if ($n < $rcount)
+			$choices[strval($n)] = $n;
+		$choices[$this->Lang('all')] = 0;
+
+		$tplvars = $tplvars + array(
+			'hasnav'=>1,
+			'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
+			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
+			'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
+			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
+			'pageof'=>$this->Lang('pageof',$curpg,$totpg),
+			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
+		);
+
+		$jsfuncs[] = <<<EOS
+function pagefirst() {
+ $.SSsort.movePage($('#submissions')[0],false,true);
+}
+function pagelast() {
+ $.SSsort.movePage($('#submissions')[0],true,true);
+}
+function pageforw() {
+ $.SSsort.movePage($('#submissions')[0],true,false);
+}
+function pageback() {
+ $.SSsort.movePage($('#submissions')[0],false,false);
+}
+function pagerows(cb) {
+ $.SSsort.setCurrent($('#submissions')[0],'pagesize',parseInt(cb.value));
+}
+
+EOS;
+	} else {
+		$tplvars['hasnav'] = 0;
+	}
 
 	$jsfuncs[] = <<<EOS
 function sel_count() {
@@ -245,7 +232,7 @@ function any_selected() {
  return (sel_count() > 0);
 }
 function confirm_selected(msg) {
- if(sel_count() > 0) {
+ if (sel_count() > 0) {
   return confirm(msg);
  } else {
   return false;
@@ -253,22 +240,19 @@ function confirm_selected(msg) {
 }
 
 EOS;
-	if($this->CheckAccess('view') || $this->CheckAccess('admin'))
+	if ($this->CheckAccess('view') || $this->CheckAccess('admin'))
 		$tplvars['export'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 		'title="'.$this->Lang('tip_export_selected_records').
 		'"  onclick="return any_selected();"');
-	if($pmod)
+	if ($pmod)
 		$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 		'title="'.$this->Lang('tip_delete_selected_records').
 		'" onclick="return confirm_selected(\''.$this->Lang('confirm_delete_sel').'\');"');
-}
-else
-{
+} else {
 	$tplvars['norecords'] = $this->Lang('norecords');
 }
 
-if($pmod)
-{
+if ($pmod) {
 	$t = $this->Lang('title_add_record');
 	$icon_add = $theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon');
 	$tplvars['iconlinkadd'] = $this->CreateLink($id,'add_record','',
@@ -281,8 +265,7 @@ if($pmod)
 			'browser_id'=>$bid));
 }
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -292,6 +275,4 @@ if($jsloads)
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
 
-echo pwbrUtils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
-
-?>
+echo PowerBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);

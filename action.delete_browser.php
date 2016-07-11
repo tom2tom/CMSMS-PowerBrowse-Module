@@ -5,14 +5,12 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess('modify')) exit;
+if (!$this->CheckAccess('modify')) exit;
 
-$funcs = new pwbrBrowserTasks();
+$funcs = new PowerBrowse\BrowserTasks();
 $res = $funcs->DeleteBrowser($params['browser_id']);
 $args = ($res) ?
 	array('message' => $this->PrettyMessage('browser_deleted')):
 	array('message' => $this->PrettyMessage('error_failed',FALSE));
 
 $this->Redirect($id,'defaultadmin','',$args);
-
-?>

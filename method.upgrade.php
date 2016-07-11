@@ -5,10 +5,7 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess('modify')) exit;
+if (!$this->CheckAccess('modify')) exit;
 
-switch ($oldversion)
-{
+switch ($oldversion) {
 }
-
-?>

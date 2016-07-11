@@ -7,7 +7,7 @@
 //setup tabbed page to edit a browser's parameters
 
 $this->BuildNav($id,$returnid,$params,$tplvars);
-if(!empty($params['message']))
+if (!empty($params['message']))
 	$tplvars['message'] = $params['message'];
 $tab = $this->GetActiveTab($params);
 $tplvars['tabs_start'] = $this->StartTabHeaders().
@@ -44,8 +44,7 @@ $tplvars = $tplvars + array(
 	'input_browser_name'=>$this->CreateInputText($id,'browser_name',$row['name'],50,256)
 );
 
-if($this->GetPreference('owned_forms'))
-{
+if ($this->GetPreference('owned_forms')) {
 	$sel = array('&lt;'.$this->Lang('all').'&gt;' => 0);
 	//find all valid owners
 	//NOTE cmsms function check_permission() always returns FALSE for everyone
@@ -60,12 +59,11 @@ WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND
 P.permission_name IN("ModifyPwBrowsers","ModifyPwFormData")
 ORDER BY U.last_name,U.first_name';
 	$rs = $db->Execute($sql);
-	if($rs)
-	{
+	if ($rs) {
 		while($urow = $rs->FetchRow())
 		{
 			$name = trim($urow['first_name'].' '.$urow['last_name']);
-			if($name == '')
+			if ($name == '')
 				$name = trim($urow['username']);
 			$sel[$name] = (int)$urow['user_id'];
 		}
@@ -85,8 +83,7 @@ $tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
 $sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
 $fields = $db->GetAll($sql,array($params['browser_id']));
-if($fields)
-{
+if ($fields) {
 	$tplvars = $tplvars + array(
 		'title_data'=>$this->Lang('title_data'),
 		'title_name'=>$this->Lang('title_field_identity'),
@@ -102,8 +99,7 @@ if($fields)
 	$icondn = $theme->DisplayImage('icons/system/arrow-d.gif',$this->Lang('down'),'','','systemicon');
 
 	$formatted = array();
-	foreach($fields as &$one)
-	{
+	foreach ($fields as &$one) {
 		$fid = (int)$one['field_id'];
 		$oneset = new stdClass();
 		$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
@@ -111,15 +107,13 @@ if($fields)
 		$oneset->display = $this->CreateInputCheckbox($id,'shown[]',$fid,(($one['shown'])?$fid:-1));
 		$oneset->sort = $this->CreateInputCheckbox($id,'sortable[]',$fid,(($one['sorted'])?$fid:-1));
 		$oneset->down = '';
-		if ($mc)
-		{
+		if ($mc) {
 			//there's a previous item,create the appropriate links
 			$oneset->up = $this->CreateLink($id,'move_field',$returnid,
 				$iconup,array('field_id'=>$fid,'prev_id'=>$previd));
 			$formatted[($mc-1)]->down = $this->CreateLink($id,'move_field',$returnid,
 				$icondn,array('field_id'=>$previd,'next_id'=>$fid));
-		}
-		else
+		} else
 			$oneset->up = '';
 		$mc++;
 		$previd = $fid; //i.e. always set before use
@@ -131,8 +125,7 @@ if($fields)
 	$rc = count($fields);
 	$tplvars['rcount'] = $rc;
 
-	if($rc > 1)
-	{
+	if ($rc > 1) {
 		$jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
 EOS;
@@ -183,7 +176,7 @@ function select_all(cb) {
  boxes = $('#listfields > tbody').find('input[name="{$id}'+target+'"]');
  st = cb.checked;
  boxes.attr('checked',st);
- if(keep && !st) {
+ if (keep && !st) {
   $(boxes[0]).attr('checked',true);
  }
 }
@@ -196,9 +189,7 @@ EOS;
 			'help_dnd'=>$this->Lang('help_dnd')
 		);
 	}
-}
-else
-{
+} else {
 	$tplvars = $tplvars + array(
 		'nofields',$this->Lang('nofields'),
 		'rcount',0
@@ -213,8 +204,7 @@ function set_tab() {
 
 EOS;
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -229,5 +219,3 @@ $tplvars = $tplvars + array(
 	'jsincs'=>$jsincs,
 	'jsfuncs'=>$jsfuncs
 );
-
-?>

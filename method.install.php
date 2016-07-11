@@ -5,10 +5,10 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess('modify')) exit;
+if (!$this->CheckAccess('modify')) exit;
 
 $pfmod = $this->GetModuleInstance('PowerForms');
-if(!$pfmod)
+if (!$pfmod)
 	return $this->PrettyMessage('error_module',FALSE);
 
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
@@ -71,20 +71,16 @@ $this->SetPreference('oldmodule_data',0); //use FormBrowser/Builder data if avai
 $this->SetPreference('owned_forms',0);	//enable user-specific browsing
 $this->SetPreference('strip_on_export',0);
 $fp = $config['uploads_path'];
-if($fp && is_dir($fp))
-{
+if ($fp && is_dir($fp)) {
 	$ud = $this->GetName();
 	$fp = $fp.DIRECTORY_SEPARATOR.$ud;
-	if(!(is_dir($fp) || mkdir($fp,0644)))
+	if (!(is_dir($fp) || mkdir($fp,0777))) //can't be sure how the server is running
 		$ud = '';
-}
-else
+} else
 	$ud = '';
 $this->SetPreference('uploads_path',$ud);
 
 //install our disposer
-$fp = cms_join_path($this->GetModulePath(),'lib','class.pwfFormBrowser.php');
+$fp = cms_join_path($this->GetModulePath(),'lib','FormBrowser.php');
 $pfmod->RegisterField($fp);
 unset($pfmod);
-
-?>

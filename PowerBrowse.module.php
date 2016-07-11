@@ -22,7 +22,7 @@ class PowerBrowse extends CMSModule
 	public $havemcrypt;	//whether password encryption is supported
 	public $before20;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->havemcrypt = function_exists('mcrypt_encrypt');
@@ -30,131 +30,129 @@ class PowerBrowse extends CMSModule
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
 	}
 
-	function AllowAutoInstall()
+	public function AllowAutoInstall()
 	{
 		return FALSE;
 	}
 
-	function AllowAutoUpgrade()
+	public function AllowAutoUpgrade()
 	{
 		return FALSE;
 	}
 
 	//for 1.11+
-	function AllowSmartyCaching()
+	public function AllowSmartyCaching()
 	{
 		return FALSE; //no frontend use
 	}
 
-	function GetName()
+	public function GetName()
 	{
 		return 'PowerBrowse';
 	}
 
-	function GetFriendlyName()
+	public function GetFriendlyName()
 	{
 		return $this->Lang('friendlyname');
 	}
 
-	function GetHelp()
+	public function GetHelp()
 	{
 		$fp = cms_join_path(dirname(__FILE__),'css','list-view.css');
 		$cont = @file_get_contents($fp);
-		if($cont)
-		{
+		if ($cont) {
 			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm','~\s?//.*$~m'),array('',''),$cont);
 			$example = str_replace(array(PHP_EOL.PHP_EOL,PHP_EOL,"\t"),array('<br />','<br />',' '),trim($example));
-		}
-		else
+		} else
 			$example = $this->Lang('error_missing');
 		return $this->Lang('help_module',$example);
 	}
 
-	function GetVersion()
+	public function GetVersion()
 	{
 		return '0.1';
 	}
 
-	function GetAuthor()
+	public function GetAuthor()
 	{
 		return 'tomphantoo';
 	}
 
-	function GetAuthorEmail()
+	public function GetAuthorEmail()
 	{
 		return 'tpgww@onepost.net';
 	}
 
-	function GetChangeLog()
+	public function GetChangeLog()
 	{
 		$fn = cms_join_path(dirname(__FILE__),'include','changelog.inc');
 		return ''.@file_get_contents($fn);
 	}
 
-	function GetDependencies()
+	public function GetDependencies()
 	{
 		return array('PowerForms'=>'0.1');
 	}
 
-	function MinimumCMSVersion()
+	public function MinimumCMSVersion()
 	{
 		return '1.10'; //class auto-loading needed in PowerForms
 	}
 
-/*	function MaximumCMSVersion()
+/*	public function MaximumCMSVersion()
 	{
 	}
 */
-	function InstallPostMessage()
+	public function InstallPostMessage()
 	{
 		return $this->Lang('postinstall');
 	}
 
-	function UninstallPreMessage()
+	public function UninstallPreMessage()
 	{
 		return $this->Lang('confirm_uninstall');
 	}
 
-	function UninstallPostMessage()
+	public function UninstallPostMessage()
 	{
 		return $this->Lang('postuninstall');
 	}
 
-	function IsPluginModule()
+	public function IsPluginModule()
 	{
 		return TRUE;
 	}
 
-	function HasAdmin()
+	public function HasAdmin()
 	{
 		return TRUE;
 	}
 
-	function LazyLoadAdmin()
+	public function LazyLoadAdmin()
 	{
 		return TRUE;
 	}
 
-	function GetAdminSection()
+	public function GetAdminSection()
 	{
 		return 'extensions';
 	}
 
-	function GetAdminDescription()
+	public function GetAdminDescription()
 	{
 		return $this->Lang('admindescription');
 	}
 
-	function VisibleToAdminUser()
+	public function VisibleToAdminUser()
 	{
 		return self::CheckAccess();
 	}
 
-/*	function AdminStyle()
+/*	public function AdminStyle()
 	{
 	}
 */
-	function GetHeaderHTML()
+	public function GetHeaderHTML()
 	{
 		$url = $this->GetModuleURLPath();
 		//the 2nd link is for dynamic style-changes, via js at runtime
@@ -164,61 +162,58 @@ class PowerBrowse extends CMSModule
 EOS;
 	}
 
-	function SuppressAdminOutput(&$request)
+	public function SuppressAdminOutput(&$request)
 	{
-		if(isset($_SERVER['QUERY_STRING']))
-		{
+		if (isset($_SERVER['QUERY_STRING'])) {
 //$adbg = $_SERVER;
 //$this->Crash();
-			if(strpos($_SERVER['QUERY_STRING'],'export') !== FALSE)
+			if (strpos($_SERVER['QUERY_STRING'],'export') !== FALSE)
 				return TRUE;
 		}
-/*		if(isset($request['mact']))
-		{
-			if(strpos($request['mact'],',export'))//export_browser or export_record
+/*		if (isset($request['mact'])) {
+			if (strpos($request['mact'],',export'))//export_browser or export_record
 				return TRUE;
-			if(isset($request['m1_export']))
+			if (isset($request['m1_export']))
 				return TRUE;
 		}
 */
 		return FALSE;
 	}
 
-	function SupportsLazyLoading()
+	public function SupportsLazyLoading()
 	{
 		return FALSE; //nothing to load
 	}
 
-	function LazyLoadFrontend()
+	public function LazyLoadFrontend()
 	{
 		return FALSE;
 	}
 
 	//setup for pre-1.10
-	function SetParameters()
+	public function SetParameters()
 	{
 		self::InitializeAdmin();
 		self::InitializeFrontend();
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
-	function InitializeFrontend()
+	public function InitializeFrontend()
 	{
 		//$this->RegisterModulePlugin();
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
-	function InitializeAdmin()
+	public function InitializeAdmin()
 	{
 		//document only the parameters relevant for external (page-tag) usage
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
-	function CheckAccess($permission='')
+	public function CheckAccess($permission='')
 	{
-		switch($permission)
-		{
+		switch ($permission) {
 		 case '':  // any module permission
 			$allow = $this->CheckPermission('ViewPwFormData');
 			if (!$allow) $allow = $this->CheckPermission('ModifyPwFormData');
@@ -240,16 +235,14 @@ EOS;
 		return $allow;
 	}
 
-	function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
+	public function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
 		if ($success)
 			return $this->ShowMessage($base);
-		else
-		{
+		else {
 			$msg = $this->ShowErrors($base);
-			if ($faillink == FALSE)
-			{
+			if ($faillink == FALSE) {
 				//strip the link
 				$pos = strpos($msg,'<a href=');
 				$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
@@ -261,20 +254,19 @@ EOS;
 		}
 	}
 
-	function GetActiveTab(&$params)
+	public function GetActiveTab(&$params)
 	{
-		if(!empty($params['active_tab']))
+		if (!empty($params['active_tab']))
 			return $params['active_tab'];
 		else
 			return 'maintab';
 	}
 
-	function BuildNav($id,$returnid,&$params,&$tplvars)
+	public function BuildNav($id,$returnid,&$params,&$tplvars)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('title_browsers'));
-		if(isset($params['browser_id']) && isset($params['form_id']) && isset($params['record_id']))
-		{
+		if (isset($params['browser_id']) && isset($params['form_id']) && isset($params['record_id'])) {
 			$navstr .= ' '.$this->CreateLink($id,'browse_list',$returnid,
 			'&#171; '.$this->Lang('title_records'),array(
 			'form_id'=>$params['form_id'],
@@ -283,5 +275,3 @@ EOS;
 		$tplvars['inner_nav'] = $navstr;
 	}
 }
-
-?>

@@ -4,14 +4,13 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess()) exit;
+if (!$this->CheckAccess()) exit;
 
-$funcs = new pwbrExport();
+$funcs = new PowerBrowse\Export();
 $res = $funcs->Export($this,$params['browser_id']);
-if($res === TRUE)
+if ($res === TRUE)
 	exit;
 unset($funcs);
 
-$this->Redirect($id,'defaultadmin',$returnid,array(
-	'message' => $this->PrettyMessage($res,FALSE)));
-?>
+$this->Redirect($id,'defaultadmin',$returnid,
+	array('message' => $this->PrettyMessage($res,FALSE)));

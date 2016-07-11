@@ -5,27 +5,25 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!($this->CheckAccess('admin') || $this->CheckAccess('view'))) exit;
+if (!($this->CheckAccess('admin') || $this->CheckAccess('view'))) exit;
 
-if(isset($params['cancel']))
+if (isset($params['cancel']))
 	$this->Redirect($id,'browse_list',$returnid,$params);
 
 $pre = cms_db_prefix();
-if(isset($params['submit']))
-{
+if (isset($params['submit'])) {
 	$collapsed = array();
 	//TODO field identifiers in the saved data
-	foreach($params['field'] as $k=>$name)
+	foreach ($params['field'] as $k=>$name)
 		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
-	$funcs = new pwbrRecordStore();
+	$funcs = new PowerBrowse\RecordStore();
 	$funcs->Update($params['record_id'],$collapsed,$this,$db,$pre);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-$funcs = new pwbrRecordLoad();
+$funcs = new PowerBrowse\RecordLoad();
 list($when,$data) = $funcs->Load($params['record_id'],$this,$db,$pre);
-if(!$when)
-{
+if (!$when) {
 	$params['message']= $this->PrettyMessage('error_data',FALSE);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
@@ -40,28 +38,24 @@ $tplvars['start_form'] =
 		'form_id'=>$params['form_id'],
 		'submit_when'=>$when));
 $tplvars['end_form'] = $this->CreateFormEnd();
-$bname = pwbrUtils::GetBrowserNameFromID($params['browser_id']);
+$bname = PowerBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
 $tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 $tplvars['submit_when'] = $when;
 
 $content = array();
-if(isset($params['edit']))
-{
+if (isset($params['edit'])) {
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit',$bname);
-	foreach($data as &$one)
-	{
+	foreach ($data as &$one) {
 		$title = $one[0];
 		$value = $one[1];
 		$len = strlen($value);
 		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
-		if($len > 50 || $newline)
-		{
+		if ($len > 50 || $newline) {
 			$rows = $len / 50 + $newline + 3;
 			$input = $this->CreateTextArea(FALSE,$id,$value,'value[]','','','','',
 				50,$rows,'','',
 				'style="width:50em;height:'.$rows.'em;"');
-		}
-		else
+		} else
 			$input = $this->CreateInputText($id,'value[]',$value,60,250);
 		$content[] = array(htmlentities($title),
 			$this->CreateInputHidden($id,'field[]',$title).$input);
@@ -69,12 +63,9 @@ if(isset($params['edit']))
 	unset($one);
 	$tplvars['btncancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 	$tplvars['btnsubmit'] = $this->CreateInputSubmit($id,'submit',$this->Lang('submit'));
-}
-else //view
-{
+} else { //view
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
-	foreach($data as &$one)
-	{
+	foreach ($data as &$one) {
 		$content[] = array(htmlentities($one[0]),htmlentities($one[1]));
 	}
 	unset($one);
@@ -82,6 +73,4 @@ else //view
 }
 $tplvars['content'] = $content;
 
-echo pwbrUtils::ProcessTemplate($this,'browse_record.tpl',$tplvars);
-
-?>
+echo PowerBrowse\Utils::ProcessTemplate($this,'browse_record.tpl',$tplvars);

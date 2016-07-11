@@ -7,12 +7,10 @@
 $padmin = $this->CheckAccess('admin');
 $pmod = $this->CheckAccess('modify');
 $pview = $this->CheckAccess('view');
-if(!($padmin || $pmod || $pview)) exit;
+if (!($padmin || $pmod || $pview)) exit;
 
-if($padmin)
-{
-	if(isset($params['submit']))
-	{
+if ($padmin) {
+	if (isset($params['submit'])) {
 		$this->SetPreference('export_file',!empty($params['export_file']));
 		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
 		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
@@ -21,57 +19,49 @@ if($padmin)
 		$this->SetPreference('owned_forms',!empty($params['owned_forms']));
 		$this->SetPreference('strip_on_export',!empty($params['strip_on_export']));
 		$t = trim($params['uploads_path']);
-		if($t && $t[0] == DIRECTORY_SEPARATOR)
+		if ($t && $t[0] == DIRECTORY_SEPARATOR)
 			$t = substr($t,1);
-		if($t)
-		{
+		if ($t) {
 			$fp = $config['uploads_path'];
-			if($fp && is_dir($fp))
-			{
+			if ($fp && is_dir($fp)) {
 				$fp = $fp.DIRECTORY_SEPARATOR.$t;
-				if(!(is_dir($fp) || mkdir($fp,0644)))
+				if (!(is_dir($fp) || mkdir($fp,0644)))
 					$t = '';
-			}
-			else
+			} else
 				$t = '';
 		}
 		$this->SetPreference('uploads_path',$t);
 		$old = $this->GetPreference('masterpass');
-		if($old)
-			$old = pwbrUtils::unfusc($oldpw);
+		if ($old)
+			$old = PowerBrowse\Utils::unfusc($oldpw);
 		$t = trim($params['masterpass']);
-		if($old != $t)
-		{
+		if ($old != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
 			$rst = $db->Execute('SELECT record_id,contents FROM '.$pre.'module_pwbr_record');
-			if($rst)
-			{
+			if ($rst) {
 				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
 				while(!$rst->EOF)
 				{
-					$val = pwbrUtils::decrypt_value($this,$rst->fields[1],$old);
-					$val = pwbrUtils::encrypt_value($this,$val,$t);
-					if(!pwbrUtils::SafeExec($sql,array($val,$rst->fields[0])))
-					{
+					$val = PowerBrowse\Utils::decrypt_value($this,$rst->fields[1],$old);
+					$val = PowerBrowse\Utils::encrypt_value($this,$val,$t);
+					if (!PowerBrowse\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
 						//TODO handle error
 					}
-					if(!$rst->MoveNext())
+					if (!$rst->MoveNext())
 						break;
 				}
 				$rst->Close();
 			}
 
-			if($t)
-				$t = pwbrUtils::fusc($t);
+			if ($t)
+				$t = PowerBrowse\Utils::fusc($t);
 			$this->SetPreference('masterpass',$t);
 		}
 
 		$params['message'] = $this->PrettyMessage('prefs_updated');
 		$params['active_tab'] = 'settings';
-	}
-	elseif(isset($params['cancel']))
-	{
+	} elseif (isset($params['cancel'])) {
 		$params['active_tab'] = 'settings';
 	}
 }
@@ -80,6 +70,4 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo pwbrUtils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
-
-?>
+echo PowerBrowse\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);

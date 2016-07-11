@@ -5,24 +5,19 @@
 # Refer to licence and other details at the top of file PowerBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerbrowse
 
-if(!$this->CheckAccess('modify')) exit;
+if (!$this->CheckAccess('modify')) exit;
 
-if(isset($params['cancel']))
-{
+if (isset($params['cancel'])) {
 	unset($params);
 	$this->Redirect($id,'defaultadmin');
 }
 
-if(isset($params['submit']))
-{
-	$funcs = new pwbrBrowserTasks();
-	if($params['browser_id'] == -1)//add browser
-	{
+if (isset($params['submit'])) {
+	$funcs = new PowerBrowse\BrowserTasks();
+	if ($params['browser_id'] == -1) { //add browser
 		$browser_id = $funcs->AddBrowser($this,$params);
 		$form_id = (int)$params['form_id'];
-	}
-	else //clone
-	{
+	} else { //clone
 		$browser_id = (int)$params['browser_id'];
 		$form_id = (int)$params['form_id'];
 		$funcs->CloneBrowser($this,$params);
@@ -35,18 +30,15 @@ if(isset($params['submit']))
 
 $tplvars = array();
 
-if($params['browser_id'] == -1)//add browser
-{
-	$funcs = new pwfBrowserIface('PowerForms');
-	if($funcs == FALSE)
-	{
+if ($params['browser_id'] == -1) { //add browser
+	$funcs = new \PowerForms\BrowserIface(); //TODO loader for this?
+	if ($funcs == FALSE) {
 		unset($params);
 		$message = $this->PrettyMessage('error_module',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
 	}
 	$formList = $funcs->GetBrowsableForms();
-	if(!$formList)
-	{
+	if (!$formList) {
 		unset($params);
 		$message = $this->PrettyMessage('noforms',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
@@ -64,18 +56,16 @@ if($params['browser_id'] == -1)//add browser
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	$tplvars['input_browser_name'] = $this->CreateInputText($id,'name','',50);
 	$tpl = 'add_browser.tpl';
-}
-else //clone existing browser
-{
+} else { //clone existing browser
 	$bid = (int)$params['browser_id'];
 	$fid = (int)$params['form_id'];
 	$tplvars['hidden'] = $this->CreateInputHidden($id,'browser_id',$bid).
 		$this->CreateInputHidden($id,'form_id',$fid);
 	$tplvars['title_form_name'] = $this->Lang('title_form_name');
-	$name = pwbrUtils::GetFormNameFromID($fid);
+	$name = PowerBrowse\Utils::GetFormNameFromID($fid);
 	$tplvars['form_name'] = $name;
 	$tplvars['title_browser_oldname'] = $this->Lang('title_browser_oldname');
-	$name = pwbrUtils::GetBrowserNameFromID($bid);
+	$name = PowerBrowse\Utils::GetBrowserNameFromID($bid);
 	$tplvars['browser_oldname'] = $name;
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	$tplvars['input_browser_name'] =
@@ -91,6 +81,4 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
-echo pwbrUtils::ProcessTemplate($this,$tpl,$tplvars);
-
-?>
+echo PowerBrowse\Utils::ProcessTemplate($this,$tpl,$tplvars);

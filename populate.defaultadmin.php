@@ -12,8 +12,7 @@ $tab = $this->GetActiveTab($params);
 
 $t = $this->starttabheaders().
 	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
-if($padmin)
-{
+if ($padmin) {
 	$t .= $this->settabheader('settings',$this->lang('tab_settings'),($tab == 'settings'));
 	$tplvars['start_settings_tab'] = $this->StartTab('settings');
 }
@@ -38,34 +37,27 @@ $jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
 $fb = $this->GetModuleInstance('FormBuilder');
-if($this->GetPreference('oldmodule_data',0))
-{
-	if($fb)
-	{
-		$funcs = new pwbrTransition();
+if ($this->GetPreference('oldmodule_data',0)) {
+	if ($fb) {
+		$funcs = new PowerBrowse\Transition();
 		$browsers = $funcs->GetBrowsersSummary();
-	}
-	else
+	} else
 		$browsers = array();
-}
-else
-{
+} else {
 	$pre = cms_db_prefix();
 	$sql = 'SELECT BR.*,COALESCE (R.count,0) AS record_count FROM '.$pre.
 'module_pwbr_browser BR LEFT JOIN (SELECT form_id,COUNT(*) as count FROM '.$pre.
 'module_pwbr_record GROUP BY form_id) R ON BR.form_id=R.form_id';
-	if(!$padmin && $this->GetPreference('owned_forms'))
-	{
+	if (!$padmin && $this->GetPreference('owned_forms')) {
 		$uid = get_userid(false);
 		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
 	}
 	$sql .= ' ORDER BY BR.name';
-	$browsers = pwbrUtils::SafeGet($sql,FALSE);
+	$browsers = PowerBrowse\Utils::SafeGet($sql,FALSE);
 }
-if($browsers)
-{
+if ($browsers) {
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
-	if($iseditor)
+	if ($iseditor)
 		$tplvars['title_related_form'] = $this->Lang('title_related_form');
 	$tplvars['title_records'] = $this->Lang('title_records');
 
@@ -78,26 +70,22 @@ if($browsers)
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
 	$data = array();
-	foreach($browsers as &$one)
-	{
+	foreach ($browsers as &$one) {
 		$oneset = new stdClass();
 		$num = $one['record_count'];
 		$oneset->recordcount = $num;
 		$bid = (int)$one['browser_id'];
 		$fid = (int)$one['form_id'];
-		if($pmod)
-		{
+		if ($pmod) {
 			$oneset->name = $this->CreateLink($id,'edit_browser','',
 				$one['name'],array('form_id'=>$fid,'browser_id'=>$bid));
 			$oneset->editlink = $this->CreateLink($id,'edit_browser','',
 				$icon_edit,array('form_id'=>$fid,'browser_id'=>$bid));
-			if($num > 0)
-			{
+			if ($num > 0) {
 				$oneset->adminlink = $this->CreateLink($id,'browse_list','',
 					$icon_admin,
 					array('form_id'=>$fid,'browser_id'=>$bid));
-			}
-			else
+			} else
 				$oneset->adminlink = '';
 			$oneset->clonelink = $this->CreateLink($id,'add_browser','',
 				$icon_clone,
@@ -106,35 +94,28 @@ if($browsers)
 				$icon_delete,
 				array('form_id'=>$fid,'browser_id'=>$bid),
 				$this->Lang('confirm_delete_browser',$one['name']));
-		}
-		else
-		{
+		} else {
 			$oneset->name = $one['name'];
 			$oneset->editlink = '';
-			if($num > 0)
-			{
-				if($padmin) $oneset->adminlink = $this->CreateLink($id,'browse_list','',
+			if ($num > 0) {
+				if ($padmin) $oneset->adminlink = $this->CreateLink($id,'browse_list','',
 					$icon_admin,
 					array('form_id'=>$fid,'browser_id'=>$bid));
 				else $oneset->adminlink = $this->CreateLink($id,'browse_list','',
 					$icon_view,
 					array('form_id'=>$fid,'browser_id'=>$bid));
-			}
-			else
+			} else
 				$oneset->adminlink = '';
 			$oneset->clonelink = '';
 			$oneset->deletelink = '';
 		}
-		if($num > 0)
-		{
+		if ($num > 0) {
 			$oneset->exportlink = $this->CreateLink($id,'export_browser','',
 				$icon_export,array('browser_id'=>$bid));
-		}
-		else
+		} else
 			$oneset->exportlink = '';
 		$oneset->selected = $this->CreateInputCheckbox($id,'sel[]',$bid,-1);
-		if($iseditor)
-		{
+		if ($iseditor) {
 			//info for site-content developers
 			$oneset->form_name=$one['form_name'];
 		}
@@ -144,8 +125,7 @@ if($browsers)
 
 	$t = count($data);
 	$tplvars['browser_count'] = $t;
-	if($t)
-	{
+	if ($t) {
 		$tplvars['browsers'] = $data;
 
 		$jsfuncs[] = <<<EOS
@@ -157,7 +137,7 @@ function any_selected() {
  return (sel_count() > 0);
 }
 function confirm_selected(msg) {
- if(sel_count() > 0) {
+ if (sel_count() > 0) {
   return confirm(msg);
  } else {
   return false;
@@ -175,8 +155,7 @@ EOS;
 			'title="'.$this->Lang('tip_delete_selected_browsers').
 			'" onclick="return confirm_selected(\''.$this->Lang('confirm').'\');"');
 
-		if($t > 1)
-		{
+		if ($t > 1) {
 			$jsfuncs[] = <<<EOS
 function select_all(cb) {
  $('input[name="{$id}sel[]"][type="checkbox"]').attr('checked',cb.checked);
@@ -184,22 +163,17 @@ function select_all(cb) {
 
 EOS;
 			$t = $this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
-		}
-		else
+		} else
 			$t = '';
 		$tplvars['selectall_browsers'] = $t;
-	}
-	else
+	} else
 		$tplvars['nobrowsers'] = $this->Lang('nobrowsers');
-}
-else
-{
+} else {
 	$tplvars['nobrowsers'] = $this->Lang('nobrowsers');
 	$tplvars['browser_count'] = 0;
 }
 
-if($padmin || $pmod)
-{
+if ($padmin || $pmod) {
 	$tplvars['addlink'] = $this->CreateLink($id,'add_browser','',
 		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_browser'),'','','systemicon'),
 		array('browser_id'=>-1));
@@ -207,20 +181,18 @@ if($padmin || $pmod)
 		$this->Lang('title_add_browser'),
 		array('browser_id'=>-1));
 
-	if(!$this->GetPreference('oldmodule_data',0) && $fb)
+	if (!$this->GetPreference('oldmodule_data',0) && $fb)
 		$tplvars['importbtn'] =
 			$this->CreateInputSubmit($id,'import',$this->Lang('import_browsers'),
 				'title="'.$this->Lang('tip_import_browsers').'"');
 }
 
-if($padmin)
-{
+if ($padmin) {
 	$tplvars['start_settingsform'] = $this->CreateFormStart($id,'defaultadmin',$returnid);
 
 	$configs = array();
 
-	if($fb)
-	{
+	if ($fb) {
 		$oneset = new stdClass();
 		$oneset->title = $this->Lang('title_oldmodule_data');
 		$oneset->input = $this->CreateInputCheckbox($id,'oldmodule_data',1,
@@ -269,8 +241,7 @@ if($padmin)
 	$oneset->help = $this->Lang('help_strip_on_export');
 	$configs[] = $oneset;
 
-	if(ini_get('mbstring.internal_encoding') !== FALSE) //PHP's encoding-conversion capability is installed
-	{
+	if (ini_get('mbstring.internal_encoding') !== FALSE) { //PHP's encoding-conversion capability is installed
 		$oneset = new stdClass();
 		$oneset->title = $this->Lang('title_export_file_encoding');
 		$encodings = array('utf-8'=>'UTF-8','windows-1252'=>'Windows-1252','iso-8859-1'=>'ISO-8859-1');
@@ -280,8 +251,8 @@ if($padmin)
 	}
 
 	$t = $this->GetPreference('masterpass');
-	if($t)
-		$t = pwbrUtils::unfusc($t);
+	if ($t)
+		$t = PowerBrowse\Utils::unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',
@@ -313,16 +284,13 @@ EOS;
 		$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),
 		'onclick="set_tab();"');
 	$tplvars['pconfig'] = 1;
-}
-else
-{
+} else {
 	$tplvars['pconfig'] = 0;
 }
 $tplvars['pmod'] = (($pmod)?1:0);
 $tplvars['pdev'] = (($iseditor)?1:0);
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -331,5 +299,3 @@ if($jsloads)
 }
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
-
-?>
