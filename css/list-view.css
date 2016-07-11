@@ -1,6 +1,6 @@
 table.table_sort th
 {
-	//ensure consistent header background
+	/* ensure consistent header background */
 	background-image: url(../images/empty.png);
 	background-repeat: no-repeat;
 	background-position: center left -10px;
