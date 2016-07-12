@@ -1,14 +1,14 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 if (!$this->CheckAccess()) exit;
 
 if (isset($params['import'])) {
 	if ($this->CheckAccess('modify') || $this->CheckAccess('admin')) {
-		$funcs = new PowerBrowse\Transition();
+		$funcs = new PWFBrowse\Transition();
 		$funcs->ImportFormBrowsers($this);
 	}
 	$this->Redirect($id,'defaultadmin');
@@ -20,7 +20,7 @@ if (!isset($params['sel']))
 if (isset($params['clone'])) {
 	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
 
-	$funcs = new PowerBrowse\BrowserTasks();
+	$funcs = new PWFBrowse\BrowserTasks();
 	foreach ($params['sel'] as $browser_id) {
 		$params['browser_id'] = $browser_id;
 		$funcs->CloneBrowser($this,$params);
@@ -31,7 +31,7 @@ if (isset($params['clone'])) {
 	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
 
 	$success = TRUE;
-	$funcs = new PowerBrowse\BrowserTasks();
+	$funcs = new PWFBrowse\BrowserTasks();
 	foreach ($params['sel'] as $browser_id) {
 		if (!$funcs->DeleteBrowser($browser_id))
 			$success = FALSE;
@@ -43,7 +43,7 @@ if (isset($params['clone'])) {
 } elseif (isset($params['export'])) {
 	if (!$this->CheckAccess()) exit;
 
-	$funcs = new PowerBrowse\Export();
+	$funcs = new PWFBrowse\Export();
 	if (count($params['sel']) == 1) {
 		$browser_id = reset($params['sel']);
 		$res = $funcs->Export($this,$browser_id);
@@ -54,7 +54,7 @@ if (isset($params['clone'])) {
 		//cannot export multi browsers as a single item, so stuff em into a zip
 		$fn = $this->GetName().$this->Lang('export').
 			'-'.implode('-',$params['sel']).'-'.date('Y-m-d-H-i').'.zip';
-		$fp = PowerBrowse\Utils::GetUploadsPath($this);
+		$fp = PWFBrowse\Utils::GetUploadsPath($this);
 		if (!$fp)
 			$fp = cms_join_path($config['root_path'],'tmp');
 		$fp .= DIRECTORY_SEPARATOR.$fn;

@@ -1,12 +1,12 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 //functions involving FormBrowser and/or FormBuilder modules (assumed present)
 
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class Transition
 {
@@ -141,7 +141,7 @@ $vals = array (size=whatever)
 */
 	function Get_Data(&$mod,&$db,$pre,$oldbid,$newbid,$oldfid)
 	{
-		$mod = cms_utils::get_module('PowerBrowse');
+		$mod = cms_utils::get_module('PWFBrowse');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
 		$fb = cms_utils::get_module('FormBuilder');
 		$flds = array();

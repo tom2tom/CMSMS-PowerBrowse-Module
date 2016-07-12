@@ -1,16 +1,16 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class BrowserTasks
 {
 	/**
 	StoreBrowser:
-	@mod: reference to current PowerBrowse class object
+	@mod: reference to current PWFBrowse class object
 	@params: reference to array of parameters for use here e.g.
 		array (size=9)
 		  'browser_id' => string '9'
@@ -79,7 +79,7 @@ class BrowserTasks
 
 	/**
 	AddBrowser:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@params: reference to array of parameters
 	Returns: id of new browser
 	*/
@@ -92,7 +92,7 @@ class BrowserTasks
 		$db->Execute('INSERT INTO '.$pre.
 	'module_pwbr_browser (browser_id,form_id,name,form_name) VALUES (?,?,?,?)',
 			array($newid,$params['form_id'],$params['name'],$formname));
-		$funcs = new \PowerForms\BrowserIface('PowerForms'); //must be present, or else we never get to here
+		$funcs = new \PWForms\BrowserIface(); //must be present, or else we never get to here TODO loader for this
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.
@@ -112,7 +112,7 @@ class BrowserTasks
 
 	/**
 	CloneBrowser:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@params: reference to array of parameters
 	Copies browser data except specific records, sets all fields to be displayed
 	*/

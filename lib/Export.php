@@ -1,17 +1,17 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBrowser-module file (C) 2006-2011 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class Export
 {
 	/**
 	ExportName:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
 	@record_id: index of the record to process, or array of such, or FALSE if @record_id is provided
 	*/
@@ -32,7 +32,7 @@ class Export
 
 	/**
 	CSV:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
 	@record_id: index of a single response to process, or array of such indices,
 		or FALSE to process the whole @browser_id, default=FALSE
@@ -174,7 +174,7 @@ class Export
 
 	/**
 	Export:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@browser_id: optional browser identifier, default FALSE
 	@record_id: optional record_id, or array of such id's, default FALSE
 	@sep: optional field-separator for exported content default ','

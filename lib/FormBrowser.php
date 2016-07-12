@@ -1,16 +1,16 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-namespace PowerForms;
+namespace PWForms;
 
 class FormBrowser extends FieldBase
 {
-	var $ModName = 'PowerBrowse';
-	var $MenuKey = 'field_label'; //lang key for fields-menu label, used by PowerForms
-	var $mymodule; //used also by PowerForms, do not rename
+	var $ModName = 'PWFBrowse';
+	var $MenuKey = 'field_label'; //lang key for fields-menu label, used by PWForms
+	var $mymodule; //used also by PWForms, do not rename
 
 	public function __construct(&$formdata,&$params)
 	{

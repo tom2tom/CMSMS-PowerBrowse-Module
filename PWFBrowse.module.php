@@ -1,9 +1,9 @@
 <?php
 #------------------------------------------------------------------------
-# This is CMS Made Simple module: PowerBrowse
+# This is CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <@>
 # Derived in part from FormBrowser module, copyright (C) 2006-2011, Samuel Goldstein <sjg@cmsmodules.com>
-# This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerbrowse
+# This project's forge-page is: http://dev.cmsmadesimple.org/projects/PWFBrowse
 #
 # This module is free software. You can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -17,19 +17,42 @@
 # Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 #-----------------------------------------------------------------------
 
-class PowerBrowse extends CMSModule
+class PWFBrowse extends CMSModule
 {
 	public $havemcrypt;	//whether password encryption is supported
 	public $before20;
 
 	public function __construct()
 	{
+		if (!function_exists('cmsms_spacedload')) {
+			spl_autoload_register(array($this,'cmsms_spacedload'));
+		}
+
 		parent::__construct();
 		$this->havemcrypt = function_exists('mcrypt_encrypt');
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
 	}
 
+	/* autoloader */
+	private function cmsms_spacedload ($class)
+	{
+		$prefix = get_class().'\\'; //specific namespace prefix
+		// ignore if the class doesn't use the prefix
+		if (!(strpos($class,$prefix) === 0 || ($class[0] == '\\' && strpos($class,$prefix,1) == 1)))
+			return;
+		// get the relative class name
+		$len = strlen($prefix);
+		if ($class[0] == '\\') {
+			$len++;
+		}
+		// base directory for the namespace prefix
+		$base_dir = __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
+		$fp = $base_dir.str_replace('\\',DIRECTORY_SEPARATOR,$relative_class).'.php';
+		if (file_exists($fp))
+			include $fp;
+	}
+	
 	public function AllowAutoInstall()
 	{
 		return FALSE;
@@ -48,7 +71,7 @@ class PowerBrowse extends CMSModule
 
 	public function GetName()
 	{
-		return 'PowerBrowse';
+		return 'PWFBrowse';
 	}
 
 	public function GetFriendlyName()
@@ -91,12 +114,12 @@ class PowerBrowse extends CMSModule
 
 	public function GetDependencies()
 	{
-		return array('PowerForms'=>'0.1');
+		return array('PWForms'=>'0.1');
 	}
 
 	public function MinimumCMSVersion()
 	{
-		return '1.10'; //class auto-loading needed in PowerForms
+		return '1.10'; //class auto-loading needed in PWForms
 	}
 
 /*	public function MaximumCMSVersion()

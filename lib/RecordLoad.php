@@ -1,15 +1,15 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class RecordLoad
 {
 	/*
-	@mod: reference to PowerBrowse module object
+	@mod: reference to PWFBrowse module object
 	@source: string to be decrypted
 	@getstruct: optional boolean, whether to unserialize decrypted value, default TRUE
 	Must be compatible with RecordStore::Encrypt()
@@ -31,7 +31,7 @@ class RecordLoad
 	/**
 	Load:
 	@record_id: identifier of record to retrieve
-	@mod: optional reference to PowerBrowse module object, default NULL
+	@mod: optional reference to PWFBrowse module object, default NULL
 	@db: optional reference to database connection object, default NULL
 	@pre: optional table-names prefix, default ''
 	Returns: 2-member array, in which 1st is submissiondate/time or FALSE,
@@ -40,7 +40,7 @@ class RecordLoad
 	public function Load($record_id,&$mod=NULL,&$db=NULL,$pre='')
 	{
 		if (!$mod)
-			$mod = cms_utils::get_module('PowerBrowse');
+			$mod = cms_utils::get_module('PWFBrowse');
 		if (!$db)
 			$db = cmsms()->GetDb();
 		if (!$pre)

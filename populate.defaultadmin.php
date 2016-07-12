@@ -1,8 +1,8 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 $iseditor = $this->CheckPermission('Modify Any Page');
 
@@ -39,7 +39,7 @@ $baseurl = $this->GetModuleURLPath();
 $fb = $this->GetModuleInstance('FormBuilder');
 if ($this->GetPreference('oldmodule_data',0)) {
 	if ($fb) {
-		$funcs = new PowerBrowse\Transition();
+		$funcs = new PWFBrowse\Transition();
 		$browsers = $funcs->GetBrowsersSummary();
 	} else
 		$browsers = array();
@@ -53,7 +53,7 @@ if ($this->GetPreference('oldmodule_data',0)) {
 		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
 	}
 	$sql .= ' ORDER BY BR.name';
-	$browsers = PowerBrowse\Utils::SafeGet($sql,FALSE);
+	$browsers = PWFBrowse\Utils::SafeGet($sql,FALSE);
 }
 if ($browsers) {
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
@@ -252,7 +252,7 @@ if ($padmin) {
 
 	$t = $this->GetPreference('masterpass');
 	if ($t)
-		$t = PowerBrowse\Utils::unfusc($t);
+		$t = PWFBrowse\Utils::unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',

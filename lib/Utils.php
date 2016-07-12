@@ -1,10 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class Utils
 {
@@ -133,7 +133,7 @@ class Utils
 
 	/**
 	GetUploadsPath:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	Returns: absolute path string or false
 	*/
 	public static function GetUploadsPath(&$mod)
@@ -152,7 +152,7 @@ class Utils
 
 	/**
 	GetUploadsUrl:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	Returns: absolute url string or false
 	*/
 	public static function GetUploadsUrl(&$mod)
@@ -251,7 +251,7 @@ class Utils
 
 	/**
 	ProcessTemplate:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PWFBrowse module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
 	@cache: optional boolean, default TRUE

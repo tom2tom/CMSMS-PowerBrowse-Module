@@ -25,7 +25,7 @@
  * mcrypt extension 
  */
  
-namespace PowerBrowse;
+namespace PWFBrowse;
 
 class Encryption
 {

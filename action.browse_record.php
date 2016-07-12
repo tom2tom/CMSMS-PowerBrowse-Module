@@ -1,9 +1,9 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBrowser-module file (C) 2006-2011 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 if (!($this->CheckAccess('admin') || $this->CheckAccess('view'))) exit;
 
@@ -16,12 +16,12 @@ if (isset($params['submit'])) {
 	//TODO field identifiers in the saved data
 	foreach ($params['field'] as $k=>$name)
 		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
-	$funcs = new PowerBrowse\RecordStore();
+	$funcs = new PWFBrowse\RecordStore();
 	$funcs->Update($params['record_id'],$collapsed,$this,$db,$pre);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-$funcs = new PowerBrowse\RecordLoad();
+$funcs = new PWFBrowse\RecordLoad();
 list($when,$data) = $funcs->Load($params['record_id'],$this,$db,$pre);
 if (!$when) {
 	$params['message']= $this->PrettyMessage('error_data',FALSE);
@@ -38,7 +38,7 @@ $tplvars['start_form'] =
 		'form_id'=>$params['form_id'],
 		'submit_when'=>$when));
 $tplvars['end_form'] = $this->CreateFormEnd();
-$bname = PowerBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
+$bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
 $tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 $tplvars['submit_when'] = $when;
 
@@ -73,4 +73,4 @@ if (isset($params['edit'])) {
 }
 $tplvars['content'] = $content;
 
-echo PowerBrowse\Utils::ProcessTemplate($this,'browse_record.tpl',$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this,'browse_record.tpl',$tplvars);

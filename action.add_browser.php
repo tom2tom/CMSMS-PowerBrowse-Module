@@ -1,9 +1,9 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBrowser-module file (C) 2006-2011 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 if (!$this->CheckAccess('modify')) exit;
 
@@ -13,7 +13,7 @@ if (isset($params['cancel'])) {
 }
 
 if (isset($params['submit'])) {
-	$funcs = new PowerBrowse\BrowserTasks();
+	$funcs = new PWFBrowse\BrowserTasks();
 	if ($params['browser_id'] == -1) { //add browser
 		$browser_id = $funcs->AddBrowser($this,$params);
 		$form_id = (int)$params['form_id'];
@@ -31,7 +31,8 @@ if (isset($params['submit'])) {
 $tplvars = array();
 
 if ($params['browser_id'] == -1) { //add browser
-	$funcs = new \PowerForms\BrowserIface(); //TODO loader for this?
+	//TODO c.f. BrowserTasks->AddBrowser(&$mod,&$params)
+	$funcs = new \PWForms\BrowserIface(); //TODO loader for this?
 	if ($funcs == FALSE) {
 		unset($params);
 		$message = $this->PrettyMessage('error_module',FALSE);
@@ -62,10 +63,10 @@ if ($params['browser_id'] == -1) { //add browser
 	$tplvars['hidden'] = $this->CreateInputHidden($id,'browser_id',$bid).
 		$this->CreateInputHidden($id,'form_id',$fid);
 	$tplvars['title_form_name'] = $this->Lang('title_form_name');
-	$name = PowerBrowse\Utils::GetFormNameFromID($fid);
+	$name = PWFBrowse\Utils::GetFormNameFromID($fid);
 	$tplvars['form_name'] = $name;
 	$tplvars['title_browser_oldname'] = $this->Lang('title_browser_oldname');
-	$name = PowerBrowse\Utils::GetBrowserNameFromID($bid);
+	$name = PWFBrowse\Utils::GetBrowserNameFromID($bid);
 	$tplvars['browser_oldname'] = $name;
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	$tplvars['input_browser_name'] =
@@ -81,4 +82,4 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
-echo PowerBrowse\Utils::ProcessTemplate($this,$tpl,$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this,$tpl,$tplvars);

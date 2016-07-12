@@ -1,8 +1,8 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 $padmin = $this->CheckAccess('admin');
 $pmod = $this->CheckAccess('modify');
@@ -33,7 +33,7 @@ if ($padmin) {
 		$this->SetPreference('uploads_path',$t);
 		$old = $this->GetPreference('masterpass');
 		if ($old)
-			$old = PowerBrowse\Utils::unfusc($oldpw);
+			$old = PWFBrowse\Utils::unfusc($oldpw);
 		$t = trim($params['masterpass']);
 		if ($old != $t) {
 			//re-encrypt all stored records
@@ -43,9 +43,9 @@ if ($padmin) {
 				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
 				while(!$rst->EOF)
 				{
-					$val = PowerBrowse\Utils::decrypt_value($this,$rst->fields[1],$old);
-					$val = PowerBrowse\Utils::encrypt_value($this,$val,$t);
-					if (!PowerBrowse\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
+					$val = PWFBrowse\Utils::decrypt_value($this,$rst->fields[1],$old);
+					$val = PWFBrowse\Utils::encrypt_value($this,$val,$t);
+					if (!PWFBrowse\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext())
@@ -55,7 +55,7 @@ if ($padmin) {
 			}
 
 			if ($t)
-				$t = PowerBrowse\Utils::fusc($t);
+				$t = PWFBrowse\Utils::fusc($t);
 			$this->SetPreference('masterpass',$t);
 		}
 
@@ -70,4 +70,4 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo PowerBrowse\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);

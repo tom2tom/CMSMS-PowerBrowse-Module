@@ -1,9 +1,9 @@
 <?php
-# This file is part of CMS Made Simple module: PowerBrowse
+# This file is part of CMS Made Simple module: PWFBrowse
 # Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBrowser-module file (C) 2006-2011 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+# Refer to licence and other details at the top of file PWFBrowse.module.php
+# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 $pconfig = $this->CheckAccess('admin');
 if ($pconfig || $this->CheckAccess('modify'))
@@ -24,7 +24,7 @@ $baseurl = $this->GetModuleURLPath();
 //replace href attribute in existing stylesheet link (early in page-processing)
 $cssfile = $this->GetPreference('list_cssfile');
 $u = ($cssfile) ?
-	PowerBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
+	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
 	$baseurl.'/css/list-view.css';
 $tplvars['cssscript'] = <<<EOS
 <script type="text/javascript">
@@ -73,7 +73,7 @@ $jsfuncs = array();
 $jsloads = array();
 
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PowerBrowse\Utils::SafeGet($sql,array($params['browser_id']));
+$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
 //if ($data) {
 	$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
@@ -83,7 +83,7 @@ $rows = array();
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
 
-	$funcs = new PowerBrowse\RecordLoad();
+	$funcs = new PWFBrowse\RecordLoad();
 	foreach ($data as &$one) {
 		$fields = array();
 		$submission = $funcs->Decrypt($this,$one['contents']);
@@ -275,4 +275,4 @@ if ($jsloads) {
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
 
-echo PowerBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);

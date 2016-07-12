@@ -19,7 +19,7 @@ $lang['confirm']='Are you sure?';
 $lang['confirm_delete_browser']='Are you sure you want to delete %s';
 $lang['confirm_delete_record']='Are you sure you want to delete this submission?';
 $lang['confirm_delete_sel']='Are you sure you want to delete the selected records?';
-$lang['confirm_uninstall']='Are you sure you want to uninstall PowerBrowse?';
+$lang['confirm_uninstall']='Are you sure you want to uninstall PWFBrowse?';
 
 $lang['delete']='Delete';
 $lang['deleted2']='Deleted %s.';
@@ -34,7 +34,7 @@ $lang['error_export']='A problem occurred during the export process.'; //how vag
 $lang['error_failed']='The requested operation failed to complete';
 $lang['error_lock']='Error. Unable to obtain exclusive access';
 $lang['error_missing']='Cannot find it';
-$lang['error_module']='The PowerForms module is missing. Please advise your site administrator.';
+$lang['error_module']='The PWForms module is missing. Please advise your site administrator.';
 $lang['error_noform']='Cannot find a requested form. Please advise your site administrator.';
 $lang['error_system']='Something is not working correctly. Please advise your site administrator.';
 $lang['error_zip']='Zip file creation failed';
@@ -49,8 +49,8 @@ $lang['help_dnd']='You can change the order by dragging any row, or double-click
 $lang['help_export_file']='Progressively create each .csv file in the general or specific <em>uploads</em> directory, instead of processing the export in memory. This may be wise if there is a lot of data to export. The downside is that someone needs to get that file and (usually) then delete it.';
 $lang['help_field_draggable']='Display order can be changed by dragging row(s).';
 $lang['help_list_cssfile']='A .css file in the general or specific <em>uploads</em> directory. Module help provides details about the contents. If left blank, default styles will be used.';
-$lang['help_oldmodule_data']='Work directly with data recorded by those modules, instead of PowerForms';
-$lang['help_onchange_notices']='If a form has disposition(s) that send email or other notice, such notice will not be sent after a record is edited via the PowerBrowse admin, if this option is de-selected.';
+$lang['help_oldmodule_data']='Work directly with data recorded by those modules, instead of PWForms';
+$lang['help_onchange_notices']='If a form has disposition(s) that send email or other notice, such notice will not be sent after a record is edited via the PWFBrowse admin, if this option is de-selected.';
 $lang['help_order']='Row-order here corresponds to column-order for listed data.';
 $lang['help_owned_forms']='Enable blocking of form-data access by any non-administrator other than a specified user';
 $lang['help_pagerows']='This is the minimum length of displayed pages. The length can be increased, while browsing.';
@@ -64,12 +64,12 @@ $lang['last']='last';
 
 $lang['message_records_deleted']='%d submission(s) deleted';
 //$lang['message_records_exported']='%d submission(s) exported';
-$lang['moddescription']='PowerBrowse enables review of submitted form data.';
+$lang['moddescription']='PWFBrowse enables review of submitted form data.';
 
 $lang['next']='next';
 $lang['nobrowsers']='No browser is registered';
 $lang['nofields']='The form has no user-input fields';
-$lang['noforms']='No PowerForms form is browsable';
+$lang['noforms']='No PWForms form is browsable';
 $lang['norecords']='No data are recorded for this browser';
 $lang['none']='None';
 
@@ -80,8 +80,8 @@ $lang['pagerows']='rows-per-page';
 $lang['perm_browsers']='Modify PowerForm Browsers';
 $lang['perm_data']='Modify Recorded PowerForm Data';
 $lang['perm_see']='View/export Recorded PowerForm Data';
-$lang['postinstall']='PowerBrowse module has been installed. Remember to apply relevant permissions.';
-$lang['postuninstall']='PowerBrowse module has been uninstalled.';
+$lang['postinstall']='PWFBrowse module has been installed. Remember to apply relevant permissions.';
+$lang['postuninstall']='PWFBrowse module has been uninstalled.';
 $lang['prefs_updated']='Preferences updated.';
 $lang['previous']='previous';
 
@@ -114,7 +114,7 @@ $lang['title_export_file']='Export to host';
 $lang['title_export_file_encoding']='Character-encoding of exported content';
 $lang['title_field_identity']='Identifier';
 $lang['title_form_fields']='The form\'s visible fields';
-$lang['title_form_name']='Data source (PowerForms form)';
+$lang['title_form_name']='Data source (PWForms form)';
 $lang['title_list_cssfile']='File containing styles for data lists';
 $lang['title_move']='Change order';
 $lang['title_oldmodule_data']='Use data from FormBuilder/Browser modules';
@@ -142,14 +142,14 @@ $lang['you_need_permission']='To access this, you need permission "%s"';
 $lang['help_module']= <<<EOS
 <h3>What does this module do?</h3>
 <p>It allows authorised users to review and modify data recorded by the
-PowerForms module for submitted forms.</p>
+PWForms module for submitted forms.</p>
 <h3>How is it used?</h3>
 <p>In the CMSMS admin Content menu, there should be an item labelled
 'Forms&nbsp;Data&nbsp;Browser'. Click on that. On the displayed page, there are
 links and inputs by which to add a new browser, or configure module settings.</p>
 <h4>Create a browser</h4>
 <p>Click on a 'Add browser' link. During browser creation, you must select a
-PowerForms form whose results the browser will display.</p>
+PWForms form whose results the browser will display.</p>
 <h4>Administering browser data</h4>
 <p>By clicking on the 'inspect' icon next to a browser in the list, you can
 add/edit/delete/export records.</p>
@@ -174,7 +174,7 @@ add/edit/delete/export records.</p>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.</p>
 <p>There are a few resources available to help you with it:</p>
 <ul>
-<li>for the latest version of this module, FAQs, or to file a bug report, please visit the CMS Made Simple  <a href="http://dev.cmsmadesimple.org/powerbrowse">Developer Forge</a>;</li>
+<li>for the latest version of this module, FAQs, or to file a bug report, please visit the CMS Made Simple  <a href="http://dev.cmsmadesimple.org/PWFBrowse">Developer Forge</a>;</li>
 <li>discussion of this module might be found in the CMS Made Simple <a href="http://forum.cmsmadesimple.org">Forum;</a></li>
 <li>perhaps you might have some success emailing the author directly.</li>
 </ul>
