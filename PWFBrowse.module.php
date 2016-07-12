@@ -39,13 +39,16 @@ class PWFBrowse extends CMSModule
 	{
 		$prefix = get_class().'\\'; //specific namespace prefix
 		// ignore if the class doesn't use the prefix
-		if (!(strpos($class,$prefix) === 0 || ($class[0] == '\\' && strpos($class,$prefix,1) == 1)))
+		if (($p = strpos($class,$prefix)) === FALSE)
+			return;
+		if (!($p === 0 || ($p === 1 && $class[0] == '\\')))
 			return;
 		// get the relative class name
 		$len = strlen($prefix);
 		if ($class[0] == '\\') {
 			$len++;
 		}
+		$relative_class = substr($class,$len);
 		// base directory for the namespace prefix
 		$base_dir = __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
 		$fp = $base_dir.str_replace('\\',DIRECTORY_SEPARATOR,$relative_class).'.php';
