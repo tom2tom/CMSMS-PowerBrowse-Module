@@ -40,7 +40,7 @@ class Utils
 				$ret = $db->GetAssoc($sql,$args);
 				break;
 			 default:
-				$ret = $db->GetAll($sql,$args);
+				$ret = $db->GetArray($sql,$args);
 				break;
 			}
 			if ($db->CompleteTrans())

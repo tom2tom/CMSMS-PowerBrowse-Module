@@ -130,7 +130,7 @@ class BrowserTasks
 			trim($params['browser_name']);
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser VALUES (?,?,?,?,?,?,?)',array_values($row));
 
-		$list = $db->GetAll('SELECT browser_id,name,shown,sorted,order_by FROM '.
+		$list = $db->GetArray('SELECT browser_id,name,shown,sorted,order_by FROM '.
 		$pre.'module_pwbr_field WHERE browser_id=?',array($browser_id));
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.

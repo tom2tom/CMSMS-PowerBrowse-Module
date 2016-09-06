@@ -19,7 +19,7 @@ class Transition
 'module_fbr_browser BR INNER JOIN '.$pre.
 'module_fb_form F ON BR.form_id=F.form_id LEFT JOIN (SELECT form_id, COUNT(*) as count FROM '.$pre.
 'module_fb_formbrowser GROUP BY form_id) C ON BR.form_id=C.form_id ORDER BY BR.name';
-		return $db->GetAll($sql);
+		return $db->GetArray($sql);
 	}
 
 	function ImportFormBrowsers(&$mod)
@@ -29,7 +29,7 @@ class Transition
 		$sql = 'SELECT B.browser_id,B.form_id,B.name,F.name AS formname FROM '.$pre.
 		'module_fbr_browser B LEFT JOIN '.$pre.
 		'module_fb_form F ON B.form_id = F.form_id ORDER BY B.browser_id';
-		$olds = $db->GetAll($sql);
+		$olds = $db->GetArray($sql);
 		if ($olds) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (browser_id,form_id,name,form_name) VALUES (?,?,?,?)';
@@ -51,7 +51,7 @@ class Transition
 		$sql = 'SELECT * FROM '.$pre.'module_fbr_browser_attr WHERE browser_id=?
 AND (name=\'admin_list_fields\' OR name=\'admin_rows_per_page\')
 ORDER BY browser_attr_id';
-		$data = $db->GetAll($sql,array($oldbid));
+		$data = $db->GetArray($sql,array($oldbid));
 		if ($data) {
 			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
 			foreach ($data as &$row) {

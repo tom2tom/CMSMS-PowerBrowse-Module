@@ -51,7 +51,7 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = $db->GetAll($sql,array($params['browser_id']));
+$data = $db->GetArray($sql,array($params['browser_id']));
 $colnames = array();
 $colsorts = array();
 //if ($data) { REDUNDANT - NEVER COME HERE, OTHERWISE

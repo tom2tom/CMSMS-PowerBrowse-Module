@@ -82,7 +82,7 @@ $tplvars['input_pagerows'] =
 $tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
 $sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
-$fields = $db->GetAll($sql,array($params['browser_id']));
+$fields = $db->GetArray($sql,array($params['browser_id']));
 if ($fields) {
 	$tplvars = $tplvars + array(
 		'title_data'=>$this->Lang('title_data'),
