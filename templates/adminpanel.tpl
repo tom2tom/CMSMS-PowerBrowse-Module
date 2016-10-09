@@ -65,13 +65,5 @@
 {$end_tab}
 {/if}
 {$tabs_footer}
-
-{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
-{/foreach}{/if}
-{if isset($jsfuncs)}
-<script type="text/javascript">
-//<![CDATA[
-{foreach from=$jsfuncs item=func}{$func}{/foreach}
-//]]>
-</script>
+{if !empty($jsall)}{$jsall}
 {/if}

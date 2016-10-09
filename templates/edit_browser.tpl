@@ -45,13 +45,5 @@
 {$tabs_end}
   <p class="pageinput" style="margin-top:10px;">{$save} {$cancel} {$apply}</p>
 {$end_form}
-
-{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
-{/foreach}{/if}
-{if isset($jsfuncs)}
-<script type="text/javascript">
-//<![CDATA[
-{foreach from=$jsfuncs item=func}{$func}{/foreach}
-//]]>
-</script>
+{if !empty($jsall)}{$jsall}
 {/if}

@@ -35,9 +35,8 @@ $tplvars['cssscript'] = <<<EOS
 EOS;
 
 $this->BuildNav($id,$returnid,$params,$tplvars);
-$tplvars['start_form'] =
-	$this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
-		array('browser_id'=>$bid,'form_id'=>$fid));
+$tplvars['start_form'] = $this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
+	array('browser_id'=>$bid,'form_id'=>$fid));
 $tplvars['end_form'] = $this->CreateFormEnd();
 
 if (!empty($params['message']))
@@ -92,8 +91,10 @@ $rows = array();
 			foreach ($submission as &$sub) //TODO any use for field index?
 			{
 				$indx = array_search($sub[0],$colnames);
-				if ($indx !== FALSE)
+				if ($indx !== FALSE) {
 					$fields[$indx] = $sub[1];
+					//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort? 
+				}
 			}
 			unset($sub);
 		}
@@ -101,7 +102,8 @@ $rows = array();
 			$rid = (int)$one['record_id'];
 			$oneset = new stdClass();
 			$oneset->submitted = $one['submitted'];
-			ksort($fields);
+			ksort($fields); //CHECKME mb_sort?
+			//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort? 
 			$oneset->fields = $fields;
 			$oneset->view = $this->CreateLink($id,'browse_record','',
 				$icon_view,
@@ -147,7 +149,6 @@ EOS;
   currentid: 'cpage',
   countid: 'tpage'
  });
-
 EOS;
 /*		$jsfuncs[] = <<<EOS
  $.SSsort.addParser({
@@ -162,14 +163,12 @@ EOS;
   watch: true,
   type: 'text'
  });
-
 EOS;
 */
 		$jsfuncs[] = <<<EOS
 function select_all(cb) {
  $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
 }
-
 EOS;
 		$tplvars['header_checkbox'] =
 			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
@@ -217,7 +216,6 @@ function pageback() {
 function pagerows(cb) {
  $.SSsort.setCurrent($('#submissions')[0],'pagesize',parseInt(cb.value));
 }
-
 EOS;
 	} else {
 		$tplvars['hasnav'] = 0;
@@ -238,7 +236,6 @@ function confirm_selected(msg) {
   return false;
  }
 }
-
 EOS;
 	if ($this->CheckAccess('view') || $this->CheckAccess('admin'))
 		$tplvars['export'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
@@ -265,14 +262,7 @@ if ($pmod) {
 			'browser_id'=>$bid));
 }
 
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
-}
-$tplvars['jsfuncs'] = $jsfuncs;
-$tplvars['jsincs'] = $jsincs;
+$tplvars['jsall'] = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
 
 echo PWFBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
