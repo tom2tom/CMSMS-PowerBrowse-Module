@@ -18,7 +18,7 @@ class Utils
 	@mode: optional type of get - 'one','row','col','assoc' or 'all', default 'all'
 	Returns: boolean indicating successful completion
 	*/
-	public static function SafeGet($sql,$args,$mode='all')
+	public static function SafeGet($sql, $args, $mode='all')
 	{
 		$db = cmsms()->GetDb();
 		$nt = 10;
@@ -60,7 +60,7 @@ class Utils
 	@args: array of arguments for @sql, or array of them
 	Returns: boolean indicating successful completion
 	*/
-	public static function SafeExec($sql,$args)
+	public static function SafeExec($sql, $args)
 	{
 		$db = cmsms()->GetDb();
 		$nt = 10;
@@ -120,7 +120,7 @@ class Utils
 	@form_id: form identifier
 	@internal: optional, default TRUE
 	*/
-	public static function GetFormNameFromID($form_id,$internal=TRUE)
+	public static function GetFormNameFromID($form_id, $internal=TRUE)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -179,7 +179,7 @@ class Utils
 	@based: optional boolean, whether to base64_encode the encrypted value, default FALSE
 	Returns: encrypted @value, or just @value if it's empty
 	*/
-	public static function encrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
+	public static function encrypt_value(&$mod, $value, $passwd=FALSE, $based=FALSE)
 	{
 		if ($value) {
 			if (!$passwd) {
@@ -204,7 +204,7 @@ class Utils
 	@based: optional boolean, whether to base64_decode the value, default FALSE
 	Returns: decrypted @value, or just @value if it's empty
 	*/
-	public static function decrypt_value(&$mod,$value,$passwd=FALSE,$based=FALSE)
+	public static function decrypt_value(&$mod, $value, $passwd=FALSE, $based=FALSE)
 	{
 		if ($value) {
 			if (!$passwd) {
@@ -257,7 +257,7 @@ class Utils
 	@cache: optional boolean, default TRUE
 	Returns: string, processed template
 	*/
-	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=TRUE)
+	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
 		if ($mod->before20) {
@@ -276,5 +276,52 @@ class Utils
 			}
 			return $tpl->fetch();
 		}
+	}
+
+	/**
+	MergeJS:
+	@jsincs: string or array of js 'include' directives
+	@jsfuncs: string or array of js methods
+	@jsloads: string or array of js onload-methods
+	@$merged: reference to variable to be populated with the merged js string
+	*/
+	public static function MergeJS($jsincs, $jsfuncs, $jsloads, &$merged)
+	{
+		if (is_array($jsincs)) {
+			$all = $jsincs;
+		} elseif ($jsincs) {
+			$all = array($jsincs);
+		} else {
+			$all = array();
+		}
+		if ($jsfuncs || $jsloads) {
+			$all[] =<<<EOS
+<script type="text/javascript">
+//<![CDATA[
+EOS;
+			if (is_array($jsfuncs)) {
+				$all = array_merge($all,$jsfuncs);
+			} elseif ($jsfuncs) {
+				$all[] = $jsfuncs;
+			}
+			if ($jsloads) {
+				$all[] =<<<EOS
+$(document).ready(function() {
+EOS;
+				if (is_array($jsloads)) {
+					$all = array_merge($all,$jsloads);
+				} else {
+					$all[] = $jsloads;
+				}
+				$all[] =<<<EOS
+});
+EOS;
+			}
+			$all[] =<<<EOS
+//]]>
+</script>
+EOS;
+		}
+		$merged = implode(PHP_EOL,$all);
 	}
 }
