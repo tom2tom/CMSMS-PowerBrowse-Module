@@ -46,7 +46,7 @@ class Transition
 		}
 	}
 
-	function Get_Attrs(&$db,$pre,$oldbid,$newbid)
+	function Get_Attrs(&$db, $pre, $oldbid, $newbid)
 	{
 		$sql = 'SELECT * FROM '.$pre.'module_fbr_browser_attr WHERE browser_id=?
 AND (name=\'admin_list_fields\' OR name=\'admin_rows_per_page\')
@@ -69,7 +69,7 @@ ORDER BY browser_attr_id';
 	}
 	
 	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
-	function Get_Fields(&$db,$pre,$oldbid,$newbid,&$value)
+	function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
 	{
 		$sql = 'SELECT F.field_id,F.name FROM '.$pre.
 'module_fb_field F JOIN '.$pre.
@@ -139,7 +139,7 @@ $vals = array (size=whatever)
   1 =>
   and so on
 */
-	function Get_Data(&$mod,&$db,$pre,$oldbid,$newbid,$oldfid)
+	function Get_Data(&$mod, &$db, $pre, $oldbid, $newbid, $oldfid)
 	{
 		$mod = cms_utils::get_module('PWFBrowse');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form

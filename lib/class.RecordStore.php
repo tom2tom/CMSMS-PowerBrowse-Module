@@ -13,7 +13,7 @@ class RecordStore
 	@source: string to be encrypted
 	Must be compatible with RecordLoad::Decrypt()
 	*/
-	private function Encrypt(&$mod,$source)
+	private function Encrypt(&$mod, $source)
 	{
 		return Utils::encrypt_value($mod,$source);
 	}
@@ -28,7 +28,7 @@ class RecordStore
 	@pre: table-names prefix
 	Returns: boolean indicating success
 	*/
-	public function Insert($browser_id,$form_id,$stamp,&$data,&$mod,&$db,$pre)
+	public function Insert($browser_id, $form_id, $stamp, &$data, &$mod, &$db, $pre)
 	{
 		$when = date('Y-m-d H:i:s',$stamp);
 		$cont = self::Encrypt($mod,serialize($data));
@@ -45,7 +45,7 @@ class RecordStore
 	@pre: table-names prefix
 	Returns: boolean indicating success
 	*/
-	public function Update($record_id,&$data,&$mod,&$db,$pre)
+	public function Update($record_id, &$data, &$mod, &$db, $pre)
 	{
 		$when = date('Y-m-d H:i:s');
 		$cont = self::Encrypt($mod,serialize($data));

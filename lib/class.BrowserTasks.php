@@ -34,7 +34,7 @@ class BrowserTasks
 		  'action' => string 'edit_browser'
 	 Returns: value returned by the last-performed SQL insertion
 	*/
-	public function StoreBrowser(&$mod,&$params)
+	public function StoreBrowser(&$mod, &$params)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -83,7 +83,7 @@ class BrowserTasks
 	@params: reference to array of parameters
 	Returns: id of new browser
 	*/
-	public function AddBrowser(&$mod,&$params)
+	public function AddBrowser(&$mod, &$params)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -116,7 +116,7 @@ class BrowserTasks
 	@params: reference to array of parameters
 	Copies browser data except specific records, sets all fields to be displayed
 	*/
-	public function CloneBrowser(&$mod,&$params)
+	public function CloneBrowser(&$mod, &$params)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();

@@ -14,7 +14,7 @@ class RecordLoad
 	@getstruct: optional boolean, whether to unserialize decrypted value, default TRUE
 	Must be compatible with RecordStore::Encrypt()
 	*/
-	public function Decrypt(&$mod,$source,$getstruct=TRUE)
+	public function Decrypt(&$mod, $source, $getstruct=TRUE)
 	{
 		if ($source) {
 			$decrypted = Utils::decrypt_value($mod,$source);
@@ -37,7 +37,7 @@ class RecordLoad
 	Returns: 2-member array, in which 1st is submissiondate/time or FALSE,
 		2nd is array of data or error message
 	*/
-	public function Load($record_id,&$mod=NULL,&$db=NULL,$pre='')
+	public function Load($record_id, &$mod=NULL, &$db=NULL, $pre='')
 	{
 		if (!$mod)
 			$mod = cms_utils::get_module('PWFBrowse');

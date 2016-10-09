@@ -12,7 +12,7 @@ class FormBrowser extends FieldBase
 	var $MenuKey = 'field_label'; //lang key for fields-menu label, used by PWForms
 	var $mymodule; //used also by PWForms, do not rename
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
@@ -25,7 +25,7 @@ class FormBrowser extends FieldBase
 		$this->mymodule = cms_utils::get_module($this->ModName);
 	}
 
-	public function Load($id,&$params)
+	public function Load($id, &$params)
 	{
 		//TODO
 		return FALSE;
@@ -52,7 +52,7 @@ class FormBrowser extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Dispose($id,$returnid)
+	public function Dispose($id, $returnid)
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
