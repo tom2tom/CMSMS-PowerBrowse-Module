@@ -279,7 +279,7 @@ EOS;
 		return $allow;
 	}
 
-	public function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
+	public function PrettyMessage($text, $success=TRUE, $faillink=FALSE, $key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
 		if ($success)
@@ -306,7 +306,7 @@ EOS;
 			return 'maintab';
 	}
 
-	public function BuildNav($id,$returnid,&$params,&$tplvars)
+	public function BuildNav($id, $returnid, &$params, &$tplvars)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('title_browsers'));
