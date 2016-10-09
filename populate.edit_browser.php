@@ -156,7 +156,6 @@ EOS;
 	var to = now.indexOf('hover');
 	$(this).attr('class', now.substring(0,to));
  });
-
 EOS;
 		$jsfuncs[] =<<<EOS
 function select_all(cb) {
@@ -180,7 +179,6 @@ function select_all(cb) {
   $(boxes[0]).attr('checked',true);
  }
 }
-
 EOS;
 		$tplvars = $tplvars + array(
 			'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
@@ -201,21 +199,13 @@ function set_tab() {
  var active = $('#page_tabs > .active');
  $('#{$id}active_tab').val(active.attr('id'));
 }
-
 EOS;
-
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
-}
 
 $tplvars = $tplvars + array(
 	'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
 	'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
-	'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"'),
-	'jsincs'=>$jsincs,
-	'jsfuncs'=>$jsfuncs
+	'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"')
 );
+
+$tplvars['jsall'] = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);

@@ -143,7 +143,6 @@ function confirm_selected(msg) {
   return false;
  }
 }
-
 EOS;
 		$tplvars['exportbtn'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 			'title="'.$this->Lang('tip_export_selected_browsers').
@@ -160,7 +159,6 @@ EOS;
 function select_all(cb) {
  $('input[name="{$id}sel[]"][type="checkbox"]').attr('checked',cb.checked);
 }
-
 EOS;
 			$t = $this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
 		} else
@@ -259,15 +257,15 @@ if ($padmin) {
 		$id.'passwd','','',40,2);
 	$configs[] = $oneset;
 
-	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery-inputCloak.min.js"></script>';
-	$jsloads[] =<<<EOS
+	$jsincs[] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
+EOS;
+	$jsloads[] = <<<EOS
  $('#{$id}passwd').inputCloak({
   type:'see4',
   symbol:'\u25CF'
  });
-
 EOS;
-
 	$tplvars['configs'] = $configs;
 
 	$jsfuncs[] = <<<EOS
@@ -275,7 +273,6 @@ function set_tab() {
  var active = $('#page_tabs > .active');
  $('#{$id}active_tab').val(active.attr('id'));
 }
-
 EOS;
 	$tplvars['save'] =
 		$this->CreateInputSubmit($id,'submit',$this->Lang('save'),
@@ -290,12 +287,5 @@ EOS;
 $tplvars['pmod'] = (($pmod)?1:0);
 $tplvars['pdev'] = (($iseditor)?1:0);
 
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
-}
-$tplvars['jsfuncs'] = $jsfuncs;
-$tplvars['jsincs'] = $jsincs;
+$tplvars['jsall'] = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
