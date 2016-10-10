@@ -52,8 +52,7 @@ class Export
 		global $db; //$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		if ($browser_id) {
-			$sql = 'SELECT record_id FROM '.$pre.
-			'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
+			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
 			$all = Utils::SafeGet($sql,array($browser_id),'col');
 		} elseif ($record_id) {
 			if (is_array($record_id))
@@ -62,7 +61,7 @@ class Export
 				$all = array($record_id);
 		} else
 			return FALSE;
-	
+
 		if ($fp && ini_get ('mbstring.internal_encoding') !== FALSE) { //send to file, and conversion is possible
 			$config = \cmsms()->GetConfig();
 			if (!empty($config['default_encoding']))
@@ -98,7 +97,7 @@ class Export
 			$data = $funcs->Load($all[0],$mod,$db,$pre);
 			if (!$data[0])
 				return FALSE;
-			$names = array();				
+			$names = array();
 			foreach ($data[1] as &$one) {
 				$fn = $one[0];
 				if ($strip)
@@ -142,8 +141,7 @@ class Export
 				return $outstr; //encoding conversion upstream
 		} else {
 			//no data, produce just a header line
-			$sql = 'SELECT name FROM '.$pre.
-			'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
+			$sql = 'SELECT name FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
 			$names = $db->GetCol($sql,array($params['browser_id']));
 			//cleanup messy field-names
 			foreach ($names as $i => &$one) {
@@ -157,7 +155,7 @@ class Export
 			if ($names)
 				$outstr .= $sep.implode($sep,$names);
 			$outstr .= PHP_EOL;
-			
+
 			if ($fp) {
 				if ($convert) {
 					$conv = mb_convert_encoding($outstr, $expchars, $defchars);
