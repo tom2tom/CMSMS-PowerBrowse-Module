@@ -38,10 +38,10 @@ $tplvars['start_form'] =
 		'form_id'=>$params['form_id'],
 		'submit_when'=>$when));
 $tplvars['end_form'] = $this->CreateFormEnd();
-$bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
 $tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 $tplvars['submit_when'] = $when;
 
+$bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
 $content = array();
 if (isset($params['edit'])) {
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit',$bname);
