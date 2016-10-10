@@ -14,8 +14,8 @@ else
 	exit;
 
 $tplvars = array();
-$tplvars['pconfig'] = (($pconfig)?1:0);
-$tplvars['pmod'] = (($pmod)?1:0);
+$tplvars['pconfig'] = ($pconfig)?1:0;
+$tplvars['pmod'] = ($pmod)?1:0;
 
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
@@ -50,16 +50,9 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = $db->GetArray($sql,array($params['browser_id']));
-$colnames = array();
-$colsorts = array();
-//if ($data) { REDUNDANT - NEVER COME HERE, OTHERWISE
-	foreach ($data as &$one) {
-		$colnames[] = $one['name'];
-		$colsorts[] = (int)$one['sorted'];
-	}
-	unset($one);
-//}
+$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
+$colnames = array_column($data,'name');
+$colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
 $tplvars['colnames'] = $colnames;
 $tplvars['colsorts'] = $colsorts;
 
@@ -93,7 +86,7 @@ $rows = array();
 				$indx = array_search($sub[0],$colnames);
 				if ($indx !== FALSE) {
 					$fields[$indx] = $sub[1];
-					//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort? 
+//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort? 
 				}
 			}
 			unset($sub);
@@ -102,22 +95,18 @@ $rows = array();
 			$rid = (int)$one['record_id'];
 			$oneset = new stdClass();
 			$oneset->submitted = $one['submitted'];
-			ksort($fields); //CHECKME mb_sort?
-			//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort? 
+			ksort($fields);
+//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort? 
 			$oneset->fields = $fields;
-			$oneset->view = $this->CreateLink($id,'browse_record','',
-				$icon_view,
+			$oneset->view = $this->CreateLink($id,'browse_record','',$icon_view,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
 			if ($pmod)
-			 $oneset->edit = $this->CreateLink($id,'browse_record','',
-				$icon_edit,
+			 $oneset->edit = $this->CreateLink($id,'browse_record','',$icon_edit,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid,'edit'=>1));
-			$oneset->export = $this->CreateLink($id,'export_record','',
-				$icon_export,
+			$oneset->export = $this->CreateLink($id,'export_record','',$icon_export,
 				array('record_id'=>$rid,'browser_id'=>$bid));
 			if ($pmod)
-			 $oneset->delete = $this->CreateLink($id,'delete_record','',
-				$icon_delete,
+			 $oneset->delete = $this->CreateLink($id,'delete_record','',$icon_delete,
 				array('record_id'=>$rid,'browser_id'=>$bid),
 				$this->Lang('confirm_delete_record'));
 			$oneset->selected = $this->CreateInputCheckbox($id,'sel[]',$rid,-1);
@@ -151,7 +140,8 @@ EOS;
   countid: 'tpage'
  });
 EOS;
-/*		$jsfuncs[] = <<<EOS
+/*TODO js-equivalent of mb_sort
+	$jsfuncs[] = <<<EOS
  $.SSsort.addParser({
   id: 'textinput',
   is: function(s,node) {
@@ -253,14 +243,10 @@ EOS;
 if ($pmod) {
 	$t = $this->Lang('title_add_record');
 	$icon_add = $theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon');
-	$tplvars['iconlinkadd'] = $this->CreateLink($id,'add_record','',
-			$icon_add,
-			array('form_id'=>$fid,
-			'browser_id'=>$bid));
-	$tplvars['textlinkadd'] = $this->CreateLink($id,'add_record','',
-			$t,
-			array('form_id'=>$fid,
-			'browser_id'=>$bid));
+	$tplvars['iconlinkadd'] = $this->CreateLink($id,'add_record','',$icon_add,
+			array('form_id'=>$fid,'browser_id'=>$bid));
+	$tplvars['textlinkadd'] = $this->CreateLink($id,'add_record','',$t,
+			array('form_id'=>$fid,'browser_id'=>$bid));
 }
 
 $tplvars['jsall'] = NULL;
