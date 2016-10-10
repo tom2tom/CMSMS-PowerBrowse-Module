@@ -10,8 +10,8 @@ namespace PWFBrowse;
 
 class Transition
 {
-	//FormBuilder-module table usage here
-	function GetBrowsersSummary()
+	//FormBuilder-module table use here
+	public function GetBrowsersSummary()
 	{
 		$pre = \cms_db_prefix();
 		$sql = <<<EOS
@@ -24,8 +24,8 @@ EOS;
 		return $db->GetArray($sql);
 	}
 
-	//FormBrowser-module table usage here
-	function ImportFormBrowsers(&$mod)
+	//FormBuilder-module table use here
+	public function ImportBrowsers(&$mod)
 	{
 		$pre = \cms_db_prefix();
 		$sql = <<<EOS
@@ -51,7 +51,7 @@ EOS;
 		}
 	}
 
-	function Get_Attrs(&$db, $pre, $oldbid, $newbid)
+	public function Get_Attrs(&$db, $pre, $oldbid, $newbid)
 	{
 		$sql = <<<EOS
 SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
@@ -74,9 +74,9 @@ EOS;
 			unset($row);
 		}
 	}
-	
+
 	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
-	function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
+	public function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
 	{
 		$sql = <<<EOS
 SELECT F.field_id,F.name FROM {$pre}module_fb_field F
@@ -112,7 +112,7 @@ $names = array (size=3)
   232 => string 'How can we contact you?' (length=23)
   233 => string 'What do you wish to change?' (length=27)
 $vals = array (size=whatever)
-  0 => 
+  0 =>
     object(stdClass)[56]
       public 'id' => string '737' (length=3)
       public 'user_approved' => string '' (length=0)
@@ -137,18 +137,18 @@ $vals = array (size=whatever)
 			<option name="field_alias"><![CDATA[]]></option>
 			<option name="css_class"><![CDATA[]]></option>
 			<option name="helptext"><![CDATA[]]></option>'... (length=5439)
-      public 'fields' => 
+      public 'fields' =>
         array (size=3)
           231 => string 'DAVID POUND' (length=11)
           232 => string 'PH 94597059 Or email davidjunefrank@bigpond.com' (length=47)
           233 => string 'No longer availabe for competition due to shoulder injury.' (length=58)
-      public 'fieldsbyalias' => 
+      public 'fieldsbyalias' =>
         array (size=1)
           '' => string 'No longer availabe for competition due to shoulder injury.' (length=58)
   1 =>
   and so on
 */
-	function Get_Data(&$mod, &$db, $pre, $oldbid, $newbid, $oldfid)
+	public function Get_Data(&$mod, &$db, $pre, $oldbid, $newbid, $oldfid)
 	{
 		$mod = \cms_utils::get_module('PWFBrowse');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
@@ -166,5 +166,4 @@ $vals = array (size=whatever)
 		}
 		unset($one);
 	}
-
 }
