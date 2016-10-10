@@ -26,6 +26,6 @@ if (isset($params['cancel'])) {
 
 $tplvars = array();
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.edit_browser.php';
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.open_browser.php';
 
-echo PWFBrowse\Utils::ProcessTemplate($this,'edit_browser.tpl',$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this,'open_browser.tpl',$tplvars);
