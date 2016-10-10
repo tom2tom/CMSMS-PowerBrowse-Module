@@ -73,7 +73,7 @@ class PWFBrowse extends CMSModule
 				include $fp;
 		}
 	}
-	
+
 	public function AllowAutoInstall()
 	{
 		return FALSE;
@@ -179,7 +179,7 @@ class PWFBrowse extends CMSModule
 
 	public function GetAdminSection()
 	{
-		return 'extensions';
+		return 'content';
 	}
 
 	public function GetAdminDescription()
