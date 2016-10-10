@@ -34,8 +34,9 @@ class RecordLoad
 	@mod: optional reference to PWFBrowse module object, default NULL
 	@db: optional reference to database connection object, default NULL
 	@pre: optional table-names prefix, default ''
-	Returns: 2-member array, in which 1st is submissiondate/time or FALSE,
-		2nd is array of data or error message
+	Returns: 2-member array:
+	 [0] = submissiondate/time or FALSE
+	 [1] = array of data or error message
 	*/
 	public function Load($record_id, &$mod=NULL, &$db=NULL, $pre='')
 	{

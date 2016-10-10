@@ -287,6 +287,7 @@ class Utils
 	@jsfuncs: string or array of js methods
 	@jsloads: string or array of js onload-methods
 	@$merged: reference to variable to be populated with the merged js string
+	Returns: nothing
 	*/
 	public static function MergeJS($jsincs, $jsfuncs, $jsloads, &$merged)
 	{
