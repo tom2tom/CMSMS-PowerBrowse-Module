@@ -77,9 +77,9 @@ if ($browsers) {
 		$bid = (int)$one['browser_id'];
 		$fid = (int)$one['form_id'];
 		if ($pmod) {
-			$oneset->name = $this->CreateLink($id,'edit_browser','',
+			$oneset->name = $this->CreateLink($id,'open_browser','',
 				$one['name'],array('form_id'=>$fid,'browser_id'=>$bid));
-			$oneset->editlink = $this->CreateLink($id,'edit_browser','',
+			$oneset->editlink = $this->CreateLink($id,'open_browser','',
 				$icon_edit,array('form_id'=>$fid,'browser_id'=>$bid));
 			if ($num > 0) {
 				$oneset->adminlink = $this->CreateLink($id,'browse_list','',

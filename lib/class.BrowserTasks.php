@@ -31,7 +31,7 @@ class BrowserTasks
 			  1 => string '60'
 		  'active_tab' => string 'listtab'
 		  'apply' => string 'Apply'
-		  'action' => string 'edit_browser'
+		  'action' => string 'open_browser'
 	 Returns: value returned by the last-performed SQL insertion
 	*/
 	public function StoreBrowser(&$mod, &$params)

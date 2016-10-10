@@ -23,7 +23,7 @@ if (isset($params['submit'])) {
 		$funcs->CloneBrowser($this,$params);
 	}
 	unset($params);
-	$this->Redirect($id,'edit_browser','',array(
+	$this->Redirect($id,'open_browser','',array(
 		'form_id'=>$form_id,
 		'browser_id'=>$browser_id));
 }
