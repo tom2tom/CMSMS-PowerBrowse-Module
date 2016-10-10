@@ -9,7 +9,7 @@ if (!$this->CheckAccess()) exit;
 if (isset($params['import'])) {
 	if ($this->CheckAccess('modify') || $this->CheckAccess('admin')) {
 		$funcs = new PWFBrowse\Transition();
-		$funcs->ImportFormBrowsers($this);
+		$funcs->ImportBrowsers($this);
 	}
 	$this->Redirect($id,'defaultadmin');
 }
