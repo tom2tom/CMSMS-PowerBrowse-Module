@@ -9,7 +9,7 @@ if (!$this->CheckAccess('modify')) exit;
 
 $pfmod = $this->GetModuleInstance('PWForms');
 if (!$pfmod)
-	return $this->PrettyMessage('error_module',FALSE);
+	return $this->PrettyMessage('error_module_forms',FALSE);
 
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
  'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
