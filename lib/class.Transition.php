@@ -10,7 +10,7 @@ namespace PWFBrowse;
 
 class Transition
 {
-	//FormBuilder-module table use here
+	//FormBrowser/Builder-module table use here
 	public function GetBrowsersSummary()
 	{
 		$pre = \cms_db_prefix();
@@ -24,7 +24,12 @@ EOS;
 		return $db->GetArray($sql);
 	}
 
-	//FormBuilder-module table use here
+	/*
+	FormBrowser/Builder-module table use here
+	Returns: 2-member array:
+	 [0] = no. of browsers processed
+	 [1] = no. of browsers skipped due to no data
+	*/
 	public function ImportBrowsers(&$mod)
 	{
 		$pre = \cms_db_prefix();
@@ -36,77 +41,32 @@ EOS;
 		$db = \cmsms()->GetDb();
 		$olds = $db->GetArray($sql);
 		if ($olds) {
+			$oc = count($olds);
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (browser_id,form_id,name,form_name) VALUES (?,?,?,?)';
 			$renums = array();
 			foreach ($olds as $row) {
 				$bid = $db->GenID($pre.'module_pwbr_browser_seq');
-				$db->Execute($sql,array($bid,-$row['form_id'],$row['name'],$row['formname'])); //form id < 0 signals FormBuilder form
-				$renums[$bid] = (int)$row['browser_id'];
-				self::Get_Data($mod,$db,$pre,$row['browser_id'],$bid,$row['form_id']);
-			}
-			foreach ($renums as $new=>$old) {
-				self::Get_Attrs($db,$pre,$old,$new);
-			}
-		}
-	}
-
-	public function Get_Attrs(&$db, $pre, $oldbid, $newbid)
-	{
-		$sql = <<<EOS
-SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
-AND (name='admin_list_fields' OR name='admin_rows_per_page')
-ORDER BY browser_attr_id
-EOS;
-		$data = $db->GetArray($sql,array($oldbid));
-		if ($data) {
-			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
-			foreach ($data as &$row) {
-				switch ($row['name']) {
-				case 'admin_list_fields':
-					self::Get_Fields($db,$pre,$oldbid,$newbid,$row['value']);
-					break;
-				case 'admin_rows_per_page':
-					$db->Execute($sql,array((int)$row['value'],$newbid));
-					break;
+				$oldid = (int)$row['browser_id'];
+				if (self::Get_Data($mod,$db,$pre,$bid,$oldid,$row['form_id'])) {
+					$renums[$bid] = $oldid;
+					$db->Execute($sql,array($bid,-$row['form_id'],$row['name'],$row['formname'])); //form id < 0 signals FormBuilder form
 				}
 			}
-			unset($row);
-		}
-	}
-
-	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
-	public function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
-	{
-		$sql = <<<EOS
-SELECT F.field_id,F.name FROM {$pre}module_fb_field F
-JOIN {$pre}module_fbr_browser B ON F.form_id=B.form_id
-WHERE B.browser_id =?
-ORDER BY F.field_id
-EOS;
-		$names = $db->GetAssoc($sql,array($oldbid));
-		$parts = explode(':',$value);
-		$i = 1;
-		$l = count($parts);
-		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
-(browser_id,name,shown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?)';
-		foreach ($parts as $one) {
-			list($indx,$order) = explode(',',$one);
-			if ($order != -1) {
-				$see = 1;
-				$order = (int)$order;
-			} else {
-				$see = 0;
-				$order = $l+$i;
+			if ($renums) {
+				foreach ($renums as $new=>$old) {
+					self::Get_Attrs($db,$pre,$old,$new);
+				}
+				$ic = count($renums);
+				return array($ic,$oc-$ic);
 			}
-			$nm = ($indx && !empty($names[$indx])) ? $names[$indx] : 'unnamed-'.$oldbid.':'.$i;
-			$db->Execute($sql,array($newbid,$nm,$see,0,$order,-$one['field_id'])); //id < 0 signals FormBuilder field
-			$i++;
+			return array(0,$oc);
 		}
+		return array(0,0);
 	}
 
 /* example data from FormBuilder::GetSortedResponses()
-$aount = string '4' (length=1)
+$count = string '4' (length=1)
 $names = array (size=3)
   231 => string 'Your name' (length=9)
   232 => string 'How can we contact you?' (length=23)
@@ -148,22 +108,81 @@ $vals = array (size=whatever)
   1 =>
   and so on
 */
-	public function Get_Data(&$mod, &$db, $pre, $oldbid, $newbid, $oldfid)
+	//this saves nothing and returns FALSE if there's no recorded response to interrogate
+	private function Get_Data(&$mod, &$db, $pre, $newbid, $oldbid, $oldfid)
 	{
-		$mod = \cms_utils::get_module('PWFBrowse');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
 		$fb = \cms_utils::get_module('FormBuilder');
 		$flds = array();
 		$parms = array();
-		list($count,$names,$details) = $fb->GetSortedResponses($oldfid,
-			-1,-1,FALSE,FALSE,$flds,'Y-m-d',$parms);
-		$funcs = new RecordStore();
-		foreach ($details as &$one) {
-			$fields = array();
-			foreach ($one->fields as $fid=>$fval)
-				$fields[-$fid] = array($names[$fid],$fval);//id < 0 signals FormBuilder field
-			$funcs->Insert($newbid,$newfid,$one->submitted_date,$fields,$mod,$db,$pre);
+//GetSortedResponses($form_id,$start_point,$number=100,$admin_approved=false,$user_approved=false,$field_list=array(),$dateFmt='d F y',&$params)
+		list($count,$names,$details) = $fb->GetSortedResponses($oldfid,	-1,-1,
+			FALSE,FALSE,$flds,'Y-m-d',$parms);
+		if ($count > 0) {
+			$funcs = new RecordStore();
+			foreach ($details as &$one) {
+				$fields = array();
+				foreach ($one->fields as $fid=>$fval)
+					$fields[-$fid] = array($names[$fid],$fval);//id < 0 signals FormBuilder field
+				$funcs->Insert($newbid,$newfid,$one->submitted_date,$fields,$mod,$db,$pre);
+			}
+			unset($one);
+			return TRUE;
 		}
-		unset($one);
+		return FALSE;
+	}
+
+	private function Get_Attrs(&$db, $pre, $oldbid, $newbid)
+	{
+		$sql = <<<EOS
+SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
+AND (name='admin_list_fields' OR name='admin_rows_per_page')
+ORDER BY browser_attr_id
+EOS;
+		$data = $db->GetArray($sql,array($oldbid));
+		if ($data) {
+			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
+			foreach ($data as &$row) {
+				switch ($row['name']) {
+				case 'admin_list_fields':
+					self::Get_Fields($db,$pre,$oldbid,$newbid,$row['value']);
+					break;
+				case 'admin_rows_per_page':
+					$db->Execute($sql,array((int)$row['value'],$newbid));
+					break;
+				}
+			}
+			unset($row);
+		}
+	}
+
+	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
+	private function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
+	{
+		$sql = <<<EOS
+SELECT F.field_id,F.name FROM {$pre}module_fb_field F
+JOIN {$pre}module_fbr_browser B ON F.form_id=B.form_id
+WHERE B.browser_id =?
+ORDER BY F.field_id
+EOS;
+		$names = $db->GetAssoc($sql,array($oldbid));
+		$parts = explode(':',$value);
+		$i = 1;
+		$l = count($parts);
+		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
+(browser_id,name,shown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?)';
+		foreach ($parts as $one) {
+			list($indx,$order) = explode(',',$one);
+			if ($order != -1) {
+				$see = 1;
+				$order = (int)$order;
+			} else {
+				$see = 0;
+				$order = $l+$i;
+			}
+			$nm = ($indx && !empty($names[$indx])) ? $names[$indx] : 'unnamed-'.$oldbid.':'.$i;
+			$db->Execute($sql,array($newbid,$nm,$see,0,$order,-$one['field_id'])); //id < 0 signals FormBuilder field
+			$i++;
+		}
 	}
 }
