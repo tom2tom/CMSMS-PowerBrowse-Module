@@ -16,7 +16,7 @@ $tplvars['tabs_start'] = $this->StartTabHeaders().
 	$this->EndTabHeaders() . $this->StartTabContent();
 
 $tplvars = $tplvars + array(
-	'start_form'=>$this->CreateFormStart($id,'edit_browser',$returnid),
+	'start_form'=>$this->CreateFormStart($id,'open_browser',$returnid),
 	'end_form'=>$this->CreateFormEnd(),
 	'hidden'=>$this->CreateInputHidden($id,'browser_id',$params['browser_id']).
 		$this->CreateInputHidden($id,'active_tab',''),
@@ -49,15 +49,15 @@ if ($this->GetPreference('owned_forms')) {
 	//find all valid owners
 	//NOTE cmsms function check_permission() always returns FALSE for everyone
 	//except the current user, so we replicate its backend operation here
-	$sql = 'SELECT DISTINCT U.user_id,U.username,U.first_name,U.last_name
-FROM '.$pre.'users U
-JOIN '.$pre.'user_groups UG ON U.user_id = UG.user_id
-JOIN '.$pre.'group_perms GP ON GP.group_id = UG.group_id
-JOIN '.$pre.'permissions P ON P.permission_id = GP.permission_id
-JOIN '.$pre.'groups GR ON GR.group_id = UG.group_id
-WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND
-P.permission_name IN("ModifyPwBrowsers","ModifyPwFormData")
-ORDER BY U.last_name,U.first_name';
+	$sql = <<<EOS
+SELECT DISTINCT U.user_id,U.username,U.first_name,U.last_name FROM {$pre}users U
+JOIN {$pre}user_groups UG ON U.user_id=UG.user_id
+JOIN {$pre}group_perms GP ON GP.group_id=UG.group_id
+JOIN {$pre}permissions P ON P.permission_id=GP.permission_id
+JOIN {$pre}groups GR ON GR.group_id=UG.group_id
+WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND P.permission_name IN('ModifyPwBrowsers','ModifyPwFormData')
+ORDER BY U.last_name,U.first_name
+EOS;
 	$rs = $db->Execute($sql);
 	if ($rs) {
 		while($urow = $rs->FetchRow())
@@ -189,8 +189,8 @@ EOS;
 	}
 } else {
 	$tplvars = $tplvars + array(
-		'nofields',$this->Lang('nofields'),
-		'rcount',0
+		'nofields'=>$this->Lang('nofields'),
+		'rcount'=>0
 	);
 }
 
