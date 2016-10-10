@@ -22,7 +22,7 @@ class FormBrowser extends FieldBase
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
 		$this->Type = 'FormBrowser';
-		$this->mymodule = cms_utils::get_module($this->ModName);
+		$this->mymodule = \cms_utils::get_module($this->ModName);
 	}
 
 	public function Load($id, &$params)
@@ -64,8 +64,8 @@ class FormBrowser extends FieldBase
 			return array(TRUE,'');
 
 		$mod = &$this->mymodule;
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 		$form_id = $this->formdata->Id;
 		$browsers = $db->GetCol($sql,array($form_id));

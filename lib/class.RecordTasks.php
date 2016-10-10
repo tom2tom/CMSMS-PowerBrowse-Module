@@ -15,8 +15,9 @@ class RecordTasks
 	*/
 	public function DeleteRecord($record_id)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'DELETE FROM '.cms_db_prefix().'module_pwbr_record WHERE record_id';
+		$pre = \cms_db_prefix();
+		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE record_id';
+		$db = \cmsms()->GetDb();
 		if (is_array($record_id)) {
 			$fillers = str_repeat('?,',count($record_id)-1);
 			$sql .= ' IN('.$fillers.'?)';
@@ -36,8 +37,9 @@ class RecordTasks
 	*/
 	public function AddRecord($form_id, $notify)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'INSERT INTO '.cms_db_prefix().'module_pwbr_record TODO';
+		$pre = \cms_db_prefix();
+		$sql = 'INSERT INTO '.$pre.'module_pwbr_record TODO';
+//		$db = \cmsms()->GetDb();
 		//TODO
 		$ret = Utils::SafeExec($sql,$args);
 		if ($ret && $notify) {

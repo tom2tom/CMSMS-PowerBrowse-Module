@@ -49,8 +49,8 @@ class Export
 	*/
 	public function CSV(&$mod, $browser_id=FALSE, $record_id=FALSE, $fp = FALSE, $sep = ',')
 	{
-		global $db; //$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		global $db; //$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		if ($browser_id) {
 			$sql = 'SELECT record_id FROM '.$pre.
 			'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
@@ -64,7 +64,7 @@ class Export
 			return FALSE;
 	
 		if ($fp && ini_get ('mbstring.internal_encoding') !== FALSE) { //send to file, and conversion is possible
-			$config = cmsms()->GetConfig();
+			$config = \cmsms()->GetConfig();
 			if (!empty($config['default_encoding']))
 				$defchars = trim($config['default_encoding']);
 			else
@@ -207,7 +207,7 @@ class Export
 		} else {
 			$csv = $this->CSV($mod,$browser_id,$record_id,FALSE,$sep);
 			if ($csv) {
-				$config = cmsms()->GetConfig();
+				$config = \cmsms()->GetConfig();
 				if (!empty($config['default_encoding']))
 					$defchars = trim($config['default_encoding']);
 				else

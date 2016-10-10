@@ -36,8 +36,8 @@ class BrowserTasks
 	*/
 	public function StoreBrowser(&$mod, &$params)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$browser_id = (int)$params['browser_id'];
 		if (isset($params['browser_owner']))
 			$owner = (int)$params['browser_owner'];
@@ -64,8 +64,8 @@ class BrowserTasks
 	*/
 	public function DeleteBrowser($browser_id)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 		if (!$db->Execute($sql, array($browser_id)))
 			return FALSE;
@@ -85,14 +85,14 @@ class BrowserTasks
 	*/
 	public function AddBrowser(&$mod, &$params)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
 		$formname = Utils::GetFormNameFromID($params['form_id'],FALSE);
 		$db->Execute('INSERT INTO '.$pre.
 	'module_pwbr_browser (browser_id,form_id,name,form_name) VALUES (?,?,?,?)',
 			array($newid,$params['form_id'],$params['name'],$formname));
-		$funcs = new \PWForms\BrowserIface(); //must be present, or else we never get to here TODO loader for this
+		$funcs = new PWForms\BrowserIface(); //must be present, or else we never get to here TODO loader for this
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.
@@ -118,8 +118,8 @@ class BrowserTasks
 	*/
 	public function CloneBrowser(&$mod, &$params)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$browser_id = (int)$params['browser_id'];
 		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
 

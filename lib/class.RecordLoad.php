@@ -40,11 +40,11 @@ class RecordLoad
 	public function Load($record_id, &$mod=NULL, &$db=NULL, $pre='')
 	{
 		if (!$mod)
-			$mod = cms_utils::get_module('PWFBrowse');
+			$mod = \cms_utils::get_module('PWFBrowse');
 		if (!$db)
-			$db = cmsms()->GetDb();
+			$db = \cmsms()->GetDb();
 		if (!$pre)
-			$pre = cms_db_prefix();
+			$pre = \cms_db_prefix();
 		$row = Utils::SafeGet(
 		'SELECT submitted,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 		array($record_id));

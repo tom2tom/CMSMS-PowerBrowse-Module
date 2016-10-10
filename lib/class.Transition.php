@@ -10,25 +10,30 @@ namespace PWFBrowse;
 
 class Transition
 {
+	//FormBuilder-module table usage here
 	function GetBrowsersSummary()
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		//FormBuilder-module table usage here
-		$sql = 'SELECT BR.*,F.name as form_name,COALESCE (C.count,0) AS record_count FROM '.$pre.
-'module_fbr_browser BR INNER JOIN '.$pre.
-'module_fb_form F ON BR.form_id=F.form_id LEFT JOIN (SELECT form_id, COUNT(*) as count FROM '.$pre.
-'module_fb_formbrowser GROUP BY form_id) C ON BR.form_id=C.form_id ORDER BY BR.name';
+		$pre = \cms_db_prefix();
+		$sql = <<<EOS
+SELECT BR.*,F.name as form_name,COALESCE (C.count,0) AS record_count FROM {$pre}module_fbr_browser BR
+INNER JOIN {$pre}module_fb_form F ON BR.form_id=F.form_id
+LEFT JOIN (SELECT form_id, COUNT(*) as count FROM {$pre}module_fb_formbrowser GROUP BY form_id) C ON BR.form_id=C.form_id
+ORDER BY BR.name
+EOS;
+		$db = \cmsms()->GetDb();
 		return $db->GetArray($sql);
 	}
 
+	//FormBrowser-module table usage here
 	function ImportFormBrowsers(&$mod)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		$sql = 'SELECT B.browser_id,B.form_id,B.name,F.name AS formname FROM '.$pre.
-		'module_fbr_browser B LEFT JOIN '.$pre.
-		'module_fb_form F ON B.form_id = F.form_id ORDER BY B.browser_id';
+		$pre = \cms_db_prefix();
+		$sql = <<<EOS
+SELECT B.browser_id,B.form_id,B.name,F.name AS formname FROM {$pre}module_fbr_browser B
+LEFT JOIN {$pre}module_fb_form F ON B.form_id=F.form_id
+ORDER BY B.browser_id
+EOS;
+		$db = \cmsms()->GetDb();
 		$olds = $db->GetArray($sql);
 		if ($olds) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
@@ -48,9 +53,11 @@ class Transition
 
 	function Get_Attrs(&$db, $pre, $oldbid, $newbid)
 	{
-		$sql = 'SELECT * FROM '.$pre.'module_fbr_browser_attr WHERE browser_id=?
-AND (name=\'admin_list_fields\' OR name=\'admin_rows_per_page\')
-ORDER BY browser_attr_id';
+		$sql = <<<EOS
+SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
+AND (name='admin_list_fields' OR name='admin_rows_per_page')
+ORDER BY browser_attr_id
+EOS;
 		$data = $db->GetArray($sql,array($oldbid));
 		if ($data) {
 			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
@@ -71,10 +78,12 @@ ORDER BY browser_attr_id';
 	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
 	function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
 	{
-		$sql = 'SELECT F.field_id,F.name FROM '.$pre.
-'module_fb_field F JOIN '.$pre.
-'module_fbr_browser B ON F.form_id = B.form_id WHERE B.browser_id =?
-ORDER BY F.field_id';
+		$sql = <<<EOS
+SELECT F.field_id,F.name FROM {$pre}module_fb_field F
+JOIN {$pre}module_fbr_browser B ON F.form_id=B.form_id
+WHERE B.browser_id =?
+ORDER BY F.field_id
+EOS;
 		$names = $db->GetAssoc($sql,array($oldbid));
 		$parts = explode(':',$value);
 		$i = 1;
@@ -141,9 +150,9 @@ $vals = array (size=whatever)
 */
 	function Get_Data(&$mod, &$db, $pre, $oldbid, $newbid, $oldfid)
 	{
-		$mod = cms_utils::get_module('PWFBrowse');
+		$mod = \cms_utils::get_module('PWFBrowse');
 		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
-		$fb = cms_utils::get_module('FormBuilder');
+		$fb = \cms_utils::get_module('FormBuilder');
 		$flds = array();
 		$parms = array();
 		list($count,$names,$details) = $fb->GetSortedResponses($oldfid,

@@ -20,7 +20,7 @@ class Utils
 	*/
 	public static function SafeGet($sql, $args, $mode='all')
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$nt = 10;
 		while($nt > 0)
 		{
@@ -62,7 +62,7 @@ class Utils
 	*/
 	public static function SafeExec($sql, $args)
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$nt = 10;
 		while($nt > 0)
 		{
@@ -89,7 +89,8 @@ class Utils
 	*/
 	public static function GetBrowserIDForRecord($record_id)
 	{
-		$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_pwbr_record WHERE record_id=?';
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_record WHERE record_id=?';
 		return self::SafeGet($sql,array($record_id),'one');
 	}
 
@@ -99,8 +100,9 @@ class Utils
 	*/
 	public static function GetBrowserNameFromID($browser_id)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT name FROM '.cms_db_prefix().'module_pwbr_browser WHERE browser_id=?';
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT name FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
+		$db = \cmsms()->GetDb();
 		return $db->GetOne($sql,array($browser_id));
 	}
 
@@ -110,8 +112,9 @@ class Utils
 	*/
 	public static function GetFormIDFromID($browser_id)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwbr_browser WHERE browser_id=?';
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT form_id FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
+		$db = \cmsms()->GetDb();
 		return $db->GetOne($sql,array($browser_id));
 	}
 
@@ -122,8 +125,8 @@ class Utils
 	*/
 	public static function GetFormNameFromID($form_id, $internal=TRUE)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		if ($internal)
 			$sql = 'SELECT form_name FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 		else
@@ -138,7 +141,7 @@ class Utils
 	*/
 	public static function GetUploadsPath(&$mod)
 	{
-		$config = cmsms()->GetConfig();
+		$config = \cmsms()->GetConfig();
 		$up = $config['uploads_path'];
 		if ($up) {
 			$rp = $mod->GetPreference('uploads_path');
@@ -157,7 +160,7 @@ class Utils
 	*/
 	public static function GetUploadsUrl(&$mod)
 	{
-		$config = cmsms()->GetConfig();
+		$config = \cmsms()->GetConfig();
 		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url':'ssl_uploads_url';
 		$up = $config[$key];
 		if ($up) {
