@@ -129,6 +129,7 @@ $rows = array();
 
 $tplvars['rows'] = $rows;
 $rcount = count($rows);
+$tplvars['rcount'] = $rcount;
 if ($rcount) {
 	if ($rcount > 1) {
 		$jsincs[] = <<<EOS
