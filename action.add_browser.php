@@ -32,10 +32,10 @@ $tplvars = array();
 
 if ($params['browser_id'] == -1) { //add browser
 	//TODO c.f. BrowserTasks->AddBrowser(&$mod,&$params)
-	$funcs = new \PWForms\BrowserIface(); //TODO loader for this?
+	$funcs = new PWForms\BrowserIface(); //TODO loader for this?
 	if ($funcs == FALSE) {
 		unset($params);
-		$message = $this->PrettyMessage('error_module',FALSE);
+		$message = $this->PrettyMessage('error_module_forms',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
 	}
 	$formList = $funcs->GetBrowsableForms();
