@@ -64,7 +64,7 @@ $this->RemovePreference();
 // remove disposer
 $pfmod = $this->GetModuleInstance('PWForms');
 if ($pfmod) {
-	$fp = cms_join_path($this->GetModulePath(),'lib','FormBrowser.php');
+	$fp = cms_join_path($this->GetModulePath(),'lib','class.FormBrowser.php');
 	$pfmod->DeregisterField($fp);
 	unset($pfmod);
 }

@@ -81,6 +81,6 @@ if ($fp && is_dir($fp)) {
 $this->SetPreference('uploads_path',$ud);
 
 //install our disposer
-$fp = cms_join_path($this->GetModulePath(),'lib','FormBrowser.php');
+$fp = cms_join_path($this->GetModulePath(),'lib','class.FormBrowser.php');
 $pfmod->RegisterField($fp);
 unset($pfmod);
