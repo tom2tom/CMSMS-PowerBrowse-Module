@@ -7,11 +7,19 @@
 if (!$this->CheckAccess()) exit;
 
 if (isset($params['import'])) {
-	if ($this->CheckAccess('modify') || $this->CheckAccess('admin')) {
-		$funcs = new PWFBrowse\Transition();
-		$funcs->ImportBrowsers($this);
+	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
+
+	$funcs = new PWFBrowse\Transition();
+	list($done,$skips) = $funcs->ImportBrowsers($this);
+	if ($done) {
+		if ($skips)
+			$parms = array('message' => $this->PrettyMessage('error_data_incomplete',FALSE));
+		else
+			$parms = array();
+	} else {
+		$parms = array('message' => $this->PrettyMessage('error_database',FALSE));
 	}
-	$this->Redirect($id,'defaultadmin');
+	$this->Redirect($id,'defaultadmin','',$parms);
 }
 
 if (!isset($params['sel']))
