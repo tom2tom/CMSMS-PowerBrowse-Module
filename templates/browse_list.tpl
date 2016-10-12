@@ -4,7 +4,7 @@
 <h2 style="margin-left:5%;">{$browser_title}</h2>
 {if !empty($rows)}
  {if $hasnav}
-  <div class="pbr_browsenav">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}&nbsp;({$pageof})&nbsp;&nbsp;{$rowchanger}</div>
+  <div class="pbr_browsenav pageinput">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}&nbsp;({$pageof})&nbsp;&nbsp;{$rowchanger}</div>
  {/if}
  {$start_form}
   <div class="pageinput pbr_overflow">
@@ -35,14 +35,14 @@
     </tbody>
    </table>
   </div>
-{if $hasnav}<div class="pbr_browsenav">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}</div>{/if}
-  <div class="pageinput" style="margin-top:0; float:right; text-align:right">{$export}{if $pmod}&nbsp;{$delete}{/if}</div>
+{if $hasnav}<div class="pbr_browsenav pageinput">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}</div>{/if}
+  <div class="pageinput" style="margin-top:1em;">
+{if $pmod}{$iconlinkadd}&nbsp;{$textlinkadd}{/if}
+<span style="margin-left:5em;">{$export}{if $pmod}&nbsp;{$delete}{/if}</span>
+  </div>
 {$end_form}
 {else}
  <p class="pageinput">{$norecords}</p>
 {/if}
-
-{if $pmod}<p class="pageinput">{$iconlinkadd}&nbsp;{$textlinkadd}</p>{/if}
-<div style="clear:right;"></div>
 {if !empty($jsall)}{$jsall}
 {/if}
