@@ -41,9 +41,9 @@ $lang['error_system']='Something is not working correctly. Please advise your si
 $lang['error_zip']='Zip file creation failed';
 $lang['export']='Export';
 
-$lang['field_label']='Store results for later browsing';
+$lang['field_label']='Store results for browsing';
 $lang['first']='first';
-$lang['friendlyname']='Forms Data Browser';
+$lang['friendlyname']='Forms Data';
 
 //$lang['help_browser_css_class']='Optional name of class, or space-separated series of class names, applied to list views';
 $lang['help_dnd']='You can change the order by dragging any row, or double-click on any number of rows prior to dragging them all.';
