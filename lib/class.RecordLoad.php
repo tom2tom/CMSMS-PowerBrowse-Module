@@ -48,7 +48,7 @@ class RecordLoad
 			$pre = \cms_db_prefix();
 		$row = Utils::SafeGet(
 		'SELECT submitted,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
-		array($record_id));
+			array($record_id),'row');
 		if ($row) {
 			$formdata = self::Decrypt($mod,$row['contents']);
 			if ($formdata)
