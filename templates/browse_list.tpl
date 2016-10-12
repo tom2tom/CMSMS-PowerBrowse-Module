@@ -36,13 +36,12 @@
    </table>
   </div>
 {if $hasnav}<div class="pbr_browsenav pageinput">{$first}&nbsp;|&nbsp;{$prev}&nbsp;&lt;&gt;&nbsp;{$next}&nbsp;|&nbsp;{$last}</div>{/if}
-  <div class="pageinput" style="margin-top:1em;">
-{if $pmod}{$iconlinkadd}&nbsp;{$textlinkadd}{/if}
-<span style="margin-left:5em;">{$export}{if $pmod}&nbsp;{$delete}{/if}</span>
-  </div>
-{$end_form}
 {else}
  <p class="pageinput">{$norecords}</p>
 {/if}
+  <div class="pageinput" style="margin-top:1em;">
+{if $pmod}<span style="margin-right:5em;">{$iconlinkadd}&nbsp;{$textlinkadd}</span>{/if}{if !empty($rows)}{$export}{if $pmod} {$delete}{/if}{/if}
+  </div>
+{$end_form}
 {if !empty($jsall)}{$jsall}
 {/if}
