@@ -17,25 +17,26 @@ $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
 
 $flds = '
- browser_id I(2) KEY,
- form_id I(2),
- name C(256),
- form_name C(256),
- owner I(4) DEFAULT 0,
- pagerows I(2) DEFAULT 10
+browser_id I(2) KEY,
+form_id I(2),
+name C(256),
+form_name C(256),
+owner I(4) DEFAULT 0,
+pagerows I(2) DEFAULT 10
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_browser',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 $db->CreateSequence($pre.'module_pwbr_browser_seq');
 
 $flds = '
- field_id I(2) AUTO KEY,
- browser_id I(2),
- name C(256),
- shown I(1) DEFAULT 1,
- sorted I(1) DEFAULT 0,
- order_by I(2) DEFAULT -1,
- form_field I(2) DEFAULT 0
+field_id I(2) AUTO KEY,
+browser_id I(2),
+name C(256),
+shown I(1) DEFAULT 1,
+frontshown I(1) DEFAULT 0,
+sorted I(1) DEFAULT 0,
+order_by I(2) DEFAULT -1,
+form_field I(2) DEFAULT 0
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_field',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -45,11 +46,11 @@ $sqlarray = $dict->CreateIndexSQL('idx_fieldbrowser',$pre.'module_pwbr_field','b
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = '
- record_id I(4) AUTO KEY,
- browser_id I(2),
- form_id I(2),
- submitted '.CMS_ADODB_DT.',
- contents B
+record_id I(4) AUTO KEY,
+browser_id I(2),
+form_id I(2),
+submitted '.CMS_ADODB_DT.',
+contents B
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_record',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
