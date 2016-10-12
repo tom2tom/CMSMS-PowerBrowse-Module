@@ -6,7 +6,8 @@
 
 if (!($this->CheckAccess('admin') || $this->CheckAccess('modify'))) exit;
 
-$funcs = new PWFBrowse\RecordTasks();
-$funcs->AddRecord($params['form_id'],$this->GetPreference('onchange_notices'));
+//$funcs = new PWFBrowse\RecordTasks();
+//$funcs->AddRecord($params['form_id'],$this->GetPreference('onchange_notices'));
+$params['message'] = 'NOT YET IMPLEMENTED'; //TODO
 
 $this->Redirect($id,'browse_list',$returnid,$params);
