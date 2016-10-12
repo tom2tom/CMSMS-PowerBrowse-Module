@@ -123,7 +123,7 @@ if ($fields) {
 
 	$tplvars['fields'] = $formatted;
 	$rc = count($fields);
-	$tplvars['rcount'] = $rc;
+	$tplvars['rc'] = $rc;
 
 	if ($rc > 1) {
 		$jsincs[] = <<<EOS
@@ -190,7 +190,7 @@ EOS;
 } else {
 	$tplvars = $tplvars + array(
 		'nofields'=>$this->Lang('nofields'),
-		'rcount'=>0
+		'rc'=>0
 	);
 }
 
