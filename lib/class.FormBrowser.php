@@ -22,7 +22,7 @@ class FormBrowser extends FieldBase
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
 		$this->Type = 'FormBrowser';
-		$this->mymodule = \cms_utils::get_module($this->ModName);
+		$this->mymodule =& \cms_utils::get_module($this->ModName);
 	}
 
 	public function Load($id, &$params)
@@ -46,9 +46,23 @@ class FormBrowser extends FieldBase
 			return array($ret);
 	}
 
+	public function GetDisplayType()
+	{
+		if (!($this->IsInput || $this->IsSortable)) //TODO check this
+			$t = '-';
+		elseif ($this->IsDisposition)
+			$t = '*';
+		else
+			$t = '';
+		if (!$this->mymodule instanceof $this->ModName) {
+			$this->mymodule =& \cms_utils::get_module($this->ModName);
+		}
+		return $t.$this->mymodule->Lang($this->MenuKey);
+	}
+
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -71,7 +85,7 @@ class FormBrowser extends FieldBase
 		$browsers = $db->GetCol($sql,array($form_id));
 		if ($browsers) {
 			$stamp = time();
-			$funcs = new RecordStore();
+			$funcs = new PWFBrowse\RecordStore();
 			foreach ($browsers as $browser_id)
 				$funcs->Insert($browser_id,$form_id,$stamp,$browsedata,$mod,$db,$pre);
 		}
