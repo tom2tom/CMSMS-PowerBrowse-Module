@@ -27,14 +27,12 @@ class FormBrowser extends FieldBase
 
 	public function Load($id, &$params)
 	{
-		//TODO
-		return FALSE;
+		return TRUE;
 	}
 
 	public function Store($deep=FALSE)
 	{
-		//TODO
-		return FALSE;
+		return TRUE;
 	}
 
 	public function GetHumanReadableValue($as_string=TRUE)
@@ -48,16 +46,10 @@ class FormBrowser extends FieldBase
 
 	public function GetDisplayType()
 	{
-		if (!($this->IsInput || $this->IsSortable)) //TODO check this
-			$t = '-';
-		elseif ($this->IsDisposition)
-			$t = '*';
-		else
-			$t = '';
 		if (!$this->mymodule instanceof $this->ModName) {
 			$this->mymodule =& \cms_utils::get_module($this->ModName);
 		}
-		return $t.$this->mymodule->Lang($this->MenuKey);
+		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
 
 	public function AdminPopulate($id)
@@ -70,26 +62,26 @@ class FormBrowser extends FieldBase
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput) //TODO is a browsable field
+			if ($one->IsInput || $one->IsSortable || $one->DisplayExternal) //TODO is a browsable field
 				$browsedata[$one->Id] = array($one->Name => $one->Value);
 		}
 		unset($one);
-		if (!$browsedata)
-			return array(TRUE,'');
-
-		$mod = &$this->mymodule;
-		$db = \cmsms()->GetDb();
-		$pre = \cms_db_prefix();
-		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
-		$form_id = $this->formdata->Id;
-		$browsers = $db->GetCol($sql,array($form_id));
-		if ($browsers) {
-			$stamp = time();
-			$funcs = new PWFBrowse\RecordStore();
-			foreach ($browsers as $browser_id)
-				$funcs->Insert($browser_id,$form_id,$stamp,$browsedata,$mod,$db,$pre);
+		if ($browsedata) {
+			if (!$this->mymodule instanceof $this->ModName) {
+				$this->mymodule =& \cms_utils::get_module($this->ModName);
+			}
+			$pre = \cms_db_prefix();
+			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
+			$db = \cmsms()->GetDb();
+			$form_id = $this->formdata->Id;
+			$browsers = $db->GetCol($sql,array($form_id));
+			if ($browsers) {
+				$stamp = time();
+				$funcs = new PWFBrowse\RecordStore();
+				foreach ($browsers as $browser_id)
+					$funcs->Insert($browser_id,$form_id,$stamp,$browsedata,$this->mymodule,$db,$pre);
+			}
 		}
-		unset($mod);
 		return array(TRUE,'');
 	}
 }
