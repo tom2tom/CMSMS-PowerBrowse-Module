@@ -56,7 +56,7 @@ $lang['help_order']='Row-order here corresponds to column-order for listed data.
 $lang['help_owned_forms']='Enable blocking of form-data access by any non-administrator other than a specified user';
 $lang['help_pagerows']='This is the minimum length of displayed pages. The length can be increased, while browsing.';
 $lang['help_strip_on_export']='Remove all HTML tags from records when exported to .csv';
-$lang['help_uploads_path']='A filesystem path relative to website-host <em>uploads</em> directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default directory will be used.';
+$lang['help_uploads_dir']='A filesystem path relative to website-host <em>uploads</em> directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default directory will be used.';
 
 $lang['import_browsers']='Import FormBrowsers';
 $lang['inspect']='Inspect';
@@ -130,7 +130,7 @@ $lang['title_strip_on_export']='Strip HTML tags on export';
 $lang['title_submit_when']='Submitted';
 $lang['title_submitted_as']='\'%s\' form submission';
 $lang['title_submitted_edit']='Edit \'%s\' form submission';
-$lang['title_uploads_path']='Sub-directory for module-specific file uploads';
+$lang['title_uploads_dir']='Sub-directory for module-specific file uploads';
 
 $lang['up']='Move up';
 $lang['update']='Update Browser';
