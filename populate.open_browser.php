@@ -6,10 +6,10 @@
 
 //setup tabbed page to edit a browser's parameters
 
-$this->BuildNav($id,$returnid,$params,$tplvars);
+$this->_BuildNav($id,$returnid,$params,$tplvars);
 if (!empty($params['message']))
 	$tplvars['message'] = $params['message'];
-$tab = $this->GetActiveTab($params);
+$tab = $this->_GetActiveTab($params);
 $tplvars['tabs_start'] = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('tab_main'),($tab == 'maintab')).
 	$this->SetTabHeader('listtab',$this->Lang('tab_list'),($tab == 'listtab')).

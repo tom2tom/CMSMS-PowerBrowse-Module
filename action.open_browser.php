@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->CheckAccess('modify')) exit;
+if (!$this->_CheckAccess('modify')) exit;
 
 if (isset($params['cancel'])) {
 	unset($params);
@@ -16,12 +16,12 @@ if (isset($params['cancel'])) {
 	$message = $this->Lang('browser2','\''.$params['browser_name'].'\'',$this->Lang('saved'));
 	unset($params);
 	$this->Redirect($id,'defaultadmin','',array(
-		'message'=>$this->PrettyMessage($message,TRUE,FALSE,FALSE)));
+		'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
 } elseif (isset($params['apply'])) {
 	$funcs = new PWFBrowse\BrowserTasks();
 	$funcs->StoreBrowser($this,$params);
 	$message = $this->Lang('browser1',$this->Lang('updated'));
-	$params['message'] = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
+	$params['message'] = $this->_PrettyMessage($message,TRUE,FALSE);
 }
 
 $tplvars = array();

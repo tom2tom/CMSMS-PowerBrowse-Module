@@ -4,20 +4,20 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->CheckAccess()) exit;
+if (!$this->_CheckAccess()) exit;
 
 if (isset($params['import'])) {
-	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
+	if (!($this->_CheckAccess('modify') || $this->_CheckAccess('admin'))) exit;
 
 	$funcs = new PWFBrowse\Transition();
 	list($done,$skips) = $funcs->ImportBrowsers($this);
 	if ($done) {
 		if ($skips)
-			$parms = array('message' => $this->PrettyMessage('error_data_incomplete',FALSE));
+			$parms = array('message' => $this->_PrettyMessage('error_data_incomplete',FALSE));
 		else
 			$parms = array();
 	} else {
-		$parms = array('message' => $this->PrettyMessage('error_database',FALSE));
+		$parms = array('message' => $this->_PrettyMessage('error_database',FALSE));
 	}
 	$this->Redirect($id,'defaultadmin','',$parms);
 }
@@ -26,7 +26,7 @@ if (!isset($params['sel']))
 	$this->Redirect($id,'defaultadmin'); //nothing selected
 
 if (isset($params['clone'])) {
-	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
+	if (!($this->_CheckAccess('modify') || $this->_CheckAccess('admin'))) exit;
 
 	$funcs = new PWFBrowse\BrowserTasks();
 	foreach ($params['sel'] as $browser_id) {
@@ -36,7 +36,7 @@ if (isset($params['clone'])) {
 	unset($funcs);
 	$params = array(); //nothing to report
 } elseif (isset($params['delete'])) {
-	if (!($this->CheckAccess('modify') || $this->CheckAccess('admin'))) exit;
+	if (!($this->_CheckAccess('modify') || $this->_CheckAccess('admin'))) exit;
 
 	$success = TRUE;
 	$funcs = new PWFBrowse\BrowserTasks();
@@ -47,9 +47,9 @@ if (isset($params['clone'])) {
 	unset($funcs);
 	$params = ($success)?
 		array():
-		array('message' => $this->PrettyMessage('error_failed',FALSE));
+		array('message' => $this->_PrettyMessage('error_failed',FALSE));
 } elseif (isset($params['export'])) {
-	if (!$this->CheckAccess()) exit;
+	if (!$this->_CheckAccess()) exit;
 
 	$funcs = new PWFBrowse\Export();
 	if (count($params['sel']) == 1) {
@@ -57,7 +57,7 @@ if (isset($params['clone'])) {
 		$res = $funcs->Export($this,$browser_id);
 		if ($res === TRUE)
 			exit;
-		$params = array('message' => $this->PrettyMessage($res,FALSE));
+		$params = array('message' => $this->_PrettyMessage($res,FALSE));
 	} else {
 		//cannot export multi browsers as a single item, so stuff em into a zip
 		$fn = $this->GetName().$this->Lang('export').
@@ -93,7 +93,7 @@ if (isset($params['clone'])) {
 				exit;
 			}
 		}
-		$params = array('message'=>$this->PrettyMessage('error_zip',FALSE));
+		$params = array('message'=>$this->_PrettyMessage('error_zip',FALSE));
 	}
 	unset($funcs);
 }

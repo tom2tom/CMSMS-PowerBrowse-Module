@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!($this->CheckAccess('admin') || $this->CheckAccess('view'))) exit;
+if (!($this->_CheckAccess('admin') || $this->_CheckAccess('view'))) exit;
 
 if (isset($params['cancel']))
 	$this->Redirect($id,'browse_list',$returnid,$params);
@@ -24,12 +24,12 @@ if (isset($params['submit'])) {
 $funcs = new PWFBrowse\RecordLoad();
 list($when,$data) = $funcs->Load($params['record_id'],$this,$db,$pre);
 if (!$when) {
-	$params['message']= $this->PrettyMessage('error_data',FALSE);
+	$params['message']= $this->_PrettyMessage('error_data',FALSE);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
 $tplvars = array();
-$this->BuildNav($id,$returnid,$params,$tplvars);
+$this->_BuildNav($id,$returnid,$params,$tplvars);
 
 $tplvars['start_form'] =
 	$this->CreateFormStart($id,'browse_record',$returnid,'POST','','','',

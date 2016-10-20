@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!($this->CheckAccess('admin') || $this->CheckAccess('modify'))) exit;
+if (!($this->_CheckAccess('admin') || $this->_CheckAccess('modify'))) exit;
 
 //$funcs = new PWFBrowse\RecordTasks();
 //$funcs->AddRecord($params['form_id'],$this->GetPreference('onchange_notices'));

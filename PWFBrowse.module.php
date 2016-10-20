@@ -189,7 +189,7 @@ class PWFBrowse extends CMSModule
 
 	public function VisibleToAdminUser()
 	{
-		return self::CheckAccess();
+		return self::_CheckAccess();
 	}
 
 /*	public function AdminStyle()
@@ -255,7 +255,7 @@ EOS;
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
-	public function CheckAccess($permission='')
+	public function _CheckAccess($permission='')
 	{
 		switch ($permission) {
 		 case '':  // any module permission
@@ -279,26 +279,24 @@ EOS;
 		return $allow;
 	}
 
-	public function PrettyMessage($text, $success=TRUE, $faillink=FALSE, $key=TRUE)
+	public function _PrettyMessage($text, $success=TRUE, $key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
 		if ($success)
 			return $this->ShowMessage($base);
 		else {
 			$msg = $this->ShowErrors($base);
-			if ($faillink == FALSE) {
-				//strip the link
-				$pos = strpos($msg,'<a href=');
-				$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
-				$pos = strpos($msg,'</a>',$pos);
-				$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
-				$msg = $part1.$part2;
-			}
+			//strip the link
+			$pos = strpos($msg,'<a href=');
+			$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
+			$pos = strpos($msg,'</a>',$pos);
+			$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
+			$msg = $part1.$part2;
 			return $msg;
 		}
 	}
 
-	public function GetActiveTab(&$params)
+	public function _GetActiveTab(&$params)
 	{
 		if (!empty($params['active_tab']))
 			return $params['active_tab'];
@@ -306,7 +304,7 @@ EOS;
 			return 'maintab';
 	}
 
-	public function BuildNav($id, $returnid, &$params, &$tplvars)
+	public function _BuildNav($id, $returnid, &$params, &$tplvars)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('title_browsers'));

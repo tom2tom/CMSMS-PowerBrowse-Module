@@ -5,10 +5,10 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-$pconfig = $this->CheckAccess('admin');
-if ($pconfig || $this->CheckAccess('modify'))
+$pconfig = $this->_CheckAccess('admin');
+if ($pconfig || $this->_CheckAccess('modify'))
 	$pmod = TRUE;
-elseif ($this->CheckAccess('view'))
+elseif ($this->_CheckAccess('view'))
 	$pmod = FALSE;
 else
 	exit;
@@ -20,21 +20,7 @@ $tplvars['pmod'] = ($pmod)?1:0;
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
 
-$baseurl = $this->GetModuleURLPath();
-//replace href attribute in existing stylesheet link (early in page-processing)
-$cssfile = $this->GetPreference('list_cssfile');
-$u = ($cssfile) ?
-	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
-	$baseurl.'/css/list-view.css';
-$tplvars['cssscript'] = <<<EOS
-<script type="text/javascript">
-//<![CDATA[
- document.getElementById('adminstyler').setAttribute('href',"{$u}");
-//]]>
-</script>
-EOS;
-
-$this->BuildNav($id,$returnid,$params,$tplvars);
+$this->_BuildNav($id,$returnid,$params,$tplvars);
 $tplvars['start_form'] = $this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
 	array('browser_id'=>$bid,'form_id'=>$fid));
 $tplvars['end_form'] = $this->CreateFormEnd();
@@ -63,6 +49,7 @@ $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 $jsincs = array();
 $jsfuncs = array();
 $jsloads = array();
+$baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
@@ -86,7 +73,7 @@ $rows = array();
 				$indx = array_search($sub[0],$colnames);
 				if ($indx !== FALSE) {
 					$fields[$indx] = $sub[1];
-//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort? 
+//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
 			}
 			unset($sub);
@@ -96,7 +83,7 @@ $rows = array();
 			$oneset = new stdClass();
 			$oneset->submitted = $one['submitted'];
 			ksort($fields);
-//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort? 
+//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort?
 			$oneset->fields = $fields;
 			$oneset->view = $this->CreateLink($id,'browse_record','',$icon_view,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
@@ -228,7 +215,7 @@ function confirm_selected(msg) {
  }
 }
 EOS;
-	if ($this->CheckAccess('view') || $this->CheckAccess('admin'))
+	if ($this->_CheckAccess('view') || $this->_CheckAccess('admin'))
 		$tplvars['export'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 		'title="'.$this->Lang('tip_export_selected_records').
 		'"  onclick="return any_selected();"');
@@ -249,7 +236,26 @@ if ($pmod) {
 			array('form_id'=>$fid,'browser_id'=>$bid));
 }
 
-$tplvars['jsall'] = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
+//replace href attribute in existing stylesheet link (early in page-processing)
+$cssfile = $this->GetPreference('list_cssfile');
+$u = ($cssfile) ?
+	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
+	$baseurl.'/css/list-view.css';
+$t = <<<EOS
+<script type="text/javascript">
+//<![CDATA[
+ document.getElementById('adminstyler').setAttribute('href',"{$u}");
+//]]>
+</script>
+EOS;
 
+$jsall = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+unset($jsincs);
+unset($jsfuncs);
+unset($jsloads);
+
+echo $t;
 echo PWFBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
+if ($jsall)
+	echo $jsall;

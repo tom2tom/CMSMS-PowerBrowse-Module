@@ -57,6 +57,6 @@ class RecordLoad
 		} else {
 			$errkey = 'error_database';
 		}
-		return array(FALSE,$mod->PrettyMessage($errkey,FALSE));
+		return array(FALSE,$mod->_PrettyMessage($errkey,FALSE));
 	}
 }

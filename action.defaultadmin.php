@@ -4,9 +4,9 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-$padmin = $this->CheckAccess('admin');
-$pmod = $this->CheckAccess('modify');
-$pview = $this->CheckAccess('view');
+$padmin = $this->_CheckAccess('admin');
+$pmod = $this->_CheckAccess('modify');
+$pview = $this->_CheckAccess('view');
 if (!($padmin || $pmod || $pview)) exit;
 
 if ($padmin) {
@@ -18,7 +18,7 @@ if ($padmin) {
 		$this->SetPreference('oldmodule_data',!empty($params['oldmodule_data']));
 		$this->SetPreference('owned_forms',!empty($params['owned_forms']));
 		$this->SetPreference('strip_on_export',!empty($params['strip_on_export']));
-		$t = trim($params['uploads_path']);
+		$t = trim($params['uploads_dir']);
 		if ($t && $t[0] == DIRECTORY_SEPARATOR)
 			$t = substr($t,1);
 		if ($t) {
@@ -30,7 +30,7 @@ if ($padmin) {
 			} else
 				$t = '';
 		}
-		$this->SetPreference('uploads_path',$t);
+		$this->SetPreference('uploads_dir',$t);
 		$old = $this->GetPreference('masterpass');
 		if ($old)
 			$old = PWFBrowse\Utils::unfusc($oldpw);
@@ -59,7 +59,7 @@ if ($padmin) {
 			$this->SetPreference('masterpass',$t);
 		}
 
-		$params['message'] = $this->PrettyMessage('prefs_updated');
+		$params['message'] = $this->_PrettyMessage('prefs_updated');
 		$params['active_tab'] = 'settings';
 	} elseif (isset($params['cancel'])) {
 		$params['active_tab'] = 'settings';

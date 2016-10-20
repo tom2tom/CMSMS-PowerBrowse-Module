@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->CheckAccess('modify')) exit;
+if (!$this->_CheckAccess('modify')) exit;
 
 if (isset($params['cancel'])) {
 	unset($params);
@@ -35,13 +35,13 @@ if ($params['browser_id'] == -1) { //add browser
 	$funcs = new PWForms\BrowserIface(); //TODO loader for this?
 	if ($funcs == FALSE) {
 		unset($params);
-		$message = $this->PrettyMessage('error_module_forms',FALSE);
+		$message = $this->_PrettyMessage('error_module_forms',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
 	}
 	$formList = $funcs->GetBrowsableForms();
 	if (!$formList) {
 		unset($params);
-		$message = $this->PrettyMessage('noforms',FALSE);
+		$message = $this->_PrettyMessage('noforms',FALSE);
 		$this->Redirect($id,'defaultadmin','',array('message' => $message));
 	}
 	$tplvars['hidden'] = $this->CreateInputHidden($id,'browser_id',-1);
@@ -74,7 +74,7 @@ if ($params['browser_id'] == -1) { //add browser
 	$tpl = 'clone_browser.tpl';
 }
 
-$this->BuildNav($id,$returnid,$params,$tplvars);
+$this->_BuildNav($id,$returnid,$params,$tplvars);
 
 $tplvars['start_form'] = $this->CreateFormStart($id,'add_browser',$returnid);
 $tplvars['end_form'] = $this->CreateFormEnd();
