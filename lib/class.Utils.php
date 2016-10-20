@@ -144,7 +144,7 @@ class Utils
 		$config = \cmsms()->GetConfig();
 		$up = $config['uploads_path'];
 		if ($up) {
-			$rp = $mod->GetPreference('uploads_path');
+			$rp = $mod->GetPreference('uploads_dir');
 			if ($rp)
 				$up .= DIRECTORY_SEPARATOR.$rp;
 			if (is_dir($up))
@@ -164,7 +164,7 @@ class Utils
 		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url':'ssl_uploads_url';
 		$up = $config[$key];
 		if ($up) {
-			$rp = $mod->GetPreference('uploads_path');
+			$rp = $mod->GetPreference('uploads_dir');
 			if ($rp) {
 				$rp = str_replace('\\','/',$rp);
 				$up .= '/'.$rp;
