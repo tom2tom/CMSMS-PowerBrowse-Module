@@ -1,4 +1,3 @@
-{if isset($cssscript)}{$cssscript}{/if}
 {if !empty($inner_nav)}<div class="pbr_innernav">{$inner_nav}</div><br />{/if}
 {if !empty($message)}<h3>{$message}</h3><br />{/if}
 <h2 style="margin-left:5%;">{$browser_title}</h2>
@@ -43,5 +42,3 @@
 {if $pmod}<span style="margin-right:5em;">{$iconlinkadd}&nbsp;{$textlinkadd}</span>{/if}{if !empty($rows)}{$export}{if $pmod} {$delete}{/if}{/if}
   </div>
 {$end_form}
-{if !empty($jsall)}{$jsall}
-{/if}
