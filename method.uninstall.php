@@ -23,7 +23,7 @@ function delTree($dir)
 	return rmdir($dir);
 }
 
-if (!$this->CheckAccess('admin')) exit;
+if (!$this->_CheckAccess('admin')) exit;
 
 $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
@@ -51,9 +51,9 @@ $this->RemovePermission('ViewPwFormData');
 
 $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
-	$ud = $this->GetPreference('uploads_dir');
-	if ($ud) {
-		$fp = $fp.DIRECTORY_SEPARATOR.$ud;
+	$upd = $this->GetPreference('uploads_dir');
+	if ($upd) {
+		$fp = cms_join_path($fp,$upd);
 		if ($fp && is_dir($fp))
 			delTree($fp);
 	}

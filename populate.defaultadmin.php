@@ -8,7 +8,7 @@ $iseditor = $this->CheckPermission('Modify Any Page');
 
 $tplvars['message'] = (isset($params['message']))?$params['message']:NULL;
 
-$tab = $this->GetActiveTab($params);
+$tab = $this->_GetActiveTab($params);
 
 $t = $this->starttabheaders().
 	$this->settabheader('browsers',$this->lang('title_browsers'),($tab == 'maintab'));
@@ -200,9 +200,9 @@ if ($padmin) {
 	}
 
 	$oneset = new stdClass();
-	$oneset->title = $this->Lang('title_uploads_path');
-	$oneset->input = $this->CreateInputText($id,'uploads_path',$this->GetPreference('uploads_path'),40,255);
-	$oneset->help = $this->Lang('help_uploads_path');
+	$oneset->title = $this->Lang('title_uploads_dir');
+	$oneset->input = $this->CreateInputText($id,'uploads_dir',$this->GetPreference('uploads_dir'),40,255);
+	$oneset->help = $this->Lang('help_uploads_dir');
 	$configs[] = $oneset;
 
 	$oneset = new stdClass();

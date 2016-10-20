@@ -5,11 +5,11 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->CheckAccess('modify')) exit;
+if (!$this->_CheckAccess('modify')) exit;
 
 $pfmod = $this->GetModuleInstance('PWForms');
 if (!$pfmod)
-	return $this->PrettyMessage('error_module_forms',FALSE);
+	return $this->_PrettyMessage('error_module_forms',FALSE);
 
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
  'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
@@ -79,7 +79,7 @@ if ($fp && is_dir($fp)) {
 		$ud = '';
 } else
 	$ud = '';
-$this->SetPreference('uploads_path',$ud);
+$this->SetPreference('uploads_dir',$ud);
 
 //install our disposer
 $fp = cms_join_path($this->GetModulePath(),'lib','class.FormBrowser.php');
