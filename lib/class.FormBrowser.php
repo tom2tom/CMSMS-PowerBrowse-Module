@@ -54,7 +54,7 @@ class FormBrowser extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,FALSE);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
