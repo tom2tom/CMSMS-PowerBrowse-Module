@@ -20,7 +20,6 @@ class FormBrowser extends FieldBase
 		$this->DisplayInSubmission = FALSE;
 		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
-		$this->IsSortable = FALSE;
 		$this->Type = 'FormBrowser';
 		$this->mymodule =& \cms_utils::get_module($this->ModName);
 	}
@@ -62,7 +61,7 @@ class FormBrowser extends FieldBase
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput || $one->IsSortable || $one->DisplayExternal) //TODO is a browsable field
+			if ($one->IsInput || $one->DisplayExternal) //TODO is a browsable field
 				$browsedata[$one->Id] = array($one->Name => $one->Value);
 		}
 		unset($one);
