@@ -44,10 +44,10 @@ class FormBrowser extends FieldBase
 
 	public function GetDisplayType()
 	{
-		$nm = self::MODNAME;
-		if (!$this->mymodule instanceof $nm) {
-			$this->mymodule =& \cms_utils::get_module(self::MODNAME);
-		}
+//		$nm = self::MODNAME;
+//		if (!$this->mymodule instanceof $nm) {
+//			$this->mymodule =& \cms_utils::get_module(self::MODNAME);
+//		}
 		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
 
@@ -66,10 +66,10 @@ class FormBrowser extends FieldBase
 		}
 		unset($one);
 		if ($browsedata) {
-			$nm = self::MODNAME;
-			if (!$this->mymodule instanceof $nm) {
-				$this->mymodule =& \cms_utils::get_module(self::MODNAME);
-			}
+//			$nm = self::MODNAME;
+//			if (!$this->mymodule instanceof $nm) {
+//				$this->mymodule =& \cms_utils::get_module(self::MODNAME);
+//			}
 			$pre = \cms_db_prefix();
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 			$db = \cmsms()->GetDb();
@@ -83,5 +83,20 @@ class FormBrowser extends FieldBase
 			}
 		}
 		return array(TRUE,'');
+	}
+
+	public function __toString()
+	{
+ 		$ob = $this->mymodule;
+		$this->mymodule = NULL;
+		$ret = parent::__toString();
+		$this->mymodule = $ob;
+		return $ret;
+	}
+
+	public function unserialize($serialized)
+	{
+		parent::unserialize($serialized);
+		$this->mymodule =& \cms_utils::get_module(self::MODNAME);
 	}
 }
