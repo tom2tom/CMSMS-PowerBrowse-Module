@@ -90,7 +90,7 @@ class BrowserTasks
 		$db->Execute('INSERT INTO '.$pre.
 	'module_pwbr_browser (browser_id,form_id,name,form_name) VALUES (?,?,?,?)',
 			array($newid,$params['form_id'],$params['name'],$formname));
-		$funcs = new PWForms\BrowserIface(); //must be present, or else we never get to here TODO loader for this
+		$funcs = new FormsIface();
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_field
