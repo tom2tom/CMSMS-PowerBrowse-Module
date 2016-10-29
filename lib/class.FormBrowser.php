@@ -8,20 +8,19 @@ namespace PWForms;
 
 class FormBrowser extends FieldBase
 {
-	var $ModName = 'PWFBrowse';
-	var $MenuKey = 'field_label'; //lang key for fields-menu label, used by PWForms
-	var $mymodule; //used also by PWForms, do not rename
+	const MODNAME = 'PWFBrowse'; //initiator/owner module name
+	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
+	public $mymodule; //used also by PWForms, do not rename
 
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'FormBrowser';
-		$this->mymodule =& \cms_utils::get_module($this->ModName);
+		$this->mymodule =& \cms_utils::get_module(self::MODNAME);
 	}
 
 	public function Load($id, &$params)
@@ -45,8 +44,9 @@ class FormBrowser extends FieldBase
 
 	public function GetDisplayType()
 	{
-		if (!$this->mymodule instanceof $this->ModName) {
-			$this->mymodule =& \cms_utils::get_module($this->ModName);
+		$nm = self::MODNAME;
+		if (!$this->mymodule instanceof $nm) {
+			$this->mymodule =& \cms_utils::get_module(self::MODNAME);
 		}
 		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
@@ -66,8 +66,9 @@ class FormBrowser extends FieldBase
 		}
 		unset($one);
 		if ($browsedata) {
-			if (!$this->mymodule instanceof $this->ModName) {
-				$this->mymodule =& \cms_utils::get_module($this->ModName);
+			$nm = self::MODNAME;
+			if (!$this->mymodule instanceof $nm) {
+				$this->mymodule =& \cms_utils::get_module(self::MODNAME);
 			}
 			$pre = \cms_db_prefix();
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
