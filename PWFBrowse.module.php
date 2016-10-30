@@ -245,12 +245,16 @@ EOS;
 	public function InitializeFrontend()
 	{
 		//$this->RegisterModulePlugin();
+		$this->RestrictUnknownParams();
+		$this->SetParameterType('browser',CLEAN_STRING);
+		$this->SetParameterType('browser_id',CLEAN_INT);
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
 	public function InitializeAdmin()
 	{
 		//document only the parameters relevant for external (page-tag) usage
+		$this->CreateParameter('browser','',$this->Lang('help_browser'),FALSE);
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
