@@ -87,7 +87,8 @@ if ($fields) {
 	$tplvars = $tplvars + array(
 		'title_data'=>$this->Lang('title_data'),
 		'title_name'=>$this->Lang('title_field_identity'),
-		'title_display'=>$this->Lang('title_display'),
+		'title_admdisplay'=>$this->Lang('title_display'),
+		'title_frntdisplay'=>$this->Lang('title_display2'),
 		'title_sort'=>$this->Lang('title_sort'),
 		'title_move'=>$this->Lang('title_move')
 	);
@@ -105,6 +106,7 @@ if ($fields) {
 		$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
 		$oneset->name = $one['name'];
 		$oneset->display = $this->CreateInputCheckbox($id,'shown[]',$fid,(($one['shown'])?$fid:-1));
+		$oneset->front = $this->CreateInputCheckbox($id,'frontshown[]',$fid,(($one['frontshown'])?$fid:-1));
 		$oneset->sort = $this->CreateInputCheckbox($id,'sortable[]',$fid,(($one['sorted'])?$fid:-1));
 		$oneset->down = '';
 		if ($mc) {
@@ -165,6 +167,10 @@ function select_all(cb) {
     keep = true;
     target = 'shown[]';
     break;
+  case '{$id}allfshow':
+    keep = true;
+    target = 'frontshown[]';
+    break;
   case '{$id}allsort':
     keep = false;
     target = 'sortable[]';
@@ -182,7 +188,8 @@ function select_all(cb) {
 EOS;
 		$tplvars = $tplvars + array(
 			'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
-			'select_all2'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
+			'select_all2'=>$this->CreateInputCheckbox($id,'allfshow',true,false,'onclick="select_all(this);"'),
+			'select_all3'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
 			'help_order'=>$this->Lang('help_order'),
 			'help_dnd'=>$this->Lang('help_dnd')
 		);
@@ -206,6 +213,3 @@ $tplvars = $tplvars + array(
 	'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
 	'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"')
 );
-
-$tplvars['jsall'] = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
