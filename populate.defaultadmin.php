@@ -286,6 +286,3 @@ EOS;
 }
 $tplvars['pmod'] = (($pmod)?1:0);
 $tplvars['pdev'] = (($iseditor)?1:0);
-
-$tplvars['jsall'] = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
