@@ -20,8 +20,9 @@
  <table id="listfields" class="pagetable leftwards{if ($rc > 1)} drag{/if}">
  <thead><tr>
   <th>{$title_name}</th>
-  <th style="text-align:center;">{$title_display}{if !empty($select_all1)}<br />{$select_all1}{/if}</th>
-  <th style="text-align:center;">{$title_sort}{if !empty($select_all2)}<br />{$select_all2}{/if}</th>
+  <th style="text-align:center;">{$title_admdisplay}{if !empty($select_all1)}<br />{$select_all1}{/if}</th>
+  <th style="text-align:center;">{$title_frntdisplay}{if !empty($select_all2)}<br />{$select_all2}{/if}</th>
+  <th style="text-align:center;">{$title_sort}{if !empty($select_all3)}<br />{$select_all3}{/if}</th>
 {if ($rc > 1)}<th class="updown">{$title_move}</th>{/if}
  </tr></thead>
  <tbody>
@@ -29,6 +30,7 @@
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
   <td>{$entry->order}{$entry->name}</td>
   <td style="text-align:center;">{$entry->display}</td>
+  <td style="text-align:center;">{$entry->front}</td>
   <td style="text-align:center;">{$entry->sort}</td>
   {if ($rc > 1)}<td class="updown">{$entry->down}{$entry->up}</td>{/if}
  </tr>
@@ -45,5 +47,3 @@
 {$tabs_end}
 <p class="pageinput" style="margin-top:1em;">{$save} {$cancel} {$apply}</p>
 {$end_form}
-{if !empty($jsall)}{$jsall}
-{/if}
