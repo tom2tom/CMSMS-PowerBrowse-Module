@@ -65,5 +65,3 @@
 {$end_tab}
 {/if}
 {$tabs_footer}
-{if !empty($jsall)}{$jsall}
-{/if}
