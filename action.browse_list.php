@@ -34,8 +34,10 @@ $data = $db->GetRow($sql,array($bid));
 $tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
-$sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
-WHERE browser_id=? AND shown=1 ORDER BY order_by';
+$sql =<<<EOS
+SELECT name,sorted FROM {$pre}module_pwbr_field
+WHERE browser_id=? AND shown=1 ORDER BY order_by
+EOS;
 $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $colnames = array_column($data,'name');
 $colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
