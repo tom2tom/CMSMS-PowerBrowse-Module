@@ -45,9 +45,10 @@ if ($this->GetPreference('oldmodule_data',0)) {
 		$browsers = array();
 } else {
 	$pre = cms_db_prefix();
-	$sql = 'SELECT BR.*,COALESCE (R.count,0) AS record_count FROM '.$pre.
-'module_pwbr_browser BR LEFT JOIN (SELECT form_id,COUNT(*) as count FROM '.$pre.
-'module_pwbr_record GROUP BY form_id) R ON BR.form_id=R.form_id';
+	$sql = <<<EOS
+SELECT BR.*,COALESCE (R.count,0) AS record_count FROM {$pre}module_pwbr_browser BR
+LEFT JOIN (SELECT form_id,COUNT(*) as count FROM {$pre}module_pwbr_record GROUP BY form_id) R ON BR.form_id=R.form_id
+EOS;
 	if (!$padmin && $this->GetPreference('owned_forms')) {
 		$uid = get_userid(false);
 		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
