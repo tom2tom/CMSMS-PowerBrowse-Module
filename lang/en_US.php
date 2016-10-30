@@ -45,6 +45,7 @@ $lang['field_label']='Store results for browsing';
 $lang['first']='first';
 $lang['friendlyname']='Forms Data';
 
+$lang['help_browser'] = 'Display recorded data for this browser (name)';
 //$lang['help_browser_css_class']='Optional name of class, or space-separated series of class names, applied to list views';
 $lang['help_dnd']='You can change the order by dragging any row, or double-click on any number of rows prior to dragging them all.';
 $lang['help_export_file']='Progressively create each .csv file in the general or specific <em>uploads</em> directory, instead of processing the export in memory. This may be wise if there is a lot of data to export. The downside is that someone needs to get that file and (usually) then delete it.';
@@ -152,9 +153,13 @@ links and inputs by which to add a new browser, or configure module settings.</p
 <h4>Create a browser</h4>
 <p>Click on a 'Add browser' link. During browser creation, you must select a
 PWForms form whose results the browser will display.</p>
-<h4>Administering browser data</h4>
+<h4>Administer recorded data</h4>
 <p>By clicking on the 'inspect' icon next to a browser in the list, you can
 add/edit/delete/export records.</p>
+<h4>Display a list of recorded data</h4>
+<p>Placing a tag like<code>{PWFBrowse browser='somename'}</code> into the content of
+a website page or template will cause that browser to be displayed.</p>
+<p>The fields to be shown can be selected when editing a browser.</p>
 <h4>List styling</h4>
 <p>Recognised classes are<ul>
 <li>table_sort</li>
