@@ -70,4 +70,9 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
+$jsall = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+
 echo PWFBrowse\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
+if ($jsall)
+	echo $jsall;

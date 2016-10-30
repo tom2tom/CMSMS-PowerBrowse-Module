@@ -26,6 +26,15 @@ if (isset($params['cancel'])) {
 
 $tplvars = array();
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.open_browser.php';
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.browser.php';
+
+$jsall = NULL;
+PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+unset($jsincs);
+unset($jsfuncs);
+unset($jsloads);
 
 echo PWFBrowse\Utils::ProcessTemplate($this,'open_browser.tpl',$tplvars);
+
+if ($jsall)
+	echo $jsall;
