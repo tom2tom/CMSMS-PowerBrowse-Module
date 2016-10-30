@@ -9,7 +9,6 @@
   <div class="pageinput pbr_overflow">
    <table id="submissions" class="pagetable leftwards">
     <thead><tr>
-     <th class="{ldelim}sss:'isoDate'{rdelim}">{$title_submit_when}</th>
 {foreach from=$colnames key=fcol item=fname}
      <th class="{ldelim}sss:{if $colsorts[$fcol]}'text'{else}false{/if}{rdelim}">{$fname}</th>
 {/foreach}
@@ -22,7 +21,6 @@
     <tbody>
 {foreach from=$rows item=resp}{cycle values='row1,row2' assign='rowclass'}
      <tr class="{$rowclass}">
-      <td>{$resp->submitted}</td>
 {foreach from=$resp->fields item=value}<td>{$value|escape}</td>{/foreach}
       <td>{$resp->view}</td>
 {if $pmod}<td>{$resp->edit}</td>{/if}
