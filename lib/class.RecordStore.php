@@ -8,50 +8,46 @@ namespace PWFBrowse;
 
 class RecordStore
 {
-	/*
-	@mod: reference to PWFBrowse module object
-	@source: string to be encrypted
-	Must be compatible with RecordLoad::Decrypt()
-	*/
-	private function Encrypt(&$mod, $source)
-	{
-		return Utils::encrypt_value($mod,$source);
-	}
-
 	/**
 	Insert:
 	@browser_id: identifier of browser to which the data belong
 	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
 	@stamp: timestamp for form submission
 	@data: reference to array of plaintext form-data to be stored
-	@db: reference to database connection object
+	@mod: reference to PWFBrowse module object
 	@pre: table-names prefix
 	Returns: boolean indicating success
 	*/
-	public function Insert($browser_id, $form_id, $stamp, &$data, &$mod, &$db, $pre)
+	public function Insert($browser_id, $form_id, $stamp, &$data, &$mod, $pre)
 	{
+		//insert fake field
 		$when = date('Y-m-d H:i:s',$stamp);
-		$cont = self::Encrypt($mod,serialize($data));
+		$store = array('submitted'=>array($mod->Lang('title_submit_when'),$when)) + $data;
+		$cont = Utils::encrypt_value($mod,serialize($store));
+		unset($store);
 		return Utils::SafeExec('INSERT INTO '.$pre.
-		'module_pwbr_record (browser_id,form_id,submitted,contents) VALUES (?,?,?,?)',
-			array($browser_id,$form_id,$when,$cont));
+		'module_pwbr_record (browser_id,form_id,contents) VALUES (?,?,?)',
+			array($browser_id,$form_id,$cont));
 	}
 
 	/**
 	Update:
 	@record_id: identifier of record to which the data belong
 	@data: reference to array of plaintext form-data to be stored
-	@db: reference to database connection object
+	@mod: reference to PWFBrowse module object
 	@pre: table-names prefix
 	Returns: boolean indicating success
 	*/
-	public function Update($record_id, &$data, &$mod, &$db, $pre)
+	public function Update($record_id, &$data, &$mod, $pre)
 	{
+		//insert fake field
 		$when = date('Y-m-d H:i:s');
-		$cont = self::Encrypt($mod,serialize($data));
+		$store = array('submitted'=>array($mod->Lang('title_submit_when'),$when)) + $data;
+		$cont = Utils::encrypt_value($mod,serialize($store));
+		unset($store);
 		return Utils::SafeExec('UPDATE '.$pre.
-		'module_pwbr_record SET submitted=?,contents=? WHERE record_id=?',
-			array($when,$cont,$record_id));
+		'module_pwbr_record SET contents=? WHERE record_id=?',
+			array($cont,$record_id));
 	}
 
 }
