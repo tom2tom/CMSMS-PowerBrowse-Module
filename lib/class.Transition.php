@@ -162,7 +162,7 @@ EOS;
 		$sql = <<<EOS
 SELECT F.field_id,F.name FROM {$pre}module_fb_field F
 JOIN {$pre}module_fbr_browser B ON F.form_id=B.form_id
-WHERE B.browser_id =?
+WHERE B.browser_id=?
 ORDER BY F.field_id
 EOS;
 		$names = $db->GetAssoc($sql,array($oldbid));
@@ -170,7 +170,7 @@ EOS;
 		$i = 1;
 		$l = count($parts);
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
-(browser_id,name,shown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?)';
+(browser_id,name,shown,frontshown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?,?)';
 		foreach ($parts as $one) {
 			list($indx,$order) = explode(',',$one);
 			if ($order != -1) {
@@ -181,7 +181,7 @@ EOS;
 				$order = $l+$i;
 			}
 			$nm = ($indx && !empty($names[$indx])) ? $names[$indx] : 'unnamed-'.$oldbid.':'.$i;
-			$db->Execute($sql,array($newbid,$nm,$see,0,$order,-$one['field_id'])); //id < 0 signals FormBuilder field
+			$db->Execute($sql,array($newbid,$nm,$see,0,0,$order,-$one['field_id'])); //id < 0 signals FormBuilder field
 			$i++;
 		}
 	}

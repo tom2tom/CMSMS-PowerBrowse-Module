@@ -17,6 +17,9 @@ class BrowserTasks
 		  'browser_name' => string 'Change Requests'
 		  'browser_pagerows' => string '10'
 		  'browser_owner' => string '19' <<< MAYBE ABSENT
+		  'frontshown' =>
+			array (size=1)
+			  0 => string '59'
 		  'orders' =>
 			array (size=3)
 			  0 => string '59'
@@ -46,11 +49,12 @@ class BrowserTasks
 		$sql = 'UPDATE '.$pre.'module_pwbr_browser SET name=?,owner=?,pagerows=? WHERE browser_id=?';
 		$db->Execute($sql,
 			array(trim($params['browser_name']),$owner,(int)$params['browser_pagerows'],$browser_id));
-		$sql = 'UPDATE '.$pre.'module_pwbr_field set shown=?,sorted=?,order_by=? WHERE field_id=?';
+		$sql = 'UPDATE '.$pre.'module_pwbr_field set shown=?,frontshown=?,sorted=?,order_by=? WHERE field_id=?';
 		foreach ($params['orders'] as $indx=>$fid) {
-			$show = in_array($fid,$params['shown']);
-			$sort = in_array($fid,$params['sortable']);
-			$db->Execute($sql,array($show,$sort,$indx+1,$fid));
+			$show = isset($params['shown']) && in_array($fid,$params['shown']);
+			$fshow = isset($params['frontshown']) && in_array($fid,$params['frontshown']);
+			$sort = isset($params['sortable']) && in_array($fid,$params['sortable']);
+			$db->Execute($sql,array($show,$fshow,$sort,$indx+1,$fid));
 		}
 	}
 
@@ -94,7 +98,7 @@ class BrowserTasks
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_field
-(browser_id,name,shown,sorted,order_by) VALUES (?,?,?,?,?)';
+(browser_id,name,shown,frontshown,sorted,order_by) VALUES (?,?,?,?,?,?)';
 			$ord = 1;
 			foreach ($list as &$fieldname) {
 				//arbitrary choice about display parameters, here
@@ -129,14 +133,15 @@ class BrowserTasks
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser
 VALUES (?,?,?,?,?,?,?)',array_values($row));
 
-		$list = $db->GetArray('SELECT browser_id,name,shown,sorted,order_by FROM '.
+		$list = $db->GetArray('SELECT browser_id,name,shown,frontshown,sorted,order_by FROM '.
 			$pre.'module_pwbr_field WHERE browser_id=?',array($browser_id));
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_field
-(browser_id,name,shown,sorted,order_by) VALUES (?,?,?,?,?)';
+(browser_id,name,shown,frontshown,sorted,order_by) VALUES (?,?,?,?,?,?)';
 			foreach ($list as $row) {
 				$row['browser_id'] = $newid;
-				$row['shown'] = 1;
+//				$row['shown'] = 1;
+//				$row['frontshown'] = 0;
 				$db->Execute($sql,array_values($row));
 			}
 		}
