@@ -74,14 +74,15 @@ EOS;
 		$this->CreateInputDropdown($id,'browser_owner',$sel,-1,$row['owner']);
 }
 
-//======= DISPLAY TAB ==========
+//======= DISPLAY TAB ========
 
 $tplvars['title_pagerows'] = $this->Lang('title_pagerows');
 $tplvars['input_pagerows'] =
 	$this->CreateInputText($id,'browser_pagerows',$row['pagerows'],5);
 $tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
-$sql = 'SELECT * FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
+$sql = 'SELECT field_id,name,shown,frontshown,sorted FROM '.$pre.'module_pwbr_field
+WHERE browser_id=? ORDER BY order_by';
 $fields = $db->GetArray($sql,array($params['browser_id']));
 if ($fields) {
 	$tplvars = $tplvars + array(
