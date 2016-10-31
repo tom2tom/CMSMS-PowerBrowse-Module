@@ -6,14 +6,14 @@
 
 namespace PWFBrowse;
 
-class RecordTasks
+class RecordOperations
 {
 	/**
-	DeleteRecord:
+	Delete:
 	@record_id: single identifier or array of such
 	Returns: boolean indicating success
 	*/
-	public function DeleteRecord($record_id)
+	public function Delete($record_id)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE record_id';
@@ -30,12 +30,12 @@ class RecordTasks
 	}
 
 	/**
-	AddRecord:
+	Add:
 	@form_id: identifier
 	@notify: boolean, whether to issue notice about added record
 	Returns: boolean indicating success
 	*/
-/*	public function AddRecord($form_id, $notify)
+/*	public function Add($form_id, $notify)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_record TODO';
