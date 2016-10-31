@@ -171,8 +171,10 @@ EOS;
 		$l = count($parts);
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
 (browser_id,name,shown,frontshown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?,?)';
-		//record fake field for date/time submitted
-		$nm = $mod->Lang('title_submit_when');
+		//record fake fields
+		$nm = $mod->Lang('title_submitted');
+		$db->Execute($sql,array($newbid,$nm,0,0,0,-2,0));
+		$nm = $mod->Lang('title_modified');
 		$db->Execute($sql,array($newbid,$nm,0,0,0,-1,0));
 		foreach ($parts as $one) {
 			list($indx,$order) = explode(',',$one);
