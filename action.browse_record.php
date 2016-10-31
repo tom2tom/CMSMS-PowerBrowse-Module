@@ -13,17 +13,17 @@ if (isset($params['cancel']))
 $pre = cms_db_prefix();
 if (isset($params['submit'])) {
 	$collapsed = array();
-	//TODO field identifiers in the saved data
-	foreach ($params['field'] as $k=>$name)
-		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
+	foreach ($params['field'] as $key=>$name) {
+		$collapsed[$key] = array($name, html_entity_decode($params['value'][$key])); //decode probably not needed
+	}
 	$funcs = new PWFBrowse\RecordStore();
-	$funcs->Update($params['record_id'],$collapsed,$this,$pre);
+	$funcs->Update($this,$pre,$params['record_id'],$collapsed);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
 $funcs = new PWFBrowse\RecordLoad();
-list($when,$data) = $funcs->Load($this,$pre,$params['record_id']);
-if (!$data) {
+list($when,$browsedata) = $funcs->Load($this,$pre,$params['record_id']);
+if (!$browsedata) {
 	$params['message']= $this->_PrettyMessage('error_data',FALSE);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
@@ -39,56 +39,66 @@ $tplvars['start_form'] =
 		'submit_when'=>$when));
 $tplvars['end_form'] = $this->CreateFormEnd();
 
-$subtitle = $this->Lang('title_submit_when');
 $bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
+$dtfmt = FALSE;
 $content = array();
 if (isset($params['edit'])) {
+	$hidden = array();
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit',$bname);
-	foreach ($data as &$one) {
-		$title = $one[0];
-		if ($title == $subtitle) {
-			$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-			if ($subfmt) {
-				$dt = new DateTime('@'.$one[1],NULL);
-				$content[] = array($title,
-					$this->CreateInputHidden($id,'field[]',$title).
-					$this->CreateInputHidden($id,'value[]',$one[1]).
-					$dt->format($subfmt)); //no change for this value
+	foreach ($browsedata as $key=>$field) {
+		$title = $field[0];
+		$hidden[] = $this->CreateInputHidden($id,'field['.$key.']',$title);
+		if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+			if ($dtfmt === FALSE) {
+				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+			}
+			if ($dtfmt) {
+				$dt = new DateTime('@'.$field[1],NULL);
+				$value = $dt->format($dtfmt);
+				if ($key == 'submitted' || $key == 'modified') {
+					$hidden[] = $this->CreateInputHidden($id,'value['.$key.']',$field[1]);
+					$content[] = array($title,$value); //no change for this value
+				} else {
+					$input = $this->CreateInputText($id,'value['.$key.']',$value,60);
+					$content[] = array(htmlentities($title),$input);
+				}
 				continue;
 			}
 		}
-		$value = $one[1];
+		$value = $field[1];
 		$len = strlen($value);
 		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
 		if ($len > 50 || $newline) {
 			$rows = $len / 50 + $newline + 3;
-			$input = $this->CreateTextArea(FALSE,$id,$value,'value[]','','','','',
+			$input = $this->CreateTextArea(FALSE,$id,$value,'value['.$key.']','','','','',
 				50,$rows,'','',
 				'style="width:50em;height:'.$rows.'em;"');
-		} else
-			$input = $this->CreateInputText($id,'value[]',$value,60,250);
-		$content[] = array(htmlentities($title),
-			$this->CreateInputHidden($id,'field[]',$title).$input);
+		} else {
+			$input = $this->CreateInputText($id,'value['.$key.']',$value,60,250);
+		}
+		$content[] = array(htmlentities($title),$input);
 	}
-	unset($one);
-	$tplvars['btncancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
-	$tplvars['btnsubmit'] = $this->CreateInputSubmit($id,'submit',$this->Lang('submit'));
+	$tplvars['submit'] = $this->CreateInputSubmit($id,'submit',$this->Lang('submit'));
+	$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 } else { //view
+	$hidden = NULL;
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
-	foreach ($data as &$one) {
-		if ($one[0] == $subtitle) {
-			$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-			if ($subfmt) {
-				$dt = new DateTime('@'.$one[1],NULL);
-				$content[] = array($one[0],$dt->format($subfmt));
+	foreach ($browsedata as $key=>$field) {
+		if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+			if ($dtfmt === FALSE) {
+				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+			}
+			if ($dtfmt) {
+				$dt = new DateTime('@'.$field[1],NULL);
+				$content[] = array($field[0],$dt->format($dtfmt));
 				continue;
 			}
 		}
-		$content[] = array(htmlentities($one[0]),htmlentities($one[1]));
+		$content[] = array(htmlentities($field[0]),htmlentities($field[1]));
 	}
-	unset($one);
-	$tplvars['btncancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('close'));
+	$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('close'));
 }
 $tplvars['content'] = $content;
+$tplvars['hidden'] = implode(PHP_EOL,$hidden);
 
 echo PWFBrowse\Utils::ProcessTemplate($this,'browse_record.tpl',$tplvars);

@@ -55,48 +55,41 @@ $sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_
 $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
 //if ($data) {
-
-	$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
-	$icon_edit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
-	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
-
-	$subfmt = FALSE;
-	$subtitle = $this->Lang('title_submit_when');
+	if ($pmod) {
+		$icon_edit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
+		$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
+	}
+	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
+	$dtfmt = FALSE;
 
 	$funcs = new PWFBrowse\RecordLoad();
 	foreach ($data as &$one) {
 		$fields = array();
-		$submission = $funcs->Decrypt($this,$one['contents']);
-		if ($submission) {
+		$browsedata = $funcs->Decrypt($this,$one['contents']);
+		if ($browsedata) {
 			//include data for fields named in $colnames
-			foreach ($submission as &$sub) //TODO any use for field index?
-			{
-				$indx = array_search($sub[0],$colnames);
+			foreach ($browsedata as $key=>$field) {
+				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if ($sub[0] == $subtitle) {
-						if ($subfmt === FALSE) {
-							$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-							if ($subfmt)
-								$dt = new DateTime('@0',NULL);
+					if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+						if ($dtfmt === FALSE) {
+							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
 						}
-						if ($subfmt) {
-							$dt->setTimestamp($sub[1]);
-							$fields[$indx] = $dt->format($subfmt);
-							continue;
+						if ($dtfmt) {
+							$dt = new DateTime('@'.$field[1],NULL);
+							$field[1] = $dt->format($dtfmt);
 						}
 					}
-					$fields[$indx] = $sub[1];
+					$fields[$indx] = $field[1];
 //TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
 			}
-			unset($sub);
 		}
 		if ($fields) {
 			$rid = (int)$one['record_id'];
 			$oneset = new stdClass();
 			ksort($fields); //conform order to titles
-//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort?
 			$oneset->fields = $fields;
 			$oneset->view = $this->CreateLink($id,'browse_record','',$icon_view,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
@@ -104,10 +97,10 @@ $rows = array();
 			 $oneset->edit = $this->CreateLink($id,'browse_record','',$icon_edit,
 				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid,'edit'=>1));
 			$oneset->export = $this->CreateLink($id,'export_record','',$icon_export,
-				array('record_id'=>$rid,'browser_id'=>$bid));
+				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
 			if ($pmod)
 			 $oneset->delete = $this->CreateLink($id,'delete_record','',$icon_delete,
-				array('record_id'=>$rid,'browser_id'=>$bid),
+				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid),
 				$this->Lang('confirm_delete_record'));
 			$oneset->selected = $this->CreateInputCheckbox($id,'sel[]',$rid,-1);
 			$rows[] = $oneset;
