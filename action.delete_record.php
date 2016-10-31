@@ -6,10 +6,9 @@
 
 if (!($this->_CheckAccess('modify') || $this->_CheckAccess('admin'))) exit;
 
+$funcs = new PWFBrowse\RecordOperations();
+$funcs->Delete($params['record_id']);
 //TODO more informative displayed message, func($params['record_id'])
-$funcs = new PWFBrowse\RecordTasks();
-$funcs->DeleteRecord($params['record_id']);
-
 $message = $this->Lang('message_records_deleted', 1);
 $params['message'] = $this->_PrettyMessage($message,TRUE,FALSE);
 
