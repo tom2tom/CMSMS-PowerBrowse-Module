@@ -34,10 +34,8 @@ $data = $db->GetRow($sql,array($bid));
 $tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
-$sql =<<<EOS
-SELECT name,sorted FROM {$pre}module_pwbr_field
-WHERE browser_id=? AND shown=1 ORDER BY order_by
-EOS;
+$sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
+WHERE browser_id=? AND shown=1 ORDER BY order_by';
 $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $colnames = array_column($data,'name');
 $colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
@@ -53,16 +51,18 @@ $jsfuncs = array();
 $jsloads = array();
 $baseurl = $this->GetModuleURLPath();
 
-$sql = 'SELECT record_id,submitted,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
+$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
 $rows = array();
 //if ($data) {
-	$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
 
 	$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
 	$icon_edit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
+
+	$subfmt = FALSE;
+	$subtitle = $this->Lang('title_submit_when');
 
 	$funcs = new PWFBrowse\RecordLoad();
 	foreach ($data as &$one) {
@@ -74,6 +74,18 @@ $rows = array();
 			{
 				$indx = array_search($sub[0],$colnames);
 				if ($indx !== FALSE) {
+					if ($sub[0] == $subtitle) {
+						if ($subfmt === FALSE) {
+							$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+							if ($subfmt)
+								$dt = new DateTime('@0',NULL);
+						}
+						if ($subfmt) {
+							$dt->setTimestamp($sub[1]);
+							$fields[$indx] = $dt->format($subfmt);
+							continue;
+						}
+					}
 					$fields[$indx] = $sub[1];
 //TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
@@ -83,8 +95,7 @@ $rows = array();
 		if ($fields) {
 			$rid = (int)$one['record_id'];
 			$oneset = new stdClass();
-			$oneset->submitted = $one['submitted'];
-			ksort($fields);
+			ksort($fields); //conform order to titles
 //TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort?
 			$oneset->fields = $fields;
 			$oneset->view = $this->CreateLink($id,'browse_record','',$icon_view,
