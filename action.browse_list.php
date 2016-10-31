@@ -17,6 +17,10 @@ $tplvars = array();
 $tplvars['pconfig'] = ($pconfig)?1:0;
 $tplvars['pmod'] = ($pmod)?1:0;
 
+if (isset($params['passthru'])) { //returning from add-record
+	$params += unserialize($params['passthru']);
+}
+
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
 
