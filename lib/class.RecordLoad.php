@@ -11,18 +11,18 @@ class RecordLoad
 	/*
 	@mod: reference to PWFBrowse module object
 	@source: string to be decrypted
-	@getstruct: optional boolean, whether to unserialize decrypted value, default TRUE
-	Must be compatible with RecordStore::Encrypt()
+	@raw: optional boolean, whether to skip unserialization of decrypted value, default FALSE
+	Must be compatible with RecordStore encryption i.e. Utils::encrypt_value($mod,serialize($store))
 	*/
-	public function Decrypt(&$mod, $source, $getstruct=TRUE)
+	public function Decrypt(&$mod, $source, $raw=FALSE)
 	{
 		if ($source) {
 			$decrypted = Utils::decrypt_value($mod,$source);
 			if ($decrypted) {
-				if ($getstruct)
-					return unserialize($decrypted);
-				else
+				if ($raw)
 					return $decrypted;
+				else
+					return unserialize($decrypted);
 			}
 		}
 		return '';
@@ -32,27 +32,24 @@ class RecordLoad
 	Load:
 	@record_id: identifier of record to retrieve
 	@mod: optional reference to PWFBrowse module object, default NULL
-	@db: optional reference to database connection object, default NULL
 	@pre: optional table-names prefix, default ''
 	Returns: 2-member array:
 	 [0] = submissiondate/time or FALSE
 	 [1] = array of data or error message
 	*/
-	public function Load($record_id, &$mod=NULL, &$db=NULL, $pre='')
+	public function Load($record_id, &$mod=NULL, $pre='')
 	{
 		if (!$mod)
 			$mod = \cms_utils::get_module('PWFBrowse');
-		if (!$db)
-			$db = \cmsms()->GetDb();
 		if (!$pre)
 			$pre = \cms_db_prefix();
-		$row = Utils::SafeGet(
-		'SELECT submitted,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
-			array($record_id),'row');
-		if ($row) {
-			$formdata = self::Decrypt($mod,$row['contents']);
+		$data = Utils::SafeGet(
+		'SELECT contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
+			array($record_id),'one');
+		if ($data) {
+			$formdata = self::Decrypt($mod,$data);
 			if ($formdata)
-				return array($row['submitted'],$formdata);
+				return array($formdata['submitted'][1],$formdata);
 			$errkey = 'error_data';
 		} else {
 			$errkey = 'error_database';
