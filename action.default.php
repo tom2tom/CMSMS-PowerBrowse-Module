@@ -43,7 +43,7 @@ $data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']),'col');
 $rows = array();
 //if ($data) {
 	$dtfmt = FALSE;
-	$funcs = new PWFBrowse\RecordLoad();
+	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as $stored) {
 		$fields = array();
 		$browsedata = $funcs->Decrypt($this,$stored);

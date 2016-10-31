@@ -77,7 +77,7 @@ class FormBrowser extends FieldBase
 			$browsers = $db->GetCol($sql,array($form_id));
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
-				$funcs = new PWFBrowse\RecordStore();
+				$funcs = new PWFBrowse\RecordContent();
 				foreach ($browsers as $browser_id) {
 					$funcs->Insert($this->mymodule,$pre,$browser_id,$form_id,$stamp,$browsedata);
 				}

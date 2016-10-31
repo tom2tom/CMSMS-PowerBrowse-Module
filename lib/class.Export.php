@@ -92,7 +92,7 @@ class Export
 		$strip = $mod->GetPreference('strip_on_export');
 
 		if ($all) {
-			$funcs = new RecordLoad();
+			$funcs = new RecordContent();
 			//header line
 			list($when,$data) = $funcs->Load($mod,$pre,$all[0]);
 			if (!$data)

@@ -10,18 +10,17 @@ if (!($this->_CheckAccess('admin') || $this->_CheckAccess('view'))) exit;
 if (isset($params['cancel']))
 	$this->Redirect($id,'browse_list',$returnid,$params);
 
+$funcs = new PWFBrowse\RecordContent();
 $pre = cms_db_prefix();
 if (isset($params['submit'])) {
 	$collapsed = array();
 	foreach ($params['field'] as $key=>$name) {
 		$collapsed[$key] = array($name, html_entity_decode($params['value'][$key])); //decode probably not needed
 	}
-	$funcs = new PWFBrowse\RecordStore();
 	$funcs->Update($this,$pre,$params['record_id'],$collapsed);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-$funcs = new PWFBrowse\RecordLoad();
 list($when,$browsedata) = $funcs->Load($this,$pre,$params['record_id']);
 if (!$browsedata) {
 	$params['message']= $this->_PrettyMessage('error_data',FALSE);

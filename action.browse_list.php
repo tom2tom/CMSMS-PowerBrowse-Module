@@ -63,7 +63,7 @@ $rows = array();
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
 	$dtfmt = FALSE;
 
-	$funcs = new PWFBrowse\RecordLoad();
+	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
 		$fields = array();
 		$browsedata = $funcs->Decrypt($this,$one['contents']);
