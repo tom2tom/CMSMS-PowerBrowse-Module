@@ -67,7 +67,6 @@ $this->SetPreference('export_file',0);
 $this->SetPreference('export_file_encoding','ISO-8859-1');
 $this->SetPreference('list_cssfile','');
 $this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
-$this->SetPreference('oldmodule_data',0); //use FormBrowser/Builder data if avaialable
 $this->SetPreference('onchange_notices',0);
 $this->SetPreference('owned_forms',0);	//enable user-specific browsing
 $this->SetPreference('strip_on_export',0);

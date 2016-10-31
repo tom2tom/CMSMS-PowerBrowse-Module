@@ -15,7 +15,6 @@ if (isset($params['submit'])) {
 		$this->SetPreference('export_file',!empty($params['export_file']));
 		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
 		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
-		$this->SetPreference('oldmodule_data',!empty($params['oldmodule_data']));
 		$this->SetPreference('onchange_notices',!empty($params['onchange_notices']));
 		$this->SetPreference('owned_forms',!empty($params['owned_forms']));
 		$this->SetPreference('strip_on_export',!empty($params['strip_on_export']));

@@ -36,26 +36,17 @@ $jsloads = array();
 $jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
-$fb = $this->GetModuleInstance('FormBuilder');
-if ($this->GetPreference('oldmodule_data',0)) {
-	if ($fb) {
-		$funcs = new PWFBrowse\Transition();
-		$browsers = $funcs->GetBrowsersSummary();
-	} else
-		$browsers = array();
-} else {
-	$pre = cms_db_prefix();
-	$sql = <<<EOS
+$pre = cms_db_prefix();
+$sql = <<<EOS
 SELECT BR.*,COALESCE (R.count,0) AS record_count FROM {$pre}module_pwbr_browser BR
 LEFT JOIN (SELECT form_id,COUNT(*) as count FROM {$pre}module_pwbr_record GROUP BY form_id) R ON BR.form_id=R.form_id
 EOS;
-	if (!$padmin && $this->GetPreference('owned_forms')) {
-		$uid = get_userid(false);
-		$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
-	}
-	$sql .= ' ORDER BY BR.name';
-	$browsers = PWFBrowse\Utils::SafeGet($sql,FALSE);
+if (!$padmin && $this->GetPreference('owned_forms')) {
+	$uid = get_userid(false);
+	$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
 }
+$sql .= ' ORDER BY BR.name';
+$browsers = PWFBrowse\Utils::SafeGet($sql,FALSE);
 if ($browsers) {
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	if ($iseditor)
@@ -180,25 +171,19 @@ if ($padmin || $pmod) {
 		$this->Lang('title_add_browser'),
 		array('browser_id'=>-1));
 
-	if (!$this->GetPreference('oldmodule_data',0) && $fb)
+	$fb = $this->GetModuleInstance('FormBuilder');
+	if ($fb) {
+		unset($fb);
 		$tplvars['importbtn'] =
 			$this->CreateInputSubmit($id,'import',$this->Lang('import_browsers'),
 				'title="'.$this->Lang('tip_import_browsers').'"');
+	}
 }
 
 if ($padmin) {
 	$tplvars['start_settingsform'] = $this->CreateFormStart($id,'defaultadmin',$returnid);
 
 	$configs = array();
-
-	if ($fb) {
-		$oneset = new stdClass();
-		$oneset->title = $this->Lang('title_oldmodule_data');
-		$oneset->input = $this->CreateInputCheckbox($id,'oldmodule_data',1,
-			   $this->GetPreference('oldmodule_data',0));
-		$oneset->help = $this->Lang('help_oldmodule_data');
-		$configs[] = $oneset;
-	}
 
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_uploads_dir');
