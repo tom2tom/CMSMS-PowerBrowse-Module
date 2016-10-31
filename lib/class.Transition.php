@@ -55,7 +55,7 @@ EOS;
 			}
 			if ($renums) {
 				foreach ($renums as $new=>$old) {
-					self::Get_Attrs($db,$pre,$old,$new);
+					self::Get_Attrs($mod,$db,$pre,$old,$new);
 				}
 				$ic = count($renums);
 				return array($ic,$oc-$ic);
@@ -121,10 +121,10 @@ $vals = array (size=whatever)
 		if ($count > 0) {
 			$funcs = new RecordStore();
 			foreach ($details as &$one) {
-				$fields = array();
+				$browsedata = array();
 				foreach ($one->fields as $fid=>$fval)
-					$fields[-$fid] = array($names[$fid],$fval);//id < 0 signals FormBuilder field
-				$funcs->Insert($newbid,$newfid,$one->submitted_date,$fields,$mod,$db,$pre);
+					$browsedata[-$fid] = array($names[$fid],$fval); //id < 0 signals FormBuilder field
+				$funcs->Insert($mod,$pre,$newbid,$newfid,$one->submitted_date,$browsedata);
 			}
 			unset($one);
 			return TRUE;
@@ -132,7 +132,7 @@ $vals = array (size=whatever)
 		return FALSE;
 	}
 
-	private function Get_Attrs(&$db, $pre, $oldbid, $newbid)
+	private function Get_Attrs(&$mod, &$db, $pre, $oldbid, $newbid)
 	{
 		$sql = <<<EOS
 SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
@@ -145,7 +145,7 @@ EOS;
 			foreach ($data as &$row) {
 				switch ($row['name']) {
 				case 'admin_list_fields':
-					self::Get_Fields($db,$pre,$oldbid,$newbid,$row['value']);
+					self::Get_Fields($mod,$db,$pre,$oldbid,$newbid,$row['value']);
 					break;
 				case 'admin_rows_per_page':
 					$db->Execute($sql,array((int)$row['value'],$newbid));
@@ -157,7 +157,7 @@ EOS;
 	}
 
 	//$value like 45,0:46,1:47,2:48,3:49,4:50,5:51,6:52,7:53,8:54,9:55,10:57,11:56,12:58,13:246,-1:247,-1
-	private function Get_Fields(&$db, $pre, $oldbid, $newbid, &$value)
+	private function Get_Fields(&$mod, &$db, $pre, $oldbid, $newbid, &$value)
 	{
 		$sql = <<<EOS
 SELECT F.field_id,F.name FROM {$pre}module_fb_field F
@@ -171,6 +171,9 @@ EOS;
 		$l = count($parts);
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
 (browser_id,name,shown,frontshown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?,?)';
+		//record fake field for date/time submitted
+		$nm = $mod->Lang('title_submit_when');
+		$db->Execute($sql,array($newbid,$nm,0,0,0,-1,0));
 		foreach ($parts as $one) {
 			list($indx,$order) = explode(',',$one);
 			if ($order != -1) {
