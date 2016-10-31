@@ -311,7 +311,7 @@ EOS;
 	public function _BuildNav($id, $returnid, &$params, &$tplvars)
 	{
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
-		'&#171; '.$this->Lang('title_browsers'));
+		'&#171; '.$this->Lang('module_nav'));
 		if (isset($params['browser_id']) && isset($params['form_id']) && isset($params['record_id'])) {
 			$navstr .= ' '.$this->CreateLink($id,'browse_list',$returnid,
 			'&#171; '.$this->Lang('title_records'),array(
