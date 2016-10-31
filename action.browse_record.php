@@ -17,13 +17,13 @@ if (isset($params['submit'])) {
 	foreach ($params['field'] as $k=>$name)
 		$collapsed[] = array($name, html_entity_decode($params['value'][$k])); //decode probably not needed
 	$funcs = new PWFBrowse\RecordStore();
-	$funcs->Update($params['record_id'],$collapsed,$this,$db,$pre);
+	$funcs->Update($params['record_id'],$collapsed,$this,$pre);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
 $funcs = new PWFBrowse\RecordLoad();
-list($when,$data) = $funcs->Load($params['record_id'],$this,$db,$pre);
-if (!$when) {
+list($when,$data) = $funcs->Load($this,$pre,$params['record_id']);
+if (!$data) {
 	$params['message']= $this->_PrettyMessage('error_data',FALSE);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
@@ -38,15 +38,25 @@ $tplvars['start_form'] =
 		'form_id'=>$params['form_id'],
 		'submit_when'=>$when));
 $tplvars['end_form'] = $this->CreateFormEnd();
-$tplvars['title_submit_when'] = $this->Lang('title_submit_when');
-$tplvars['submit_when'] = $when;
 
+$subtitle = $this->Lang('title_submit_when');
 $bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
 $content = array();
 if (isset($params['edit'])) {
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit',$bname);
 	foreach ($data as &$one) {
 		$title = $one[0];
+		if ($title == $subtitle) {
+			$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+			if ($subfmt) {
+				$dt = new DateTime('@'.$one[1],NULL);
+				$content[] = array($title,
+					$this->CreateInputHidden($id,'field[]',$title).
+					$this->CreateInputHidden($id,'value[]',$one[1]).
+					$dt->format($subfmt)); //no change for this value
+				continue;
+			}
+		}
 		$value = $one[1];
 		$len = strlen($value);
 		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
@@ -66,6 +76,14 @@ if (isset($params['edit'])) {
 } else { //view
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
 	foreach ($data as &$one) {
+		if ($one[0] == $subtitle) {
+			$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+			if ($subfmt) {
+				$dt = new DateTime('@'.$one[1],NULL);
+				$content[] = array($one[0],$dt->format($subfmt));
+				continue;
+			}
+		}
 		$content[] = array(htmlentities($one[0]),htmlentities($one[1]));
 	}
 	unset($one);
