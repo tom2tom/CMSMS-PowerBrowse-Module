@@ -9,15 +9,17 @@ $pmod = $this->_CheckAccess('modify');
 $pview = $this->_CheckAccess('view');
 if (!($padmin || $pmod || $pview)) exit;
 
-if ($padmin) {
-	if (isset($params['submit'])) {
+if (isset($params['submit'])) {
+	if ($padmin) {
+		$this->SetPreference('date_format',trim($params['date_format']));
 		$this->SetPreference('export_file',!empty($params['export_file']));
 		$this->SetPreference('export_file_encoding',trim($params['export_file_encoding']));
 		$this->SetPreference('list_cssfile',trim($params['list_cssfile']));
-		$this->SetPreference('onchange_notices',!empty($params['onchange_notices']));
 		$this->SetPreference('oldmodule_data',!empty($params['oldmodule_data']));
+		$this->SetPreference('onchange_notices',!empty($params['onchange_notices']));
 		$this->SetPreference('owned_forms',!empty($params['owned_forms']));
 		$this->SetPreference('strip_on_export',!empty($params['strip_on_export']));
+		$this->SetPreference('time_format',trim($params['time_format']));
 		$t = trim($params['uploads_dir']);
 		if ($t && $t[0] == DIRECTORY_SEPARATOR)
 			$t = substr($t,1);
@@ -33,7 +35,7 @@ if ($padmin) {
 		$this->SetPreference('uploads_dir',$t);
 		$old = $this->GetPreference('masterpass');
 		if ($old)
-			$old = PWFBrowse\Utils::unfusc($oldpw);
+			$old = PWFBrowse\Utils::unfusc($old);
 		$t = trim($params['masterpass']);
 		if ($old != $t) {
 			//re-encrypt all stored records
@@ -58,12 +60,11 @@ if ($padmin) {
 				$t = PWFBrowse\Utils::fusc($t);
 			$this->SetPreference('masterpass',$t);
 		}
-
 		$params['message'] = $this->_PrettyMessage('prefs_updated');
-		$params['active_tab'] = 'settings';
-	} elseif (isset($params['cancel'])) {
-		$params['active_tab'] = 'settings';
 	}
+	$params['active_tab'] = 'settings';
+} elseif (isset($params['cancel'])) {
+	$params['active_tab'] = 'settings';
 }
 
 $tplvars = array();
