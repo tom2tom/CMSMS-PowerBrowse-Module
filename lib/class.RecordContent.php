@@ -38,17 +38,22 @@ class RecordContent
 	@pre: table-names prefix
 	@record_id: identifier of record to which the data belong
 	@data: reference to array of plaintext form-data to be stored, or if @raw=TRUE, serialized form-data
+	@stamp: optional boolean, whether to skip adding a modification-time, default FALSE
 	@raw: optional boolean, whether to skip serialization of @data, default FALSE
 	Returns: boolean indicating success
 	*/
-	public function Update(&$mod, $pre, $record_id, &$data, $raw=FALSE)
+	public function Update(&$mod, $pre, $record_id, &$data, $stamp=FALSE, $raw=FALSE)
 	{
 		if ($raw) {
 			$cont = $data;
 		} else {
-			//insert/update fake field
-			$stamp = time();
-			$store = array('modified'=>array($mod->Lang('title_modified'),$stamp,'stamp')) + $data;
+			if ($stamp) {
+				$store = $data;
+			} else {
+				//insert/update fake field
+				$stamp = time();
+				$store = array('modified'=>array($mod->Lang('title_modified'),$stamp,'stamp')) + $data;
+			}
 			$cont = Utils::encrypt_value($mod,serialize($store));
 			unset($store);
 		}
