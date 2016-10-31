@@ -28,14 +28,14 @@ class RecordTasks
 		}
 		return Utils::SafeExec($sql,$args);
 	}
-	
+
 	/**
 	AddRecord:
 	@form_id: identifier
 	@notify: boolean, whether to issue notice about added record
 	Returns: boolean indicating success
 	*/
-	public function AddRecord($form_id, $notify)
+/*	public function AddRecord($form_id, $notify)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_record TODO';
@@ -47,4 +47,5 @@ class RecordTasks
 		}
 		return $ret;
 	}
+*/
 }
