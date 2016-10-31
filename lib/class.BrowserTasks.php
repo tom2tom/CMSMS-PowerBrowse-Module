@@ -12,13 +12,13 @@ class BrowserTasks
 	StoreBrowser:
 	@mod: reference to current PWFBrowse class object
 	@params: reference to array of parameters for use here e.g.
-		array (size=9)
+		array
 		  'browser_id' => string '9'
 		  'browser_name' => string 'Change Requests'
 		  'browser_pagerows' => string '10'
 		  'browser_owner' => string '19' <<< MAYBE ABSENT
 		  'frontshown' =>
-			array (size=1)
+			array
 			  0 => string '59'
 		  'orders' =>
 			array (size=3)
@@ -26,10 +26,10 @@ class BrowserTasks
 			  1 => string '58'
 			  2 => string '60'
 		  'shown' =>
-			array (size=1)
+			array
 			  0 => string '59'
 		  'sortable' =>
-			array (size=2)
+			array
 			  0 => string '58'
 			  1 => string '60'
 		  'active_tab' => string 'listtab'
