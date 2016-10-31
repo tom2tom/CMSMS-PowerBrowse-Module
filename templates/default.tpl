@@ -14,7 +14,7 @@
     <tbody>
 {foreach from=$rows item=resp}{cycle values='row1,row2' assign='rowclass'}
      <tr class="{$rowclass}">
-{foreach from=$resp->fields item=value}<td>{$value|escape}</td>{/foreach}
+{foreach from=$resp item=value}<td>{$value|escape}</td>{/foreach}
      </tr>
 {/foreach}
     </tbody>
