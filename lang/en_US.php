@@ -45,6 +45,7 @@ $lang['field_label']='Store results for browsing';
 $lang['first']='first';
 $lang['friendlyname']='Forms Data';
 
+$lang['help_date'] = 'A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
 $lang['help_browser'] = 'Display recorded data for this browser (name)';
 //$lang['help_browser_css_class']='Optional name of class, or space-separated series of class names, applied to list views';
 $lang['help_dnd']='You can change the order by dragging any row, or double-click on any number of rows prior to dragging them all.';
@@ -57,6 +58,7 @@ $lang['help_order']='Row-order here corresponds to column-order for listed data.
 $lang['help_owned_forms']='Enable blocking of form-data access by any non-administrator other than a specified user';
 $lang['help_pagerows']='This is the minimum length of displayed pages. The length can be increased, while browsing.';
 $lang['help_strip_on_export']='Remove all HTML tags from records when exported to .csv';
+$lang['help_time'] = 'See advice for date format.';
 $lang['help_uploads_dir']='A filesystem path relative to website-host <em>uploads</em> directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default directory will be used.';
 
 $lang['import_browsers']='Import FormBrowsers';
@@ -67,6 +69,7 @@ $lang['last']='last';
 $lang['message_records_deleted']='%d submission(s) deleted';
 //$lang['message_records_exported']='%d submission(s) exported';
 $lang['moddescription']='PWFBrowse enables review of submitted form data.';
+$lang['module_nav']='Module mainpage';
 
 $lang['next']='next';
 $lang['nobrowsers']='No browser is registered';
@@ -111,6 +114,7 @@ $lang['title_browser_owner']='Responsible person';
 $lang['title_browser_search_field']='Field to display as the record\'s title when a record is shown in site search results';
 $lang['title_browsers']='Browsers';
 $lang['title_data']='List data';
+$lang['title_dateformat'] = 'Template for formatting displayed dates';
 $lang['title_display']='Admin List';
 $lang['title_display2']='FrontEnd List';
 $lang['title_export_file']='Export to host';
@@ -132,6 +136,7 @@ $lang['title_strip_on_export']='Strip HTML tags on export';
 $lang['title_submit_when']='Submitted';
 $lang['title_submitted_as']='\'%s\' form submission';
 $lang['title_submitted_edit']='Edit \'%s\' form submission';
+$lang['title_timeformat'] = 'Template for formatting displayed times';
 $lang['title_uploads_dir']='Sub-directory for module-specific file uploads';
 
 $lang['up']='Move up';
@@ -174,8 +179,8 @@ a website page or template will cause that browser to be displayed.</p>
 <h3>Requirements</h3>
 <ul>
 <li>CMS Made Simple 1.10+</li>
-<li>PHP 5.2+</li>
-<li>PHP extension mbstring (used when exporting)</li>
+<li>PHP 5.3+</li>
+<li>PHP extension mbstring</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.</p>
