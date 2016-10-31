@@ -30,19 +30,15 @@ class RecordLoad
 
 	/**
 	Load:
+	@mod: reference to PWFBrowse module object
+	@pre: table-names prefix
 	@record_id: identifier of record to retrieve
-	@mod: optional reference to PWFBrowse module object, default NULL
-	@pre: optional table-names prefix, default ''
 	Returns: 2-member array:
 	 [0] = submissiondate/time or FALSE
 	 [1] = array of data or error message
 	*/
-	public function Load($record_id, &$mod=NULL, $pre='')
+	public function Load(&$mod, $pre, $record_id)
 	{
-		if (!$mod)
-			$mod = \cms_utils::get_module('PWFBrowse');
-		if (!$pre)
-			$pre = \cms_db_prefix();
 		$data = Utils::SafeGet(
 		'SELECT contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 			array($record_id),'one');

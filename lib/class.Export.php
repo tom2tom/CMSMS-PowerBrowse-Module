@@ -52,7 +52,7 @@ class Export
 		global $db; //$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		if ($browser_id) {
-			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY submitted';
+			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY record_id';
 			$all = Utils::SafeGet($sql,array($browser_id),'col');
 		} elseif ($record_id) {
 			if (is_array($record_id))
@@ -94,8 +94,8 @@ class Export
 		if ($all) {
 			$funcs = new RecordLoad();
 			//header line
-			$data = $funcs->Load($all[0],$mod,$db,$pre);
-			if (!$data[0])
+			list($when,$data) = $funcs->Load($mod,$pre,$all[0]);
+			if (!$data)
 				return FALSE;
 			$names = array();
 			foreach ($data[1] as &$one) {
@@ -111,8 +111,8 @@ class Export
 			$outstr .= PHP_EOL;
 			//data lines(s)
 			foreach ($all as $one) {
-				$data = $funcs->Load($one,$mod,$db,$pre);
-				if (!$data[0])
+				list($when,$data) = $funcs->Load($mod,$pre,$one);
+				if (!$data)
 					continue;	//decryption error
 				$outstr .= str_replace($sep,$r,$data[0]);
 				foreach ($data[1] as &$one) {
