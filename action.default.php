@@ -38,50 +38,40 @@ $jsfuncs = array();
 $jsloads = array();
 $baseurl = $this->GetModuleURLPath();
 
-$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
+$sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
+$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']),'col');
 $rows = array();
 //if ($data) {
-	$subfmt = FALSE;
-	$subtitle = $this->Lang('title_submit_when');
+	$dtfmt = FALSE;
 	$funcs = new PWFBrowse\RecordLoad();
-	foreach ($data as &$one) {
+	foreach ($data as $stored) {
 		$fields = array();
-		$submission = $funcs->Decrypt($this,$one['contents']);
-		if ($submission) {
+		$browsedata = $funcs->Decrypt($this,$stored);
+		if ($browsedata) {
 			//include data for fields named in $colnames
-			foreach ($submission as &$sub) //TODO any use for field index?
-			{
-				$indx = array_search($sub[0],$colnames);
+			foreach ($browsedata as $key=>$field) {
+				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if ($sub[0] == $subtitle) {
-						if ($subfmt === FALSE) {
-							$subfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-							if ($subfmt)
-								$dt = new DateTime('@0',NULL);
+					if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+						if ($dtfmt === FALSE) {
+							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
 						}
-						if ($subfmt) {
-							$dt->setTimestamp($sub[1]);
-							$fields[$indx] = $dt->format($subfmt);
-							continue;
+						if ($dtfmt) {
+							$dt = new DateTime('@'.$field[1],NULL);
+							$field[1] = $dt->format($dtfmt);
 						}
 					}
-					$fields[$indx] = $sub[1];
+					$fields[$indx] = $field[1];
 //TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
 			}
-			unset($sub);
 		}
 		if ($fields) {
-			$rid = (int)$one['record_id'];
-			$oneset = new stdClass();
 			ksort($fields); //conform order to titles
 //TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort?
-			$oneset->fields = $fields;
-			$rows[] = $oneset;
+			$rows[] = $fields;
 		}
 	}
-	unset($one);
 //}
 
 $tplvars['rows'] = $rows;
