@@ -213,6 +213,18 @@ if ($padmin) {
 	$configs[] = $oneset;
 
 	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_dateformat');
+	$oneset->input = $this->CreateInputText($id,'date_format',$this->GetPreference('date_format'),10,12);
+	$oneset->help = $this->Lang('help_date');
+	$configs[] = $oneset;
+
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_timeformat');
+	$oneset->input = $this->CreateInputText($id,'time_format',$this->GetPreference('time_format'),8,12);
+	$oneset->help = $this->Lang('help_time');
+	$configs[] = $oneset;
+
+	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_owned_forms');
 	$oneset->input = $this->CreateInputCheckbox($id,'owned_forms',1,
 		   $this->GetPreference('owned_forms'));

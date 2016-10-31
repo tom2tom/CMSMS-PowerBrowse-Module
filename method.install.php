@@ -62,14 +62,16 @@ $this->CreatePermission('ModifyPwBrowsers',$this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData',$this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData',$this->Lang('perm_see'));
 
-$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
+$this->SetPreference('date_format','Y-m-d');
 $this->SetPreference('export_file',0);
 $this->SetPreference('export_file_encoding','ISO-8859-1');
 $this->SetPreference('list_cssfile','');
-$this->SetPreference('onchange_notices',0);
+$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
 $this->SetPreference('oldmodule_data',0); //use FormBrowser/Builder data if avaialable
+$this->SetPreference('onchange_notices',0);
 $this->SetPreference('owned_forms',0);	//enable user-specific browsing
 $this->SetPreference('strip_on_export',0);
+$this->SetPreference('time_format','H:i:s');
 $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
 	$ud = $this->GetName();
