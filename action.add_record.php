@@ -6,8 +6,28 @@
 
 if (!($this->_CheckAccess('admin') || $this->_CheckAccess('modify'))) exit;
 
-//$funcs = new PWFBrowse\RecordTasks();
-//$funcs->AddRecord($params['form_id'],$this->GetPreference('onchange_notices'));
-$params['message'] = 'NOT YET IMPLEMENTED'; //TODO
-
-$this->Redirect($id,'browse_list',$returnid,$params);
+$pf = cms_utils::get_module('PWForms');
+if ($pf) {
+	if ($params['form_id'] < 0) {
+		$funcs = new PWFBrowse\Transition();
+		$fid = $funcs->MigrateIds($this,$params['form_id']);
+		if ($fid !== FALSE) {
+			$params['form_id'] = $fid;
+		} else {
+			$params['message'] = $this->_PrettyMessage('error_data',FALSE);
+			$this->Redirect($id,'browse_list',$returnid,$params);
+		}
+	} else {
+		$fid = $params['form_id'];
+	}
+	$parms = array(
+		'form_id'=>$fid,
+		'resume'=>'PWFBrowse,browse_list', //parameters for cancellation-redirect
+		'passthru'=>serialize($params) //scalar data to be provided as a parameter to the 'resume' action
+	);
+	$pf->DoAction('show_form',$id,$parms,$returnid);
+	return;
+} else {
+	$params['message'] = $this->_PrettyMessage('error_module_forms',FALSE);
+	$this->Redirect($id,'browse_list',$returnid,$params);
+}
