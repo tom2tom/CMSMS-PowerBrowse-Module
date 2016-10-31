@@ -105,7 +105,7 @@ class Export
 				$names[] = str_replace($sep,$r,$fn);
 			}
 			unset($one);
-			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
+			$outstr = str_replace($sep,$r,$mod->Lang('title_submitted'));
 			if ($names)
 				$outstr .= $sep.implode($sep,$names);
 			$outstr .= PHP_EOL;
@@ -151,7 +151,7 @@ class Export
 			}
 			unset($one);
 
-			$outstr = str_replace($sep,$r,$mod->Lang('title_submit_when'));
+			$outstr = str_replace($sep,$r,$mod->Lang('title_submitted'));
 			if ($names)
 				$outstr .= $sep.implode($sep,$names);
 			$outstr .= PHP_EOL;
