@@ -4,9 +4,10 @@
  <h2>{$title_browser}</h2>
  <br />
 {$start_form}
+{$hidden}
  <div class="pbr_overflow">
 {foreach from=$content item=field}<p><strong>{$field[0]}</strong><br />{$field[1]}</p>{/foreach}
  </div>
-{if isset($btnsubmit)}{$btnsubmit} {/if}{$btncancel}
+{if isset($submit)}{$submit} {/if}{$cancel}
 {$end_form}
 </div>
