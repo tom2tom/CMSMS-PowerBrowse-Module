@@ -98,31 +98,49 @@ class Export
 			if (!$data)
 				return FALSE;
 			$names = array();
-			foreach ($data[1] as &$one) {
+			foreach ($data as &$one) {
 				$fn = $one[0];
 				if ($strip)
 					$fn = strip_tags($fn);
 				$names[] = str_replace($sep,$r,$fn);
 			}
 			unset($one);
-			$outstr = str_replace($sep,$r,$mod->Lang('title_submitted'));
-			if ($names)
-				$outstr .= $sep.implode($sep,$names);
-			$outstr .= PHP_EOL;
+			if ($names) {
+				$outstr = implode($sep,$names);
+				$outstr .= PHP_EOL;
+			} else
+				return FALSE;
+			$dtfmt = FALSE;
 			//data lines(s)
 			foreach ($all as $one) {
 				list($when,$data) = $funcs->Load($mod,$pre,$one);
 				if (!$data)
 					continue;	//decryption error
-				$outstr .= str_replace($sep,$r,$data[0]);
-				foreach ($data[1] as &$one) {
-					$fv = $one[1];
-					if ($strip)
-						$fv = strip_tags($fv);
-					$fv = str_replace($sep,$r,$fv);
-					$outstr .= $sep.preg_replace('/[\n\t\r]/',$sep2,$fv);
+				$vals = array();
+				foreach ($data as &$one) {
+	//TODO process field-sequence data
+					if (isset($one[2]) && $one[2] == 'stamp') {
+						if ($dtfmt === FALSE) {
+							$dtfmt = trim($mod->GetPreference('date_format').' '.$mod->GetPreference('time_format'));
+							if ($dtfmt)
+								$dt = new \DateTime('@0',NULL);
+						}
+						if ($dtfmt) {
+							$dt->setTimestamp($one[1]);
+							$vals[] = str_replace($sep,$r,$dt->format($dtfmt));
+						} else {
+							$vals[] = $one[1];
+						}
+					} else {
+						$fv = $one[1];
+						if ($strip)
+							$fv = strip_tags($fv);
+						$fv = str_replace($sep,$r,$fv);
+						$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+					}
 				}
 				unset($one);
+				$outstr .= implode($sep,$vals);
 				$outstr .= PHP_EOL;
 				if ($fp) {
 					if ($convert) {
