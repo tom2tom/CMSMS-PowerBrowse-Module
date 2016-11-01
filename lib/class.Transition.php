@@ -91,24 +91,24 @@ EOS;
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (browser_id,form_id,name,form_name) VALUES (?,?,?,?)';
 			$renums = array();
+			$converts = self::Get_Converts($db,$pre,0); //field_id translations
 			foreach ($olds as $row) {
-				$bid = $db->GenID($pre.'module_pwbr_browser_seq');
-				$oldid = (int)$row['browser_id'];
-				if (self::Get_Data($mod,$db,$pre,$bid,$oldid,$row['form_id'])) {
-					$renums[$bid] = $oldid;
-					$converts = self::Get_Converts($db,$pre,$row['form_id']);
-					if ($converts) {
-						$fid = reset($converts);
-					} else {
-						$fid = -$row['form_id']; //form id < 0 signals FormBuilder form id
-					}
-					$db->Execute($sql,array($bid,$fid,$row['name'],$row['formname']));
+				$newbid = $db->GenID($pre.'module_pwbr_browser_seq');
+				$oldbid = (int)$row['browser_id'];
+				$fconv = self::Get_Converts($db,$pre,$row['form_id']);
+				if ($fconv) {
+					$newfid = reset($fconv);
+				} else {
+					$newfid = -$row['form_id']; //form id < 0 signals FormBuilder form id
+				}
+				if (self::Get_Data($mod,$db,$pre,$newbid,$oldbid,$newfid,$row['form_id'],$converts)) {
+					$renums[$newbid] = $oldbid;
+					$db->Execute($sql,array($newbid,$newfid,$row['name'],$row['formname']));
 				}
 			}
 			if ($renums) {
-				$converts = self::Get_Converts($db,$pre,0); //field_id translations
-				foreach ($renums as $new=>$old) {
-					self::Get_Attrs($mod,$db,$pre,$old,$new,$converts);
+				foreach ($renums as $newbid=>$oldbid) {
+					self::Get_Attrs($mod,$db,$pre,$newbid,$oldbid,$converts);
 				}
 				$ic = count($renums);
 				return array($ic,$oc-$ic);
@@ -162,9 +162,8 @@ $vals = array (size=whatever)
   and so on
 */
 	//this saves nothing and returns FALSE if there's no recorded response to interrogate
-	private function Get_Data(&$mod, &$db, $pre, $newbid, $oldbid, $oldfid)
+	private function Get_Data(&$mod, &$db, $pre, $newbid, $oldbid, $newfid, $oldfid, &$fieldconverts)
 	{
-		$newfid = -(int)$oldfid; //id < 0 signals FormBuilder form
 		$fb = \cms_utils::get_module('FormBuilder');
 		$flds = array();
 		$parms = array();
@@ -176,7 +175,12 @@ $vals = array (size=whatever)
 			foreach ($details as &$one) {
 				$olddata = array();
 				foreach ($one->fields as $fid=>$fval) {
-					$olddata[-$fid] = array($names[$fid],$fval); //id < 0 signals FormBuilder field
+					if ($fieldconverts && array_key_exists($fid,$fieldconverts)) {
+						$nid = (int)$fieldconverts[$fid];
+					} else {
+						$nid = -$fid; //id < 0 signals FormBuilder field
+					}
+					$olddata[$nid] = array($names[$fid],$fval);
 				}
 				$funcs->Insert($mod,$pre,$newbid,$newfid,$one->submitted_date,$olddata);
 			}
@@ -186,7 +190,7 @@ $vals = array (size=whatever)
 		return FALSE;
 	}
 
-	private function Get_Attrs(&$mod, &$db, $pre, $oldbid, $newbid, &$fieldconverts)
+	private function Get_Attrs(&$mod, &$db, $pre, $newbid, $oldbid, &$fieldconverts)
 	{
 		$sql = <<<EOS
 SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
