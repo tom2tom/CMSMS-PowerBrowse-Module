@@ -42,7 +42,8 @@ $sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = PWFBrowse\Utils::SafeGet($sql,array($bid),'col');
 $rows = array();
 //if ($data) {
-	$dtfmt = FALSE;
+	$dfmt = FALSE;
+	$tfmt = FALSE;
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as $stored) {
 		$fields = array();
@@ -52,15 +53,19 @@ $rows = array();
 			foreach ($browsedata as $key=>$field) {
 				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if (isset($field['dt']) {
-						if ($dtfmt === FALSE) {
-							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+					if (isset($field['dt'])) { //TODO or 'd' or 't'
+						if ($dfmt === FALSE) {
+							$dfmt = $this->GetPreference('date_format');
+							$tfmt = $this->GetPreference('time_format');
+							$dtfmt = trim($dfmt.' '.$tfmt);
+							$dt = new DateTime('@0',NULL);
 						}
 						if ($dtfmt) {
 							$dt = new DateTime('@'.$field[1],NULL);
 							$field[1] = $dt->format($dtfmt);
 						}
 					}
+					//TODO other format directives
 					$fields[$indx] = $field[1];
 //TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
@@ -166,19 +171,24 @@ EOS;
 	$tplvars['norecords'] = $this->Lang('norecords');
 }
 
-//replace href attribute in existing stylesheet link (early in page-processing)
+//apply styling
 $cssfile = $this->GetPreference('list_cssfile');
-$u = ($cssfile) ?
+$url = ($cssfile) ?
 	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
 	$baseurl.'/css/list-view.css';
 $t = <<<EOS
-<script type="text/javascript">
-//<![CDATA[
-//TODO frontend styling
- document.getElementById('adminstyler').setAttribute('href',"{$u}");
-//]]>
-</script>
+var linkadd = '<link rel="stylesheet" type="text/css" href="{$url}" />',
+ \$head = $('head'),
+ \$linklast = \$head.find('link[rel="stylesheet"]:last');
+if (\$linklast.length) {
+ \$linklast.after(linkadd);
+} else {
+ \$head.append(linkadd);
+}
 EOS;
+$jsall = NULL;
+PWForms\Utils::MergeJS(FALSE,array($t),FALSE,$jsall);
+echo $jsall;
 
 $jsall = NULL;
 PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
@@ -186,7 +196,6 @@ unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
-echo $t;
 echo PWFBrowse\Utils::ProcessTemplate($this,'default.tpl',$tplvars);
 if ($jsall)
 	echo $jsall;
