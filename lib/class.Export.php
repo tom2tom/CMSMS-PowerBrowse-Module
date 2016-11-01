@@ -110,7 +110,8 @@ class Export
 				$outstr .= PHP_EOL;
 			} else
 				return FALSE;
-			$dtfmt = FALSE;
+			$dfmt = FALSE;
+			$tfmt = FALSE;
 			//data lines(s)
 			foreach ($all as $one) {
 				list($when,$data) = $funcs->Load($mod,$pre,$one);
@@ -118,12 +119,12 @@ class Export
 					continue;	//decryption error
 				$vals = array();
 				foreach ($data as &$one) {
-	//TODO process field-sequence data
-					if (isset($one[2]) && $one[2] == 'stamp') {
-						if ($dtfmt === FALSE) {
-							$dtfmt = trim($mod->GetPreference('date_format').' '.$mod->GetPreference('time_format'));
-							if ($dtfmt)
-								$dt = new \DateTime('@0',NULL);
+					if (isset($field['dt'])) { //TODO or 'd' or 't'
+						if ($dfmt === FALSE) {
+							$dfmt = $this->GetPreference('date_format');
+							$tfmt = $this->GetPreference('time_format');
+							$dtfmt = trim($dfmt.' '.$tfmt);
+							$dt = new DateTime('@0',NULL);
 						}
 						if ($dtfmt) {
 							$dt->setTimestamp($one[1]);
@@ -132,6 +133,7 @@ class Export
 							$vals[] = $one[1];
 						}
 					} else {
+	//TODO process other field-format data
 						$fv = $one[1];
 						if ($strip)
 							$fv = strip_tags($fv);

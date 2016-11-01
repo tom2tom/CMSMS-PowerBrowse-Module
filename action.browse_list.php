@@ -65,7 +65,8 @@ $rows = array();
 		$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
 	}
 	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
-	$dtfmt = FALSE;
+	$dfmt = FALSE;
+	$tfmt = FALSE;
 
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
@@ -76,17 +77,19 @@ $rows = array();
 			foreach ($browsedata as $key=>$field) {
 				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if (isset($field['dt'])) {
-						if ($dtfmt === FALSE) {
-							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-							if ($dtfmt) {
-								$dt = new DateTime('@0',NULL);
+					if (isset($field['dt'])) { //TODO or 'd' or 't'
+						if ($dfmt === FALSE) {
+							$dfmt = $this->GetPreference('date_format');
+							$tfmt = $this->GetPreference('time_format');
+							$dtfmt = trim($dfmt.' '.$tfmt);
+							$dt = new DateTime('@0',NULL);
 						}
 						if ($dtfmt) {
 							$dt->setTimestamp($field[1]);
 							$field[1] = $dt->format($dtfmt);
 						}
 					}
+					//TODO other format directives
 					$fields[$indx] = $field[1];
 //TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}

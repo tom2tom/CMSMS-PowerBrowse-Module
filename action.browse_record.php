@@ -39,7 +39,8 @@ $tplvars['start_form'] =
 $tplvars['end_form'] = $this->CreateFormEnd();
 
 $bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
-$dtfmt = FALSE;
+$dfmt = FALSE;
+$tfmt = FALSE;
 $content = array();
 if (isset($params['edit'])) {
 	$hidden = array();
@@ -47,11 +48,12 @@ if (isset($params['edit'])) {
 	foreach ($browsedata as $key=>$field) {
 		$title = $field[0];
 		$hidden[] = $this->CreateInputHidden($id,'field['.$key.']',$title);
-		if (isset($field['dt'])) {
-			if ($dtfmt === FALSE) {
-				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-				if ($dtfmt) {
-					$dt = new DateTime('@0',NULL);
+		if (isset($field['dt'])) { //TODO or 'd' or 't'
+			if ($dfmt === FALSE) {
+				$dfmt = $this->GetPreference('date_format');
+				$tfmt = $this->GetPreference('time_format');
+				$dtfmt = trim($dfmt.' '.$tfmt);
+				$dt = new DateTime('@0',NULL);
 			}
 			if ($dtfmt) {
 				$dt->setTimestamp($field[1]);
@@ -66,6 +68,7 @@ if (isset($params['edit'])) {
 				continue;
 			}
 		}
+		//TODO other format directives
 		$value = $field[1];
 		$len = strlen($value);
 		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
@@ -85,11 +88,12 @@ if (isset($params['edit'])) {
 	$hidden = NULL;
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
 	foreach ($browsedata as $key=>$field) {
-		if (isset($field['dt'])) {
-			if ($dtfmt === FALSE) {
-				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
-				if ($dtfmt) {
-					$dt = new DateTime('@0',NULL);
+		if (isset($field['dt'])) { //TODO or 'd' or 't'
+			if ($dfmt === FALSE) {
+				$dfmt = $this->GetPreference('date_format');
+				$tfmt = $this->GetPreference('time_format');
+				$dtfmt = trim($dfmt.' '.$tfmt);
+				$dt = new DateTime('@0',NULL);
 			}
 			if ($dtfmt) {
 				$dt->setTimestamp($field[1]);
@@ -97,6 +101,7 @@ if (isset($params['edit'])) {
 				continue;
 			}
 		}
+		//TODO other format directives
 		$content[] = array(htmlentities($field[0]),htmlentities($field[1]));
 	}
 	$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('close'));
