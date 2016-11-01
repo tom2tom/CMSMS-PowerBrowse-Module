@@ -244,7 +244,7 @@ EOS;
 	//partial setup for pre-1.10, backend setup for 1.10+
 	public function InitializeFrontend()
 	{
-		//$this->RegisterModulePlugin();
+		$this->RegisterModulePlugin(TRUE);
 		$this->RestrictUnknownParams();
 		$this->SetParameterType('browser',CLEAN_STRING);
 		$this->SetParameterType('browser_id',CLEAN_INT);
