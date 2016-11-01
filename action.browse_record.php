@@ -47,18 +47,20 @@ if (isset($params['edit'])) {
 	foreach ($browsedata as $key=>$field) {
 		$title = $field[0];
 		$hidden[] = $this->CreateInputHidden($id,'field['.$key.']',$title);
-		if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+		if (isset($field['dt'])) {
 			if ($dtfmt === FALSE) {
 				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+				if ($dtfmt) {
+					$dt = new DateTime('@0',NULL);
 			}
 			if ($dtfmt) {
-				$dt = new DateTime('@'.$field[1],NULL);
+				$dt->setTimestamp($field[1]);
 				$value = $dt->format($dtfmt);
-				if ($key == 'submitted' || $key == 'modified') {
+				if ($key[0] == '_') { //internal-use fake field, not editable
 					$hidden[] = $this->CreateInputHidden($id,'value['.$key.']',$field[1]);
 					$content[] = array($title,$value); //no change for this value
 				} else {
-					$input = $this->CreateInputText($id,'value['.$key.']',$value,60);
+					$input = $this->CreateInputText($id,'value['.$key.']',$value,60); //TODO reconvert when saving
 					$content[] = array(htmlentities($title),$input);
 				}
 				continue;
@@ -83,12 +85,14 @@ if (isset($params['edit'])) {
 	$hidden = NULL;
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
 	foreach ($browsedata as $key=>$field) {
-		if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+		if (isset($field['dt'])) {
 			if ($dtfmt === FALSE) {
 				$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+				if ($dtfmt) {
+					$dt = new DateTime('@0',NULL);
 			}
 			if ($dtfmt) {
-				$dt = new DateTime('@'.$field[1],NULL);
+				$dt->setTimestamp($field[1]);
 				$content[] = array($field[0],$dt->format($dtfmt));
 				continue;
 			}

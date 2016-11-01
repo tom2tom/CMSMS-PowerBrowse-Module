@@ -76,12 +76,14 @@ $rows = array();
 			foreach ($browsedata as $key=>$field) {
 				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+					if (isset($field['dt'])) {
 						if ($dtfmt === FALSE) {
 							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
+							if ($dtfmt) {
+								$dt = new DateTime('@0',NULL);
 						}
 						if ($dtfmt) {
-							$dt = new DateTime('@'.$field[1],NULL);
+							$dt->setTimestamp($field[1]);
 							$field[1] = $dt->format($dtfmt);
 						}
 					}

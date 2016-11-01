@@ -26,7 +26,7 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND frontshown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
+$data = PWFBrowse\Utils::SafeGet($sql,array($bid));
 $colnames = array_column($data,'name');
 $colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
 $tplvars['colnames'] = $colnames;
@@ -39,7 +39,7 @@ $jsloads = array();
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']),'col');
+$data = PWFBrowse\Utils::SafeGet($sql,array($bid),'col');
 $rows = array();
 //if ($data) {
 	$dtfmt = FALSE;
@@ -52,7 +52,7 @@ $rows = array();
 			foreach ($browsedata as $key=>$field) {
 				$indx = array_search($field[0],$colnames);
 				if ($indx !== FALSE) {
-					if ($key == 'submitted' || $key == 'modified' || (isset($field[2]) && $field[2]=='stamp')) {
+					if (isset($field['dt']) {
 						if ($dtfmt === FALSE) {
 							$dtfmt = trim($this->GetPreference('date_format').' '.$this->GetPreference('time_format'));
 						}
@@ -174,6 +174,7 @@ $u = ($cssfile) ?
 $t = <<<EOS
 <script type="text/javascript">
 //<![CDATA[
+//TODO frontend styling
  document.getElementById('adminstyler').setAttribute('href',"{$u}");
 //]]>
 </script>

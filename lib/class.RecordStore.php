@@ -20,8 +20,8 @@ class RecordStore
 	*/
 	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data)
 	{
-		//insert fake field
-		$store = array('submitted'=>array($mod->Lang('title_submitted'),$stamp,'stamp')) + $data;
+		//insert fake field with read-only key and datetime marker
+		$store = array('_s'=>array(0=>$mod->Lang('title_submitted'),1=>$stamp,'dt'=>'')) + $data;
 		$cont = Utils::encrypt_value($mod,serialize($store));
 		unset($store);
 		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,contents) VALUES (?,?,?)',
@@ -38,9 +38,9 @@ class RecordStore
 	*/
 	public function Update(&$mod, $pre, $record_id, &$data)
 	{
-		//insert/update fake field
+		//insert/update fake field with read-only key and datetime marker
 		$stamp = time();
-		$store = array('modified'=>array($mod->Lang('title_modified'),$stamp,'stamp')) + $data;
+		$store = array('_m'=>array(0=>$mod->Lang('title_modified'),1=>$stamp,'dt'=>'')) + $data;
 		$cont = Utils::encrypt_value($mod,serialize($store));
 		unset($store);
 		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?',
