@@ -57,11 +57,23 @@ class FormBrowser extends FieldBase
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)) //TODO is a browsable field
-				$browsedata[$one->Id] = array($one->Name,$one->GetDisplayableValue());
-//				if (0) { //TODO 3rd member if relevant e.g. 'stamp'
-//					$browsedata[$one->Id][] = 'whatever';
-//				}
+			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)) { //TODO is a browsable field
+				$save = array($one->Name,$one->GetDisplayableValue());
+				//TODO other presentation control(s) if relevant e.g. sequence-member
+				if ($one->IsTimeStamp) {
+					if ($one->ShowDate) {
+						if ($one->ShowTime)
+							$save['dt'] = '';
+						else
+							$save['d'] = '';
+					} elseif ($one->ShowTime) {
+						$save['t'] = '';
+					} else {
+						continue;
+					}
+				}
+				$browsedata[$one->Id] = $save;
+			}
 		}
 		unset($one);
 		if ($browsedata) {
