@@ -33,7 +33,7 @@ class FormBrowser extends FieldBase
 		return TRUE;
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Form Browser]'; //by convention, not translated
 		if ($as_string)
@@ -44,10 +44,6 @@ class FormBrowser extends FieldBase
 
 	public function GetDisplayType()
 	{
-//		$nm = self::MODNAME;
-//		if (!$this->mymodule instanceof $nm) {
-//			$this->mymodule =& \cms_utils::get_module(self::MODNAME);
-//		}
 		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
 
@@ -61,15 +57,14 @@ class FormBrowser extends FieldBase
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput || $one->DisplayExternal) //TODO is a browsable field
-				$browsedata[$one->Id] = array($one->Name => $one->Value);
+			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)) //TODO is a browsable field
+				$browsedata[$one->Id] = array($one->Name,$one->GetDisplayableValue());
+//				if (0) { //TODO 3rd member if relevant e.g. 'stamp'
+//					$browsedata[$one->Id][] = 'whatever';
+//				}
 		}
 		unset($one);
 		if ($browsedata) {
-//			$nm = self::MODNAME;
-//			if (!$this->mymodule instanceof $nm) {
-//				$this->mymodule =& \cms_utils::get_module(self::MODNAME);
-//			}
 			$pre = \cms_db_prefix();
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 			$db = \cmsms()->GetDb();
@@ -77,7 +72,7 @@ class FormBrowser extends FieldBase
 			$browsers = $db->GetCol($sql,array($form_id));
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
-				$funcs = new PWFBrowse\RecordContent();
+				$funcs = new \PWFBrowse\RecordContent();
 				foreach ($browsers as $browser_id) {
 					$funcs->Insert($this->mymodule,$pre,$browser_id,$form_id,$stamp,$browsedata);
 				}
