@@ -87,7 +87,7 @@ class RecordContent
 	@pre: table-names prefix
 	@record_id: identifier of record to retrieve
 	Returns: 2-member array:
-	 [0] = submission timestamp or FALSE
+	 [0] = T/F success-indicator
 	 [1] = array of data or error message
 	*/
 	public function Load(&$mod, $pre, $record_id)
@@ -96,9 +96,9 @@ class RecordContent
 		'SELECT contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 			array($record_id),'one');
 		if ($data) {
-			$formdata = self::Decrypt($mod,$data);
-			if ($formdata)
-				return array($formdata['submitted'][1],$formdata);
+			$browsedata = self::Decrypt($mod,$data);
+			if ($browsedata)
+				return array(TRUE,$browsedata);
 			$errkey = 'error_data';
 		} else {
 			$errkey = 'error_database';
