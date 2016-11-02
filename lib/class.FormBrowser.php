@@ -53,13 +53,17 @@ class FormBrowser extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
+	/*
+	NOTE: presentation control(s) here must be suitably replicated in Utils::FormatRecord()
+	*/
 	public function Dispose($id, $returnid)
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)) { //TODO is a browsable field
+			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)
+				|| $one->IsSequence) { //TODO is a browsable field
 				$save = array($one->Name,$one->GetDisplayableValue());
-				//TODO other presentation control(s) if relevant e.g. sequence-member
+				//TODO other presentation control(s) if relevant
 				if ($one->IsTimeStamp) {
 					if ($one->ShowDate) {
 						if ($one->ShowTime)
@@ -70,6 +74,14 @@ class FormBrowser extends FieldBase
 						$save['t'] = '';
 					} else {
 						continue;
+					}
+				} elseif ($one->IsSequence) {
+					if($one->Type == 'SequenceStart') {
+						$save['_ss'] = '';
+					} elseif ($one->Type == 'SequenceEnd') {
+						$save['_se'] = '';
+					} else {
+						$save['_sb'] = '';
 					}
 				}
 				$browsedata[$one->Id] = $save;
