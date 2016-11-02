@@ -99,11 +99,16 @@ class BrowserTasks
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_field
 (browser_id,name,shown,frontshown,sorted,order_by) VALUES (?,?,?,?,?,?)';
-			$ord = 1;
+			//record fake fields
+			$fieldname = $mod->Lang('title_submitted');
+			$db->Execute($sql,array($newid,$fieldname,1,0,1,1,0));
+			$fieldname = $mod->Lang('title_modified');
+			$db->Execute($sql,array($newid,$fieldname,0,0,1,2,0));
+			$ord = 3;
 			foreach ($list as &$fieldname) {
 				//arbitrary choice about display parameters, here
-				$show = ($ord < 6);
-				$sort = ($ord < 3);
+				$show = ($ord < 8);
+				$sort = ($ord < 5);
 				$db->Execute($sql,array($newid,$fieldname,$show,$sort,$ord));
 				$ord++;
 			}
