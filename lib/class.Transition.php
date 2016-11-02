@@ -226,20 +226,20 @@ ORDER BY F.field_id
 EOS;
 		$names = $db->GetAssoc($sql,array($oldbid));
 		$parts = explode(':',$value);
-		$i = 1;
+		$i = 3;
 		$l = count($parts);
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_field
 (browser_id,name,shown,frontshown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?,?)';
-		//record fake fields
+		//record internal-use fields
 		$nm = $mod->Lang('title_submitted');
-		$db->Execute($sql,array($newbid,$nm,0,0,0,-2,0));
+		$db->Execute($sql,array($newbid,$nm,1,0,1,1,0));
 		$nm = $mod->Lang('title_modified');
-		$db->Execute($sql,array($newbid,$nm,0,0,0,-1,0));
+		$db->Execute($sql,array($newbid,$nm,0,0,1,2,0));
 		foreach ($parts as $one) {
 			list($indx,$order) = explode(',',$one);
 			if ($order != -1) {
 				$see = 1;
-				$order = (int)$order;
+				$order += 2;
 			} else {
 				$see = 0;
 				$order = $l+$i;
