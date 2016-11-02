@@ -252,6 +252,112 @@ class Utils
 		return '';
 	}
 
+	/*
+	@allfields: reference to array of (plaintext) field-data - see FormatRecord description
+	On arrival, the 'current' member of @allfields is a SequenceStart field
+	@htmlout: optional boolean, default TRUE
+	*/
+	private static function MergeSequenceData(&$allfields, $htmlout=TRUE)
+	{
+		$names = array();
+		$vals = array();
+		$first = TRUE;
+		$joiner = ($htmlout) ? '<br />':PHP_EOL;
+		$si = 0;
+		while (1) {
+			$field =& next($allfields);
+			if ($field === FALSE) {
+				//TODO handle error
+				return array(NULL,NULL);
+			}
+			if (count($field) > 2) {
+				if (isset($field['_sb'])) { //field is SequenceBreak
+					$first = FALSE;
+					$si = 0;
+					continue;
+				} elseif (isset($field['_se'])) { //field is SequenceEnd
+					next($allfields); //skip this member
+					return array($names,$vals); //i.e. data + multi-store indicator
+				} elseif (isset($field['_ss'])) { //field is SequenceStart (nested)
+					list($subnames,$subvals) = self::MergeSequenceData($allfields,$htmlout); //recurse
+					$field = array($subnames[0].',etc',implode($joiner,$subvals)); //TODO something to store in $names,$vals
+				} else {
+					self::FormatRecord($mod,$field,$allfields,$htmlout);
+				}
+			}
+			if ($first) {
+				$names[$si] = $field[0];
+				$vals[$si] = $field[1];
+			} else {
+				$vals[$si] .= $joiner.$field[1];
+			}
+			$si++;
+		}
+	}
+
+	/**
+	FormatRecord:
+	@mod: reference to current module object
+	@field: reference to current member of @allfields
+	@allfields: reference to array of (plaintext) field-data, each member an array:
+	 [0] = title for public display
+	 [1] = value, probably not displayable
+	 other member(s) relate to custom-formatting
+	@htmlout: optional boolean, for possible downstream sequence-processing, default TRUE
+	Returns: nothing, but @field content will probably be changed
+	NOTE: the processing here must be suitably replicated in class.FormBrowser.php
+	*/
+	public static function FormatRecord(&$mod, &$field, &$allfields, $htmlout=TRUE)
+	{
+		static $dfmt = FALSE;
+		static $tfmt = FALSE;
+		static $dtfmt = FALSE;
+
+		foreach (array('dt','d','t','_ss','_se','_sb') as $f) {
+			if (isset($field[$f])) {
+				switch ($f) {
+				 case 'dt':
+					if ($dtfmt === FALSE) {
+						if ($dfmt === FALSE) $dfmt = trim($mod->GetPreference('date_format'));
+						if ($tfmt === FALSE) $tfmt = trim($mod->GetPreference('time_format'));
+						$dtfmt = trim($dfmt.' '.$tfmt);
+					}
+					if ($dtfmt) {
+						$dt = new \DateTime('@'.$field[1],NULL);
+						$field[1] = $dt->format($dtfmt);
+					}
+					break;
+				 case 'd':
+					if ($dfmt === FALSE) {
+						$dfmt = trim($mod->GetPreference('date_format'));
+					}
+					if ($dfmt) {
+						$dt = new \DateTime('@'.$field[1],NULL);
+						$field[1] = $dt->format($dfmt);
+					}
+					break;
+				 case 't':
+					if ($tfmt === FALSE) {
+						$tfmt = trim($mod->GetPreference('time_format'));
+					}
+					if ($tfmt) {
+						$dt = new \DateTime('@'.$field[1],NULL);
+						$field[1] = $dt->format($tfmt);
+					}
+					break;
+				 case '_ss': //sequence-start
+					list($field[0],$field[1]) = self::MergeSequenceData($allfields,$htmlout); //accumulate sequence values
+					break;
+				 case '_se': //sequence-end, should never get to here
+				 case '_sb': // -break ditto
+					$field[0] = '';
+					$field[1] = '';
+					break;
+				}
+			}
+		}
+	}
+
 	/**
 	ProcessTemplate:
 	@mod: reference to current PWFBrowse module object
