@@ -77,13 +77,4 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
-$jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
-unset($jsincs);
-unset($jsfuncs);
-unset($jsloads);
-
 echo PWFBrowse\Utils::ProcessTemplate($this,$tpl,$tplvars);
-
-if ($jsall)
-	echo $jsall;
