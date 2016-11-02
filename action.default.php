@@ -75,12 +75,10 @@ $rows = array();
 		}
 		if ($fields) {
 			ksort($fields); //conform order to titles
-//TODO identify & handle FieldsetStart/End : multi-values per cell instead of multi-cols? how to sort?
 			$rows[] = $fields;
 		}
 	}
 //}
-
 $tplvars['rows'] = $rows;
 $rcount = count($rows);
 $tplvars['rcount'] = $rcount;
