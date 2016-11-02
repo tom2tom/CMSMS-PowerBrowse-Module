@@ -42,32 +42,34 @@ $sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = PWFBrowse\Utils::SafeGet($sql,array($bid),'col');
 $rows = array();
 //if ($data) {
-	$dfmt = FALSE;
-	$tfmt = FALSE;
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as $stored) {
 		$fields = array();
 		$browsedata = $funcs->Decrypt($this,$stored);
 		if ($browsedata) {
 			//include data for fields named in $colnames
-			foreach ($browsedata as $key=>$field) {
-				$indx = array_search($field[0],$colnames);
-				if ($indx !== FALSE) {
-					if (isset($field['dt'])) { //TODO or 'd' or 't'
-						if ($dfmt === FALSE) {
-							$dfmt = $this->GetPreference('date_format');
-							$tfmt = $this->GetPreference('time_format');
-							$dtfmt = trim($dfmt.' '.$tfmt);
-							$dt = new DateTime('@0',NULL);
+			foreach ($browsedata as $field) { //$key unused
+				if (count($field) == 2) {
+					$indx = array_search($field[0],$colnames);
+					if ($indx !== FALSE) {
+						$fields[$indx] = $field[1];
+					}
+				} else { //format-parameter(s) present
+					PWFBrowse\Utils::FormatRecord($this,$field,$browsedata);
+					if (!is_array($field[0])) {
+						$indx = array_search($field[0],$colnames);
+						if ($indx !== FALSE) {
+							$fields[$indx] = $field[1];
 						}
-						if ($dtfmt) {
-							$dt = new DateTime('@'.$field[1],NULL);
-							$field[1] = $dt->format($dtfmt);
+					} else {
+						//output sequence-fields
+						foreach ($field[0] as $skey=>$sname) {
+							$indx = array_search($sname,$colnames);
+							if ($indx !== FALSE) {
+								$fields[$indx] = $field[1][$skey];
+							}
 						}
 					}
-					//TODO other format directives
-					$fields[$indx] = $field[1];
-//TODO identify & handle FieldsetStart/End : multi-rows instead of multi-cols? how to sort?
 				}
 			}
 		}
