@@ -51,7 +51,7 @@ if (isset($params['clone'])) {
 } elseif (isset($params['export'])) {
 	if (!$this->_CheckAccess()) exit;
 
-	$funcs = new PWFBrowse\Export();
+	$funcs = new PWFBrowse\RecordExport();
 	if (count($params['sel']) == 1) {
 		$browser_id = reset($params['sel']);
 		$res = $funcs->Export($this,$browser_id);

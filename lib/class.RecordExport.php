@@ -7,7 +7,7 @@
 
 namespace PWFBrowse;
 
-class Export
+class RecordExport
 {
 	/**
 	ExportName:
@@ -94,14 +94,15 @@ class Export
 		if ($all) {
 			$funcs = new RecordContent();
 			//header line
-			list($when,$data) = $funcs->Load($mod,$pre,$all[0]);
-			if (!$data)
-				return FALSE;
+			list($res,$browsedata) = $funcs->Load($mod,$pre,$all[0]);
+			if (!$res)
+				return FALSE; //TODO report message
 			$names = array();
-			foreach ($data as &$one) {
+			foreach ($browsedata as &$one) {
 				$fn = $one[0];
 				if ($strip)
 					$fn = strip_tags($fn);
+//TODO don't repeat names for sequences
 				$names[] = str_replace($sep,$r,$fn);
 			}
 			unset($one);
@@ -110,38 +111,39 @@ class Export
 				$outstr .= PHP_EOL;
 			} else
 				return FALSE;
-			$dfmt = FALSE;
-			$tfmt = FALSE;
 			//data lines(s)
 			foreach ($all as $one) {
-				list($when,$data) = $funcs->Load($mod,$pre,$one);
-				if (!$data)
+				list($res,$browsedata) = $funcs->Load($mod,$pre,$one);
+				if (!$res)
 					continue;	//decryption error
 				$vals = array();
-				foreach ($data as &$one) {
-					if (isset($field['dt'])) { //TODO or 'd' or 't'
-						if ($dfmt === FALSE) {
-							$dfmt = $this->GetPreference('date_format');
-							$tfmt = $this->GetPreference('time_format');
-							$dtfmt = trim($dfmt.' '.$tfmt);
-							$dt = new DateTime('@0',NULL);
-						}
-						if ($dtfmt) {
-							$dt->setTimestamp($one[1]);
-							$vals[] = str_replace($sep,$r,$dt->format($dtfmt));
-						} else {
-							$vals[] = $one[1];
-						}
-					} else {
-	//TODO process other field-format data
-						$fv = $one[1];
+				foreach ($browsedata as $field) { //$key unused
+					if (count($field) == 2) {
+						$fv = $field[1];
 						if ($strip)
 							$fv = strip_tags($fv);
 						$fv = str_replace($sep,$r,$fv);
 						$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+					} else { //format-parameter(s) present
+						PWFBrowse\Utils::FormatRecord($this,$field,$browsedata,FALSE);
+						if (!is_array($field[0])) {
+							$fv = $field[1];
+							if ($strip)
+								$fv = strip_tags($fv);
+							$fv = str_replace($sep,$r,$fv);
+							$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+						} else {
+							//output sequence-fields
+							foreach ($field[0] as $skey=>$sname) {
+								$fv = $field[1][$skey];
+								if ($strip)
+									$fv = strip_tags($fv);
+								$fv = str_replace($sep,$r,$fv);
+								$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+							}
+						}
 					}
 				}
-				unset($one);
 				$outstr .= implode($sep,$vals);
 				$outstr .= PHP_EOL;
 				if ($fp) {

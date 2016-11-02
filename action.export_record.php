@@ -6,7 +6,7 @@
 
 if (!$this->_CheckAccess()) exit;
 
-$funcs = new PWFBrowse\Export();
+$funcs = new PWFBrowse\RecordExport();
 $res = $funcs->Export($this,FALSE,$params['record_id']);
 if ($res === TRUE)
 	exit;

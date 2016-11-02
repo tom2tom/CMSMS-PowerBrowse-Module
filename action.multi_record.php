@@ -20,7 +20,7 @@ if (isset($params['delete'])) {
 } elseif (isset($params['export'])) {
 	if (!$this->_CheckAccess()) exit;
 
-	$funcs = new PWFBrowse\Export();
+	$funcs = new PWFBrowse\RecordExport();
 	$res = $funcs->Export($this,FALSE,$params['sel']);
 	if ($res === TRUE)
 		exit;
