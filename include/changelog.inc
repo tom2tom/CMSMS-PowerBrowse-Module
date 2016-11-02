@@ -20,4 +20,10 @@
 <li>password management</li>
 </ul>
 </li>
+<li>Version 0.8 - Nov 2016
+<ul>
+<li>support field-sequences</li>
+<li>fontend data-list display</li>
+</ul>
+</li>
 </ul>
