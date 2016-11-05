@@ -20,7 +20,7 @@ class FormBrowser extends FieldBase
 		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'FormBrowser';
-		$this->mymodule =& \cms_utils::get_module(self::MODNAME);
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
 	public function Load($id, &$params)
@@ -33,7 +33,7 @@ class FormBrowser extends FieldBase
 		return TRUE;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Form Browser]'; //by convention, not translated
 		if ($as_string)
@@ -49,7 +49,7 @@ class FormBrowser extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,FALSE,FALSE);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -62,7 +62,7 @@ class FormBrowser extends FieldBase
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)
 				|| $one->IsSequence) { //TODO is a browsable field
-				$save = array($one->Name,$one->GetDisplayableValue());
+				$save = array($one->Name,$one->DisplayableValue());
 				//TODO other presentation control(s) if relevant
 				if ($one->IsTimeStamp) {
 					if ($one->ShowDate) {
@@ -76,6 +76,8 @@ class FormBrowser extends FieldBase
 						continue;
 					}
 				} elseif ($one->IsSequence) {
+					$save[0] = ''; //nothing displayed for these
+					$save[1] = '';
 					if($one->Type == 'SequenceStart') {
 						$save['_ss'] = '';
 					} elseif ($one->Type == 'SequenceEnd') {
@@ -117,6 +119,6 @@ class FormBrowser extends FieldBase
 	public function unserialize($serialized)
 	{
 		parent::unserialize($serialized);
-		$this->mymodule =& \cms_utils::get_module(self::MODNAME);
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 }
