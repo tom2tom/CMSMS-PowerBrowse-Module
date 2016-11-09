@@ -146,7 +146,7 @@ EOS;
 			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
 		);
 
-		$jsfuncs[] = <<<EOS
+		$jsfuncs[] = <<<'EOS'
 function pagefirst() {
  $.SSsort.movePage($('#submissions')[0],false,true);
 }
