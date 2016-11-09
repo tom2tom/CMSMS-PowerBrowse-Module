@@ -16,7 +16,7 @@
 	<th class="pageicon"></th>
 	<th class="pageicon"></th>
 {/if}
- 	<th class="checkbox" style="width:20px;">{$selectall_browsers}</th>
+ 	<th class="checkbox">{$selectall_browsers}</th>
   </tr></thead>
   <tbody>
 {foreach from=$browsers item=entry}{cycle values='row1,row2' assign=rowclass}
