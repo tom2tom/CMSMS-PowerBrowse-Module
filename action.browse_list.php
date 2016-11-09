@@ -145,7 +145,7 @@ EOS;
  });
 EOS;
 /*TODO js-equivalent of mb_sort
-	$jsfuncs[] = <<<EOS
+	$jsfuncs[] = <<<'EOS'
  $.SSsort.addParser({
   id: 'textinput',
   is: function(s,node) {
@@ -160,7 +160,7 @@ EOS;
  });
 EOS;
 */
-		$jsfuncs[] = <<<EOS
+		$jsfuncs[] = <<<'EOS'
 function select_all(cb) {
  $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
 }
@@ -195,7 +195,7 @@ EOS;
 			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
 		);
 
-		$jsfuncs[] = <<<EOS
+		$jsfuncs[] = <<<'EOS'
 function pagefirst() {
  $.SSsort.movePage($('#submissions')[0],false,true);
 }

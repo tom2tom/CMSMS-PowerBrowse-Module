@@ -146,7 +146,7 @@ $lang['updated2']='Updated %s.';
 $lang['view']='View';
 $lang['you_need_permission']='To access this, you need permission "%s"';
 
-$lang['help_module']= <<<EOS
+$lang['help_module']= <<<'EOS'
 <h3>What does this module do?</h3>
 <p>It allows authorised users to review and modify data recorded by the
 PWForms module for submitted forms.</p>
@@ -195,5 +195,3 @@ Derived in part from FormBrowser module, copyright &copy; 2006-2011, Samuel Gold
 All rights reserved.</p>
 <p>This module has been released under the <a href="http://www.gnu.org/licenses/licenses.html#AGPL">GNU Affero General Public License</a> version 3. The module must not be used otherwise than in accordance with that licence.</p>
 EOS;
-
-?>

@@ -132,7 +132,7 @@ if ($fields) {
 		$jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
 EOS;
-		$jsloads[] = <<<EOS
+		$jsloads[] = <<<'EOS'
  $('.updown').css('display','none');
  $('.dndhelp').css('display','block');
  $('#listfields').addClass('table_drag').tableDnD({
