@@ -60,7 +60,7 @@ class FormBrowser extends FieldBase
 	{
 		$browsedata = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput && ($one->DisplayInForm || $one->DisplayExternal)
+			if ($one->IsInput && ($one->DisplayInForm)
 				|| $one->IsSequence) { //TODO is a browsable field
 				$save = array($one->Name,$one->DisplayableValue());
 				//TODO other presentation control(s) if relevant
