@@ -135,7 +135,7 @@ class PWFBrowse extends CMSModule
 
 	public function GetDependencies()
 	{
-		return array('PWForms'=>'0.1');
+		return array('PWForms'=>'0.7');
 	}
 
 	public function MinimumCMSVersion()
