@@ -1,20 +1,22 @@
-This is a form-data manager for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired by Samuel Goldstein's FormBrowser module.
+### Overview
 
-It is NOT YET feature-complete.
+This is a form-data manager module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired somewhat by Samuel Goldstein's FormBrowser module.
 
 If you want to compare it with FormBrowser ...
-<ul>
-<li>easier to use</li>
-<li>omits lots of crufty, mostly- if not entirely-irrelevant, stuff (most notably - FEU browsing)</li>
-<li>a few additions e.g.
-<ul>
-<li>displayed data can be sorted on anything</li>
-<li>optional per-user data-access limitation</li>
-<li>obfuscation of stored data (encryption-ready, pending a robust password-management interface)</li>
-<li>more-tolerant exporting</li>
-<li>adapted for high-traffic-volume data saving</li>
-</ul>
-</li>
-</ul>
 
-It includes an interface for exchanging data with the companion PowerForms module (which is being developed).
+* easier to use
+* omits crufty, mostly- if not entirely-irrelevant, stuff
+* only a list-view is available for frontend display
+* no frontend editing of recorded data
+* a few additions e.g.
+	* displayed data can be sorted on anything
+	* optional per-user data-access limitation
+	* all stored data are encrypted
+	* more-tolerant exporting
+	* adapted for high-traffic-volume data saving
+
+### Usage
+
+Form data is by default retrieved from forms displayed using the companion PowerForms module.
+
+Data recorded for use by the FormBrowser module can be imported from Formbuilder.
