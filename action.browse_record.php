@@ -21,8 +21,8 @@ if (isset($params['submit'])) {
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
 
-list($when,$browsedata) = $funcs->Load($this,$pre,$params['record_id']);
-if (!$browsedata) {
+list($res,$browsedata) = $funcs->Load($this,$pre,$params['record_id']);
+if (!$res) {
 	$params['message']= $this->_PrettyMessage('error_data',FALSE);
 	$this->Redirect($id,'browse_list',$returnid,$params);
 }
@@ -34,13 +34,10 @@ $tplvars['start_form'] =
 	$this->CreateFormStart($id,'browse_record',$returnid,'POST','','','',
 		array('record_id'=>$params['record_id'],
 		'browser_id'=>$params['browser_id'],
-		'form_id'=>$params['form_id'],
-		'submit_when'=>$when));
+		'form_id'=>$params['form_id']));
 $tplvars['end_form'] = $this->CreateFormEnd();
 
 $bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
-$dfmt = FALSE;
-$tfmt = FALSE;
 $content = array();
 if (isset($params['edit'])) {
 	$hidden = array();
@@ -48,27 +45,32 @@ if (isset($params['edit'])) {
 	foreach ($browsedata as $key=>$field) {
 		$title = $field[0];
 		$hidden[] = $this->CreateInputHidden($id,'field['.$key.']',$title);
-		if (isset($field['dt'])) { //TODO or 'd' or 't'
-			if ($dfmt === FALSE) {
-				$dfmt = $this->GetPreference('date_format');
-				$tfmt = $this->GetPreference('time_format');
-				$dtfmt = trim($dfmt.' '.$tfmt);
-				$dt = new DateTime('@0',NULL);
-			}
-			if ($dtfmt) {
-				$dt->setTimestamp($field[1]);
-				$value = $dt->format($dtfmt);
+		if (count($field) > 2) { //format-parameter(s) present
+			$value = $field[1]; //log current value
+			PWFBrowse\Utils::FormatRecord($this,$field,$browsedata);
+			if (!is_array($field[0])) {
 				if ($key[0] == '_') { //internal-use fake field, not editable
-					$hidden[] = $this->CreateInputHidden($id,'value['.$key.']',$field[1]);
-					$content[] = array($title,$value); //no change for this value
+					$hidden[] = $this->CreateInputHidden($id,'value['.$key.']',$value); //un-formatted value
+					$content[] = array(htmlentities($title),$field[1]); //no change for this value
 				} else {
-					$input = $this->CreateInputText($id,'value['.$key.']',$value,60); //TODO reconvert when saving
+					$input = $this->CreateInputText($id,'value['.$key.']',$field[1],60); //TODO reconvert when saving
 					$content[] = array(htmlentities($title),$input);
 				}
 				continue;
+			} else {
+				//maybe-editable sequence-fields
+//TODO fix this
+				foreach ($field[0] as $skey=>$sname) {
+					if ($skey[0] == '_') { //internal-use fake field, not editable
+						$hidden[] = $this->CreateInputHidden($id,'value['.$key.']',$field[1][$skey]); //un-formatted value
+						$content[] = array(htmlentities($title),$field[1][$skey]); //no change for this value
+					} else {
+						$input = $this->CreateInputText($id,'value['.$key.']',$field[1][$skey],60); //TODO reconvert when saving
+						$content[] = array(htmlentities($title),$input);
+					}
+				}
 			}
 		}
-		//TODO other format directives
 		$value = $field[1];
 		$len = strlen($value);
 		$newline = strpos($value,PHP_EOL) !== FALSE || strpos($value,"<br") !== FALSE;
@@ -88,20 +90,16 @@ if (isset($params['edit'])) {
 	$hidden = NULL;
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as',$bname);
 	foreach ($browsedata as $key=>$field) {
-		if (isset($field['dt'])) { //TODO or 'd' or 't'
-			if ($dfmt === FALSE) {
-				$dfmt = $this->GetPreference('date_format');
-				$tfmt = $this->GetPreference('time_format');
-				$dtfmt = trim($dfmt.' '.$tfmt);
-				$dt = new DateTime('@0',NULL);
-			}
-			if ($dtfmt) {
-				$dt->setTimestamp($field[1]);
-				$content[] = array($field[0],$dt->format($dtfmt));
+		if (count($field) > 2) { //format-parameter(s) present
+			PWFBrowse\Utils::FormatRecord($this,$field,$browsedata);
+			if (is_array($field[0])) {
+				//output sequence-fields
+				foreach ($field[0] as $skey=>$sname) {
+					$content[] = array(htmlentities($sname),htmlentities($field[1][$skey]));
+				}
 				continue;
 			}
 		}
-		//TODO other format directives
 		$content[] = array(htmlentities($field[0]),htmlentities($field[1]));
 	}
 	$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('close'));
