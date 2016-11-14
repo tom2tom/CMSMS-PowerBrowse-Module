@@ -59,49 +59,51 @@ class FormBrowser extends FieldBase
 	public function Dispose($id, $returnid)
 	{
 		$browsedata = array();
-		foreach ($this->formdata->Fields as &$one) {
-			if ($one->IsInput && ($one->DisplayInForm)
-				|| $one->IsSequence) { //TODO is a browsable field
-				$save = array($one->Name,$one->DisplayableValue());
+		foreach ($this->formdata->Fields as &$obfld) {
+			if (($obfld->IsInput && $obfld->DisplayInForm) //TODO is a browsable field
+				|| $obfld->IsSequence) {
+				$save = array($obfld->Name,$obfld->DisplayableValue());
 				//TODO other presentation control(s) if relevant
-				if ($one->IsTimeStamp) {
-					if ($one->ShowDate) {
-						if ($one->ShowTime)
+				if ($obfld->IsTimeStamp) {
+					if ($obfld->ShowDate) {
+						if ($obfld->ShowTime)
 							$save['dt'] = '';
 						else
 							$save['d'] = '';
-					} elseif ($one->ShowTime) {
+					} elseif ($obfld->ShowTime) {
 						$save['t'] = '';
 					} else {
 						continue;
 					}
-				} elseif ($one->IsSequence) {
+				} elseif ($obfld->IsSequence) {
 					$save[0] = ''; //nothing displayed for these
 					$save[1] = '';
-					if($one->Type == 'SequenceStart') {
+					if($obfld->Type == 'SequenceStart') {
 						$save['_ss'] = '';
-					} elseif ($one->Type == 'SequenceEnd') {
-						$save['_se'] = '';
+					} elseif ($obfld->LastBreak) {
+						$save['_se'] = ''; //final 'SequenceEnd'
 					} else {
-						$save['_sb'] = '';
+						$save['_sb'] = ''; //intermediate 'SequenceEnd'
 					}
 				}
-				$browsedata[$one->Id] = $save;
+				$browsedata[$obfld->Id] = $save;
 			}
 		}
-		unset($one);
+		unset($obfld);
 		if ($browsedata) {
 			$pre = \cms_db_prefix();
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 			$db = \cmsms()->GetDb();
 			$form_id = $this->formdata->Id;
-			$browsers = $db->GetCol($sql,array($form_id));
+			$browsers = $db->GetCol($sql,array($form_id)); //TODO support high-load
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
 				$funcs = new \PWFBrowse\RecordContent();
 				foreach ($browsers as $browser_id) {
 					$funcs->Insert($this->mymodule,$pre,$browser_id,$form_id,$stamp,$browsedata);
 				}
+			} else {
+				return array(FALSE,$this->formdata->formsmodule->Lang('missing_type','browser for form')); //TODO lang
 			}
 		}
 		return array(TRUE,'');
