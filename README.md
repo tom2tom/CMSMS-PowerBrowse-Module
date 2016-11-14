@@ -1,6 +1,6 @@
 ### Overview
 
-This is a form-data manager module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired somewhat by Samuel Goldstein's FormBrowser module.
+This is a form-data manager module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, descended from Samuel Goldstein's FormBrowser module.
 
 If you want to compare it with FormBrowser ...
 
