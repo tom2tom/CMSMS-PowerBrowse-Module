@@ -271,11 +271,11 @@ class Utils
 				return array(NULL,NULL);
 			}
 			if (count($field) > 2) {
-				if (isset($field['_sb'])) { //field is SequenceBreak
+				if (isset($field['_sb'])) { //field is intermediate SequenceEnd
 					$first = FALSE;
 					$si = 0;
 					continue;
-				} elseif (isset($field['_se'])) { //field is SequenceEnd
+				} elseif (isset($field['_se'])) { //field is final SequenceEnd
 					next($allfields); //skip this member
 					return array($names,$vals); //i.e. data + multi-store indicator
 				} elseif (isset($field['_ss'])) { //field is SequenceStart (nested)
