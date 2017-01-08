@@ -22,30 +22,29 @@ class Utils
 	{
 		$db = \cmsms()->GetDb();
 		$nt = 10;
-		while($nt > 0)
-		{
+		while ($nt > 0) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 			$db->StartTrans();
 			switch ($mode) {
 			 case 'one':
-				$ret = $db->GetOne($sql,$args);
+				$ret = $db->GetOne($sql, $args);
 				break;
 			 case 'row':
-				$ret = $db->GetRow($sql,$args);
+				$ret = $db->GetRow($sql, $args);
 				break;
 			 case 'col':
-				$ret = $db->GetCol($sql,$args);
+				$ret = $db->GetCol($sql, $args);
 				break;
 			 case 'assoc':
-				$ret = $db->GetAssoc($sql,$args);
+				$ret = $db->GetAssoc($sql, $args);
 				break;
 			 default:
-				$ret = $db->GetArray($sql,$args);
+				$ret = $db->GetArray($sql, $args);
 				break;
 			}
-			if ($db->CompleteTrans())
+			if ($db->CompleteTrans()) {
 				return $ret;
-			else {
+			} else {
 				$nt--;
 				usleep(50000);
 			}
@@ -64,18 +63,19 @@ class Utils
 	{
 		$db = \cmsms()->GetDb();
 		$nt = 10;
-		while($nt > 0)
-		{
+		while ($nt > 0) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
 			$db->StartTrans();
 			if (is_array($sql)) {
-				foreach ($sql as $i=>$cmd)
-					$db->Execute($cmd,$args[$i]);
-			} else
-				$db->Execute($sql,$args);
-			if ($db->CompleteTrans())
+				foreach ($sql as $i=>$cmd) {
+					$db->Execute($cmd, $args[$i]);
+				}
+			} else {
+				$db->Execute($sql, $args);
+			}
+			if ($db->CompleteTrans()) {
 				return TRUE;
-			else {
+			} else {
 				$nt--;
 				usleep(50000);
 			}
@@ -91,7 +91,7 @@ class Utils
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_record WHERE record_id=?';
-		return self::SafeGet($sql,array($record_id),'one');
+		return self::SafeGet($sql, array($record_id), 'one');
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Utils
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 		$db = \cmsms()->GetDb();
-		return $db->GetOne($sql,array($browser_id));
+		return $db->GetOne($sql, array($browser_id));
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Utils
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT form_id FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 		$db = \cmsms()->GetDb();
-		return $db->GetOne($sql,array($browser_id));
+		return $db->GetOne($sql, array($browser_id));
 	}
 
 	/**
@@ -127,17 +127,18 @@ class Utils
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		if ($internal)
+		if ($internal) {
 			$sql = 'SELECT form_name FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
-		else
+		} else {
 			$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		return $db->GetOne($sql,array($form_id));
+		}
+		return $db->GetOne($sql, array($form_id));
 	}
 
 	/**
 	GetUploadsPath:
 	@mod: reference to current PWFBrowse module object
-	Returns: absolute path string or false
+	Returns: absolute path string or FALSE
 	*/
 	public static function GetUploadsPath(&$mod)
 	{
@@ -145,10 +146,12 @@ class Utils
 		$up = $config['uploads_path'];
 		if ($up) {
 			$rp = $mod->GetPreference('uploads_dir');
-			if ($rp)
+			if ($rp) {
 				$up .= DIRECTORY_SEPARATOR.$rp;
-			if (is_dir($up))
+			}
+			if (is_dir($up)) {
 				return $up;
+			}
 		}
 		return FALSE;
 	}
@@ -156,7 +159,7 @@ class Utils
 	/**
 	GetUploadsUrl:
 	@mod: reference to current PWFBrowse module object
-	Returns: absolute url string or false
+	Returns: absolute url string or FALSE
 	*/
 	public static function GetUploadsUrl(&$mod)
 	{
@@ -166,7 +169,7 @@ class Utils
 		if ($up) {
 			$rp = $mod->GetPreference('uploads_dir');
 			if ($rp) {
-				$rp = str_replace('\\','/',$rp);
+				$rp = str_replace('\\', '/', $rp);
 				$up .= '/'.$rp;
 			}
 			return $up;
@@ -189,12 +192,14 @@ class Utils
 				$passwd = self::unfusc($mod->GetPreference('masterpass'));
 			}
 			if ($passwd && $mod->havemcrypt) {
-				$e = new Encryption(MCRYPT_BLOWFISH,MCRYPT_MODE_CBC,self::ENC_ROUNDS);
-				$value = $e->encrypt($value,$passwd);
-				if ($based)
+				$e = new Encryption(MCRYPT_BLOWFISH, MCRYPT_MODE_CBC, self::ENC_ROUNDS);
+				$value = $e->encrypt($value, $passwd);
+				if ($based) {
 					$value = base64_encode($value);
-			} else
+				}
+			} else {
 				$value = self::fusc($passwd.$value);
+			}
 		}
 		return $value;
 	}
@@ -214,12 +219,14 @@ class Utils
 				$passwd = self::unfusc($mod->GetPreference('masterpass'));
 			}
 			if ($passwd && $mod->havemcrypt) {
-				if ($based)
+				if ($based) {
 					$value = base64_decode($value);
-				$e = new Encryption(MCRYPT_BLOWFISH,MCRYPT_MODE_CBC,self::ENC_ROUNDS);
-				$value = $e->decrypt($value,$passwd);
-			} else
-				$value = substr(strlen($passwd),self::unfusc($value));
+				}
+				$e = new Encryption(MCRYPT_BLOWFISH, MCRYPT_MODE_CBC, self::ENC_ROUNDS);
+				$value = $e->decrypt($value, $passwd);
+			} else {
+				$value = substr(strlen($passwd), self::unfusc($value));
+			}
 		}
 		return $value;
 	}
@@ -232,7 +239,7 @@ class Utils
 	public static function fusc($str)
 	{
 		if ($str) {
-			$s = substr(base64_encode(md5(microtime())),0,5);
+			$s = substr(base64_encode(md5(microtime())), 0, 5);
 			return $s.base64_encode($s.$str);
 		}
 		return '';
@@ -246,8 +253,8 @@ class Utils
 	public static function unfusc($str)
 	{
 		if ($str) {
-			$s = base64_decode(substr($str,5));
-			return substr($s,5);
+			$s = base64_decode(substr($str, 5));
+			return substr($s, 5);
 		}
 		return '';
 	}
@@ -279,10 +286,10 @@ class Utils
 					next($allfields); //skip this member
 					return array($names,$vals); //i.e. data + multi-store indicator
 				} elseif (isset($field['_ss'])) { //field is SequenceStart (nested)
-					list($subnames,$subvals) = self::MergeSequenceData($allfields,$htmlout); //recurse
-					$field = array($subnames[0].',etc',implode($joiner,$subvals)); //TODO something to store in $names,$vals
+					list($subnames, $subvals) = self::MergeSequenceData($allfields, $htmlout); //recurse
+					$field = array($subnames[0].',etc',implode($joiner, $subvals)); //TODO something to store in $names,$vals
 				} else {
-					self::FormatRecord($mod,$field,$allfields,$htmlout);
+					self::FormatRecord($mod, $field, $allfields, $htmlout);
 				}
 			}
 			if ($first) {
@@ -313,17 +320,21 @@ class Utils
 		static $tfmt = FALSE;
 		static $dtfmt = FALSE;
 
-		foreach (array('dt','d','t','_ss','_se','_sb') as $f) {
+		foreach (array('dt', 'd', 't', '_ss', '_se', '_sb') as $f) {
 			if (isset($field[$f])) {
 				switch ($f) {
 				 case 'dt':
 					if ($dtfmt === FALSE) {
-						if ($dfmt === FALSE) $dfmt = trim($mod->GetPreference('date_format'));
-						if ($tfmt === FALSE) $tfmt = trim($mod->GetPreference('time_format'));
+						if ($dfmt === FALSE) {
+							$dfmt = trim($mod->GetPreference('date_format'));
+						}
+						if ($tfmt === FALSE) {
+							$tfmt = trim($mod->GetPreference('time_format'));
+						}
 						$dtfmt = trim($dfmt.' '.$tfmt);
 					}
 					if ($dtfmt) {
-						$dt = new \DateTime('@'.$field[1],NULL);
+						$dt = new \DateTime('@'.$field[1], NULL);
 						$field[1] = $dt->format($dtfmt);
 					}
 					break;
@@ -332,7 +343,7 @@ class Utils
 						$dfmt = trim($mod->GetPreference('date_format'));
 					}
 					if ($dfmt) {
-						$dt = new \DateTime('@'.$field[1],NULL);
+						$dt = new \DateTime('@'.$field[1], NULL);
 						$field[1] = $dt->format($dfmt);
 					}
 					break;
@@ -341,12 +352,12 @@ class Utils
 						$tfmt = trim($mod->GetPreference('time_format'));
 					}
 					if ($tfmt) {
-						$dt = new \DateTime('@'.$field[1],NULL);
+						$dt = new \DateTime('@'.$field[1], NULL);
 						$field[1] = $dt->format($tfmt);
 					}
 					break;
 				 case '_ss': //sequence-start
-					list($field[0],$field[1]) = self::MergeSequenceData($allfields,$htmlout); //accumulate sequence values
+					list($field[0], $field[1]) = self::MergeSequenceData($allfields, $htmlout); //accumulate sequence values
 					break;
 				 case '_se': //sequence-end, should never get to here
 				 case '_sb': // -break ditto
@@ -377,11 +388,12 @@ class Utils
 				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwbr'.$tplname.$lang);
-				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,$compile_id,$smarty);
-				if (!$tpl->isCached())
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);
+				if (!$tpl->isCached()) {
 					$tpl->assign($tplvars);
+				}
 			} else {
-				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), NULL, NULL, $smarty, $tplvars);
 			}
 			return $tpl->fetch();
 		}
@@ -410,7 +422,7 @@ class Utils
 //<![CDATA[
 EOS;
 			if (is_array($jsfuncs)) {
-				$all = array_merge($all,$jsfuncs);
+				$all = array_merge($all, $jsfuncs);
 			} elseif ($jsfuncs) {
 				$all[] = $jsfuncs;
 			}
@@ -419,7 +431,7 @@ EOS;
 $(document).ready(function() {
 EOS;
 				if (is_array($jsloads)) {
-					$all = array_merge($all,$jsloads);
+					$all = array_merge($all, $jsloads);
 				} else {
 					$all[] = $jsloads;
 				}
@@ -432,6 +444,6 @@ EOS;
 </script>
 EOS;
 		}
-		$merged = implode(PHP_EOL,$all);
+		$merged = implode(PHP_EOL, $all);
 	}
 }

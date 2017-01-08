@@ -6,12 +6,13 @@
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
 $pconfig = $this->_CheckAccess('admin');
-if ($pconfig || $this->_CheckAccess('modify'))
+if ($pconfig || $this->_CheckAccess('modify')) {
 	$pmod = TRUE;
-elseif ($this->_CheckAccess('view'))
+} elseif ($this->_CheckAccess('view')) {
 	$pmod = FALSE;
-else
+} else {
 	exit;
+}
 
 $tplvars = array();
 $tplvars['pconfig'] = ($pconfig)?1:0;
@@ -24,25 +25,28 @@ if (isset($params['passthru'])) { //returning from add-record
 $bid = (int)$params['browser_id'];
 $fid = (int)$params['form_id'];
 
-$this->_BuildNav($id,$returnid,$params,$tplvars);
-$tplvars['start_form'] = $this->CreateFormStart($id,'multi_record',$returnid,'POST','','','',
-	array('browser_id'=>$bid,'form_id'=>$fid));
+$this->_BuildNav($id, $returnid, $params, $tplvars);
+$tplvars['start_form'] = $this->CreateFormStart($id, 'multi_record', $returnid, 'POST', '', '', '',
+	array('browser_id'=>$bid, 'form_id'=>$fid));
 $tplvars['end_form'] = $this->CreateFormEnd();
 
-if (!empty($params['message']))
+if (!empty($params['message'])) {
 	$tplvars['message'] = $params['message'];
+}
 
 $pre = cms_db_prefix();
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
-$data = $db->GetRow($sql,array($bid));
+$data = $db->GetRow($sql, array($bid));
 $tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
-$colnames = array_column($data,'name');
-$colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
+$data = PWFBrowse\Utils::SafeGet($sql, array($params['browser_id']));
+$colnames = array_column($data, 'name');
+$colsorts = array_map(function ($v) {
+	return (int)$v;
+}, array_column($data, 'sorted'));
 $tplvars['colnames'] = $colnames;
 $tplvars['colsorts'] = $colsorts;
 
@@ -56,39 +60,39 @@ $jsloads = array();
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql,array($params['browser_id']));
+$data = PWFBrowse\Utils::SafeGet($sql, array($params['browser_id']));
 $rows = array();
 //if ($data) {
-	$icon_view = $theme->DisplayImage('icons/system/view.gif',$this->Lang('view'),'','','systemicon');
+	$icon_view = $theme->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon');
 	if ($pmod) {
-		$icon_edit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
-		$icon_delete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
+		$icon_edit = $theme->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon');
+		$icon_delete = $theme->DisplayImage('icons/system/delete.gif', $this->Lang('delete'), '', '', 'systemicon');
 	}
-	$icon_export = $theme->DisplayImage('icons/system/export.gif',$this->Lang('export'),'','','systemicon');
+	$icon_export = $theme->DisplayImage('icons/system/export.gif', $this->Lang('export'), '', '', 'systemicon');
 
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
 		$fields = array();
-		$browsedata = $funcs->Decrypt($this,$one['contents']);
+		$browsedata = $funcs->Decrypt($this, $one['contents']);
 		if ($browsedata) {
 			//include data for fields named in $colnames
 			foreach ($browsedata as $field) { //$key unused
 				if (count($field) == 2) {
-					$indx = array_search($field[0],$colnames);
+					$indx = array_search($field[0], $colnames);
 					if ($indx !== FALSE) {
 						$fields[$indx] = $field[1];
 					}
 				} else { //format-parameter(s) present
-					PWFBrowse\Utils::FormatRecord($this,$field,$browsedata);
+					PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
 					if (!is_array($field[0])) {
-						$indx = array_search($field[0],$colnames);
+						$indx = array_search($field[0], $colnames);
 						if ($indx !== FALSE) {
 							$fields[$indx] = $field[1];
 						}
 					} else {
 						//output sequence-fields
 						foreach ($field[0] as $skey=>$sname) {
-							$indx = array_search($sname,$colnames);
+							$indx = array_search($sname, $colnames);
 							if ($indx !== FALSE) {
 								$fields[$indx] = $field[1][$skey];
 							}
@@ -102,18 +106,20 @@ $rows = array();
 			$oneset = new stdClass();
 			ksort($fields); //conform order to titles
 			$oneset->fields = $fields;
-			$oneset->view = $this->CreateLink($id,'browse_record','',$icon_view,
-				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
-			if ($pmod)
-			 $oneset->edit = $this->CreateLink($id,'browse_record','',$icon_edit,
-				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid,'edit'=>1));
-			$oneset->export = $this->CreateLink($id,'export_record','',$icon_export,
-				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid));
-			if ($pmod)
-			 $oneset->delete = $this->CreateLink($id,'delete_record','',$icon_delete,
-				array('record_id'=>$rid,'browser_id'=>$bid,'form_id'=>$fid),
+			$oneset->view = $this->CreateLink($id, 'browse_record', '', $icon_view,
+				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid));
+			if ($pmod) {
+				$oneset->edit = $this->CreateLink($id, 'browse_record', '', $icon_edit,
+				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid, 'edit'=>1));
+			}
+			$oneset->export = $this->CreateLink($id, 'export_record', '', $icon_export,
+				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid));
+			if ($pmod) {
+				$oneset->delete = $this->CreateLink($id, 'delete_record', '', $icon_delete,
+				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid),
 				$this->Lang('confirm_delete_record'));
-			$oneset->selected = $this->CreateInputCheckbox($id,'sel[]',$rid,-1);
+			}
+			$oneset->selected = $this->CreateInputCheckbox($id, 'sel[]', $rid, -1);
 			$rows[] = $oneset;
 		}
 	}
@@ -138,7 +144,7 @@ EOS;
   evenClass: 'row2',
   oddsortClass: 'row1s',
   evensortClass: 'row2s',
-  paginate: true,
+  paginate: TRUE,
   pagesize: {$pagerows},
   currentid: 'cpage',
   countid: 'tpage'
@@ -155,7 +161,7 @@ EOS;
   format: function(s,node) {
    return $.trim(node.childNodes[0].value);
   },
-  watch: true,
+  watch: TRUE,
   type: 'text'
  });
 EOS;
@@ -166,9 +172,10 @@ function select_all(cb) {
 }
 EOS;
 		$tplvars['header_checkbox'] =
-			$this->CreateInputCheckbox($id,'selectall',true,false,'onclick="select_all(this);"');
-	} else
+			$this->CreateInputCheckbox($id, 'selectall', TRUE, FALSE, 'onclick="select_all(this);"');
+	} else {
 		$tplvars['header_checkbox'] = NULL;
+	}
 
 	if ($pagerows && $rcount>$pagerows) {
 		//more setup for SSsort
@@ -178,11 +185,13 @@ EOS;
 		$choices = array(strval($pagerows) => $pagerows);
 		$f = ($pagerows < 4) ? 5 : 2;
 		$n = $pagerows * $f;
-		if ($n < $rcount)
+		if ($n < $rcount) {
 			$choices[strval($n)] = $n;
+		}
 		$n *= 2;
-		if ($n < $rcount)
+		if ($n < $rcount) {
 			$choices[strval($n)] = $n;
+		}
 		$choices[$this->Lang('all')] = 0;
 
 		$tplvars = $tplvars + array(
@@ -191,8 +200,8 @@ EOS;
 			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
 			'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
 			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
-			'pageof'=>$this->Lang('pageof',$curpg,$totpg),
-			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
+			'pageof'=>$this->Lang('pageof', $curpg, $totpg),
+			'rowchanger'=>$this->CreateInputDropdown($id, 'pagerows', $choices, -1, $pagerows, 'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
 		);
 
 		$jsfuncs[] = <<<'EOS'
@@ -232,25 +241,27 @@ function confirm_selected(msg) {
  }
 }
 EOS;
-	if ($this->_CheckAccess('view') || $this->_CheckAccess('admin'))
-		$tplvars['export'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
+	if ($this->_CheckAccess('view') || $this->_CheckAccess('admin')) {
+		$tplvars['export'] = $this->CreateInputSubmit($id, 'export', $this->Lang('export'),
 		'title="'.$this->Lang('tip_export_selected_records').
 		'"  onclick="return any_selected();"');
-	if ($pmod)
-		$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
+	}
+	if ($pmod) {
+		$tplvars['delete'] = $this->CreateInputSubmit($id, 'delete', $this->Lang('delete'),
 		'title="'.$this->Lang('tip_delete_selected_records').
 		'" onclick="return confirm_selected(\''.$this->Lang('confirm_delete_sel').'\');"');
+	}
 } else {
 	$tplvars['norecords'] = $this->Lang('norecords');
 }
 
 if ($pmod) {
 	$t = $this->Lang('title_add_record');
-	$icon_add = $theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon');
-	$tplvars['iconlinkadd'] = $this->CreateLink($id,'add_record','',$icon_add,
-			array('form_id'=>$fid,'browser_id'=>$bid));
-	$tplvars['textlinkadd'] = $this->CreateLink($id,'add_record','',$t,
-			array('form_id'=>$fid,'browser_id'=>$bid));
+	$icon_add = $theme->DisplayImage('icons/system/newobject.gif', $t, '', '', 'systemicon');
+	$tplvars['iconlinkadd'] = $this->CreateLink($id, 'add_record', '', $icon_add,
+			array('form_id'=>$fid, 'browser_id'=>$bid));
+	$tplvars['textlinkadd'] = $this->CreateLink($id, 'add_record', '', $t,
+			array('form_id'=>$fid, 'browser_id'=>$bid));
 }
 
 //replace href attribute in existing stylesheet link (early in page-processing)
@@ -267,12 +278,13 @@ $t = <<<EOS
 EOS;
 
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
 echo $t;
-echo PWFBrowse\Utils::ProcessTemplate($this,'browse_list.tpl',$tplvars);
-if ($jsall)
+echo PWFBrowse\Utils::ProcessTemplate($this, 'browse_list.tpl', $tplvars);
+if ($jsall) {
 	echo $jsall;
+}

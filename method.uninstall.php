@@ -8,22 +8,26 @@
 //NB caller must be very careful that top-level dir is valid!
 function delTree($dir)
 {
-	$files = array_diff(scandir($dir),array('.','..'));
+	$files = array_diff(scandir($dir), array('.', '..'));
 	if ($files) {
 		foreach ($files as $file) {
 			$fp = $dir.DIRECTORY_SEPARATOR.$file;
 			if (is_dir($fp)) {
-			 	if (!delTree($fp))
-					return false;
-			} else
+				if (!delTree($fp)) {
+					return FALSE;
+				}
+			} else {
 				unlink($fp);
+			}
 		}
 		unset($files);
 	}
 	return rmdir($dir);
 }
 
-if (!$this->_CheckAccess('admin')) exit;
+if (!$this->_CheckAccess('admin')) {
+	exit;
+}
 
 $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
@@ -53,9 +57,10 @@ $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
 	$upd = $this->GetPreference('uploads_dir');
 	if ($upd) {
-		$fp = cms_join_path($fp,$upd);
-		if ($fp && is_dir($fp))
+		$fp = cms_join_path($fp, $upd);
+		if ($fp && is_dir($fp)) {
 			delTree($fp);
+		}
 	}
 }
 // remove preferences
@@ -64,7 +69,7 @@ $this->RemovePreference();
 // remove disposer
 $pfmod = $this->GetModuleInstance('PWForms');
 if ($pfmod) {
-	$fp = cms_join_path($this->GetModulePath(),'lib','class.FormBrowser.php');
+	$fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');
 	$pfmod->DeregisterField($fp);
 	unset($pfmod);
 }

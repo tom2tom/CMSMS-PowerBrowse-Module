@@ -5,7 +5,7 @@
  * Note that this is not just straight encryption.  It also has a few other
  *  features in it to make the encrypted data far more secure.  Note that any
  *  other implementations used to decrypt data will have to do the same exact
- *  operations.  
+ *  operations.
  *
  * Security Benefits:
  *  Uses Key stretching
@@ -22,7 +22,7 @@
  * $data = $e->decrypt($encryptedData,$key);
  *
  * Requires:
- * mcrypt extension 
+ * mcrypt extension
  */
  
 namespace PWFBrowse;
@@ -64,8 +64,8 @@ class Encryption
 	 * @param string $data The encrypted datat to decrypt
 	 * @param string $key  The key to use for decryption
 	 *
-	 * @returns string|false The returned string if decryption is successful
-	 *						   false if it is not
+	 * @returns string|FALSE The returned string if decryption is successful
+	 *						   FALSE if it is not
 	 */
 	public function decrypt($data, $key)
 	{
@@ -73,10 +73,10 @@ class Encryption
 		$enc = substr($data, 128, -64);
 		$mac = substr($data, -64);
 
-		list ($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
+		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
 
-		if ($mac !== hash_hmac('sha512', $enc, $macKey, true)) {
-			 return false;
+		if ($mac !== hash_hmac('sha512', $enc, $macKey, TRUE)) {
+			return FALSE;
 		}
 
 		$dec = mcrypt_decrypt($this->cipher, $cipherKey, $enc, $this->mode, $iv);
@@ -88,7 +88,7 @@ class Encryption
 
 	/**
 	 * Encrypt the supplied data using the supplied key
-	 * 
+	 *
 	 * @param string $data The data to encrypt
 	 * @param string $key  The key to encrypt with
 	 *
@@ -97,13 +97,13 @@ class Encryption
 	public function encrypt($data, $key)
 	{
 		$salt = mcrypt_create_iv(128, MCRYPT_DEV_URANDOM);
-		list ($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
+		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
 
 		$data = $this->pad($data);
 
 		$enc = mcrypt_encrypt($this->cipher, $cipherKey, $data, $this->mode, $iv);
 
-		$mac = hash_hmac('sha512', $enc, $macKey, true);
+		$mac = hash_hmac('sha512', $enc, $macKey, TRUE);
 		return $salt . $enc . $mac;
 	}
 
@@ -144,15 +144,15 @@ class Encryption
 	 */
 	protected function pbkdf2($algo, $key, $salt, $rounds, $length)
 	{
-		$size   = strlen(hash($algo, '', true));
+		$size   = strlen(hash($algo, '', TRUE));
 		$len	= ceil($length / $size);
 		$result = '';
 		for ($i = 1; $i <= $len; $i++) {
-			$tmp = hash_hmac($algo, $salt . pack('N', $i), $key, true);
+			$tmp = hash_hmac($algo, $salt . pack('N', $i), $key, TRUE);
 			$res = $tmp;
 			for ($j = 1; $j < $rounds; $j++) {
-				 $tmp  = hash_hmac($algo, $tmp, $key, true);
-				 $res ^= $tmp;
+				$tmp  = hash_hmac($algo, $tmp, $key, TRUE);
+				$res ^= $tmp;
 			}
 			$result .= $res;
 		}
@@ -173,9 +173,11 @@ class Encryption
 	{
 		$length = mcrypt_get_block_size($this->cipher, $this->mode);
 		$last = ord($data[strlen($data) - 1]);
-		if ($last > $length) return false;
+		if ($last > $length) {
+			return FALSE;
+		}
 		if (substr($data, -1 * $last) !== str_repeat(chr($last), $last)) {
-			return false;
+			return FALSE;
 		}
 		return substr($data, 0, -1 * $last);
 	}

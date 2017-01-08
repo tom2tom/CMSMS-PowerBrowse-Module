@@ -26,10 +26,10 @@ class RecordContent
 	{
 		//insert fake field with read-only key and datetime marker
 		$store = array('_s'=>array(0=>$mod->Lang('title_submitted'),1=>$stamp,'dt'=>'')) + $data;
-		$cont = Utils::encrypt_value($mod,serialize($store));
+		$cont = Utils::encrypt_value($mod, serialize($store));
 		unset($store);
 		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,contents) VALUES (?,?,?)',
-			array($browser_id,$form_id,$cont));
+			array($browser_id, $form_id, $cont));
 	}
 
 	/**
@@ -54,11 +54,11 @@ class RecordContent
 				$stamp = time();
 				$store = array('_m'=>array(0=>$mod->Lang('title_modified'),1=>$stamp,'dt'=>'')) + $data;
 			}
-			$cont = Utils::encrypt_value($mod,serialize($store));
+			$cont = Utils::encrypt_value($mod, serialize($store));
 			unset($store);
 		}
 		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?',
-			array($cont,$record_id));
+			array($cont, $record_id));
 	}
 
 	/*
@@ -70,12 +70,13 @@ class RecordContent
 	public function Decrypt(&$mod, $source, $raw=FALSE)
 	{
 		if ($source) {
-			$decrypted = Utils::decrypt_value($mod,$source);
+			$decrypted = Utils::decrypt_value($mod, $source);
 			if ($decrypted) {
-				if ($raw)
+				if ($raw) {
 					return $decrypted;
-				else
+				} else {
 					return unserialize($decrypted);
+				}
 			}
 		}
 		return '';
@@ -94,15 +95,16 @@ class RecordContent
 	{
 		$data = Utils::SafeGet(
 		'SELECT contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
-			array($record_id),'one');
+			array($record_id), 'one');
 		if ($data) {
-			$browsedata = self::Decrypt($mod,$data);
-			if ($browsedata)
+			$browsedata = self::Decrypt($mod, $data);
+			if ($browsedata) {
 				return array(TRUE,$browsedata);
+			}
 			$errkey = 'error_data';
 		} else {
 			$errkey = 'error_database';
 		}
-		return array(FALSE,$mod->_PrettyMessage($errkey,FALSE));
+		return array(FALSE,$mod->_PrettyMessage($errkey, FALSE));
 	}
 }

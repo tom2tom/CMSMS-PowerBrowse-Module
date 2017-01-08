@@ -4,13 +4,16 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->_CheckAccess()) exit;
+if (!$this->_CheckAccess()) {
+	exit;
+}
 
 $funcs = new PWFBrowse\RecordExport();
-$res = $funcs->Export($this,$params['browser_id']);
-if ($res === TRUE)
+$res = $funcs->Export($this, $params['browser_id']);
+if ($res === TRUE) {
 	exit;
+}
 unset($funcs);
 
-$this->Redirect($id,'defaultadmin',$returnid,
-	array('message' => $this->_PrettyMessage($res,FALSE)));
+$this->Redirect($id, 'defaultadmin', $returnid,
+	array('message' => $this->_PrettyMessage($res, FALSE)));

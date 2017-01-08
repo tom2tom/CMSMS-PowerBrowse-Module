@@ -6,20 +6,21 @@
 
 //setup tabbed page to edit a browser's parameters
 
-$this->_BuildNav($id,$returnid,$params,$tplvars);
-if (!empty($params['message']))
+$this->_BuildNav($id, $returnid, $params, $tplvars);
+if (!empty($params['message'])) {
 	$tplvars['message'] = $params['message'];
+}
 $tab = $this->_GetActiveTab($params);
 $tplvars['tabs_start'] = $this->StartTabHeaders().
-	$this->SetTabHeader('maintab',$this->Lang('tab_main'),($tab == 'maintab')).
-	$this->SetTabHeader('listtab',$this->Lang('tab_list'),($tab == 'listtab')).
+	$this->SetTabHeader('maintab', $this->Lang('tab_main'), ($tab == 'maintab')).
+	$this->SetTabHeader('listtab', $this->Lang('tab_list'), ($tab == 'listtab')).
 	$this->EndTabHeaders() . $this->StartTabContent();
 
 $tplvars = $tplvars + array(
-	'start_form'=>$this->CreateFormStart($id,'open_browser',$returnid),
+	'start_form'=>$this->CreateFormStart($id, 'open_browser', $returnid),
 	'end_form'=>$this->CreateFormEnd(),
-	'hidden'=>$this->CreateInputHidden($id,'browser_id',$params['browser_id']).
-		$this->CreateInputHidden($id,'active_tab',''),
+	'hidden'=>$this->CreateInputHidden($id, 'browser_id', $params['browser_id']).
+		$this->CreateInputHidden($id, 'active_tab', ''),
 	'tabs_end'=>$this->EndTabContent(),
 	'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
 	'maintab_start'=>$this->StartTab('maintab'),
@@ -35,13 +36,13 @@ $baseurl = $this->GetModuleURLPath();
 //======= MAIN TAB ========
 
 $pre = cms_db_prefix();
-$row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?',array($params['browser_id']));
+$row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?', array($params['browser_id']));
 
 $tplvars = $tplvars + array(
 	'title_form_name'=>$this->Lang('title_form_name'),
 	'form_name'=>$row['form_name'],
 	'title_browser_name'=>$this->Lang('title_browser_name'),
-	'input_browser_name'=>$this->CreateInputText($id,'browser_name',$row['name'],50,256)
+	'input_browser_name'=>$this->CreateInputText($id, 'browser_name', $row['name'], 50, 256)
 );
 
 if ($this->GetPreference('owned_forms')) {
@@ -60,30 +61,30 @@ ORDER BY U.last_name,U.first_name
 EOS;
 	$rs = $db->Execute($sql);
 	if ($rs) {
-		while($urow = $rs->FetchRow())
-		{
+		while ($urow = $rs->FetchRow()) {
 			$name = trim($urow['first_name'].' '.$urow['last_name']);
-			if ($name == '')
+			if ($name == '') {
 				$name = trim($urow['username']);
+			}
 			$sel[$name] = (int)$urow['user_id'];
 		}
 		$rs->Close();
 	}
 	$tplvars['title_browser_owner'] = $this->Lang('title_browser_owner');
 	$tplvars['input_browser_owner'] =
-		$this->CreateInputDropdown($id,'browser_owner',$sel,-1,$row['owner']);
+		$this->CreateInputDropdown($id, 'browser_owner', $sel, -1, $row['owner']);
 }
 
 //======= DISPLAY TAB ========
 
 $tplvars['title_pagerows'] = $this->Lang('title_pagerows');
 $tplvars['input_pagerows'] =
-	$this->CreateInputText($id,'browser_pagerows',$row['pagerows'],5);
+	$this->CreateInputText($id, 'browser_pagerows', $row['pagerows'], 5);
 $tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
 $sql = 'SELECT field_id,name,shown,frontshown,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? ORDER BY order_by';
-$fields = $db->GetArray($sql,array($params['browser_id']));
+$fields = $db->GetArray($sql, array($params['browser_id']));
 if ($fields) {
 	$tplvars = $tplvars + array(
 		'title_data'=>$this->Lang('title_data'),
@@ -97,8 +98,8 @@ if ($fields) {
 	$mc = 0;
 	$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 		cms_utils::get_theme_object();
-	$iconup = $theme->DisplayImage('icons/system/arrow-u.gif',$this->Lang('up'),'','','systemicon');
-	$icondn = $theme->DisplayImage('icons/system/arrow-d.gif',$this->Lang('down'),'','','systemicon');
+	$iconup = $theme->DisplayImage('icons/system/arrow-u.gif', $this->Lang('up'), '', '', 'systemicon');
+	$icondn = $theme->DisplayImage('icons/system/arrow-d.gif', $this->Lang('down'), '', '', 'systemicon');
 
 	$formatted = array();
 	foreach ($fields as &$one) {
@@ -106,18 +107,19 @@ if ($fields) {
 		$oneset = new stdClass();
 		$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
 		$oneset->name = $one['name'];
-		$oneset->display = $this->CreateInputCheckbox($id,'shown[]',$fid,(($one['shown'])?$fid:-1));
-		$oneset->front = $this->CreateInputCheckbox($id,'frontshown[]',$fid,(($one['frontshown'])?$fid:-1));
-		$oneset->sort = $this->CreateInputCheckbox($id,'sortable[]',$fid,(($one['sorted'])?$fid:-1));
+		$oneset->display = $this->CreateInputCheckbox($id, 'shown[]', $fid, (($one['shown'])?$fid:-1));
+		$oneset->front = $this->CreateInputCheckbox($id, 'frontshown[]', $fid, (($one['frontshown'])?$fid:-1));
+		$oneset->sort = $this->CreateInputCheckbox($id, 'sortable[]', $fid, (($one['sorted'])?$fid:-1));
 		$oneset->down = '';
 		if ($mc) {
 			//there's a previous item,create the appropriate links
-			$oneset->up = $this->CreateLink($id,'move_field',$returnid,
-				$iconup,array('field_id'=>$fid,'prev_id'=>$previd));
-			$formatted[($mc-1)]->down = $this->CreateLink($id,'move_field',$returnid,
-				$icondn,array('field_id'=>$previd,'next_id'=>$fid));
-		} else
+			$oneset->up = $this->CreateLink($id, 'move_field', $returnid,
+				$iconup, array('field_id'=>$fid, 'prev_id'=>$previd));
+			$formatted[($mc-1)]->down = $this->CreateLink($id, 'move_field', $returnid,
+				$icondn, array('field_id'=>$previd, 'next_id'=>$fid));
+		} else {
 			$oneset->up = '';
+		}
 		$mc++;
 		$previd = $fid; //i.e. always set before use
 		$formatted[] = $oneset;
@@ -165,32 +167,32 @@ function select_all(cb) {
  var keep,target,boxes,st;
  switch (cb.name) {
   case '{$id}allshow':
-    keep = true;
-    target = 'shown[]';
-    break;
+	keep = true;
+	target = 'shown[]';
+	break;
   case '{$id}allfshow':
-    keep = true;
-    target = 'frontshown[]';
-    break;
+	keep = true;
+	target = 'frontshown[]';
+	break;
   case '{$id}allsort':
-    keep = false;
-    target = 'sortable[]';
-    break;
+	keep = false;
+	target = 'sortable[]';
+	break;
   default:
-    return;
+	return;
  }
  boxes = $('#listfields > tbody').find('input[name="{$id}'+target+'"]');
  st = cb.checked;
  boxes.attr('checked',st);
  if (keep && !st) {
-  $(boxes[0]).attr('checked',true);
+  $(boxes[0]).attr('checked',TRUE);
  }
 }
 EOS;
 		$tplvars = $tplvars + array(
-			'select_all1'=>$this->CreateInputCheckbox($id,'allshow',true,false,'onclick="select_all(this);"'),
-			'select_all2'=>$this->CreateInputCheckbox($id,'allfshow',true,false,'onclick="select_all(this);"'),
-			'select_all3'=>$this->CreateInputCheckbox($id,'allsort',true,false,'onclick="select_all(this);"'),
+			'select_all1'=>$this->CreateInputCheckbox($id, 'allshow', TRUE, FALSE, 'onclick="select_all(this);"'),
+			'select_all2'=>$this->CreateInputCheckbox($id, 'allfshow', TRUE, FALSE, 'onclick="select_all(this);"'),
+			'select_all3'=>$this->CreateInputCheckbox($id, 'allsort', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'help_order'=>$this->Lang('help_order'),
 			'help_dnd'=>$this->Lang('help_dnd')
 		);
@@ -210,7 +212,7 @@ function set_tab() {
 EOS;
 
 $tplvars = $tplvars + array(
-	'save'=>$this->CreateInputSubmit($id,'submit',$this->Lang('save'),'onclick="set_tab();"'),
-	'apply'=>$this->CreateInputSubmit($id,'apply',$this->Lang('apply'),'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
-	'cancel'=>$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'),'onclick="set_tab();"')
+	'save'=>$this->CreateInputSubmit($id, 'submit', $this->Lang('save'), 'onclick="set_tab();"'),
+	'apply'=>$this->CreateInputSubmit($id, 'apply', $this->Lang('apply'), 'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
+	'cancel'=>$this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'), 'onclick="set_tab();"')
 );

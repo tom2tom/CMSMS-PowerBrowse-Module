@@ -18,14 +18,15 @@ class RecordExport
 	public function ExportName(&$mod, $browser_id=FALSE, $record_id=FALSE)
 	{
 		if (!$browser_id) {
-			if (is_array($record_id))
+			if (is_array($record_id)) {
 				$rid = reset($record_id);
-			else
+			} else {
 				$rid = $record_id;
+			}
 			$browser_id = Utils::GetBrowserIDForRecord($rid);
 		}
 		$bname = Utils::GetBrowserNameFromID($browser_id);
-		$sname = preg_replace('/\W/','_',$bname);
+		$sname = preg_replace('/\W/', '_', $bname);
 		$datestr = date('Y-m-d-H-i');
 		return $mod->GetName().$mod->Lang('export').'-'.$sname.'-'.$datestr.'.csv';
 	}
@@ -53,25 +54,29 @@ class RecordExport
 		$pre = \cms_db_prefix();
 		if ($browser_id) {
 			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY record_id';
-			$all = Utils::SafeGet($sql,array($browser_id),'col');
+			$all = Utils::SafeGet($sql, array($browser_id), 'col');
 		} elseif ($record_id) {
-			if (is_array($record_id))
+			if (is_array($record_id)) {
 				$all = $record_id;
-			else
+			} else {
 				$all = array($record_id);
-		} else
+			}
+		} else {
 			return FALSE;
+		}
 
-		if ($fp && ini_get ('mbstring.internal_encoding') !== FALSE) { //send to file, and conversion is possible
+		if ($fp && ini_get('mbstring.internal_encoding') !== FALSE) { //send to file, and conversion is possible
 			$config = \cmsms()->GetConfig();
-			if (!empty($config['default_encoding']))
+			if (!empty($config['default_encoding'])) {
 				$defchars = trim($config['default_encoding']);
-			else
+			} else {
 				$defchars = 'UTF-8';
-			$expchars = $mod->GetPreference('export_file_encoding','ISO-8859-1');
-			$convert = (strcasecmp ($expchars,$defchars) != 0);
-		} else
+			}
+			$expchars = $mod->GetPreference('export_file_encoding', 'ISO-8859-1');
+			$convert = (strcasecmp($expchars, $defchars) != 0);
+		} else {
 			$convert = FALSE;
+		}
 
 		$sep2 = ($sep != ' ')?' ':',';
 		switch ($sep) {
@@ -94,57 +99,64 @@ class RecordExport
 		if ($all) {
 			$funcs = new RecordContent();
 			//header line
-			list($res,$browsedata) = $funcs->Load($mod,$pre,$all[0]);
-			if (!$res)
-				return FALSE; //TODO report message
+			list($res, $browsedata) = $funcs->Load($mod, $pre, $all[0]);
+			if (!$res) {
+				return FALSE;
+			} //TODO report message
 			$names = array();
 			foreach ($browsedata as &$one) {
 				$fn = $one[0];
-				if ($strip)
+				if ($strip) {
 					$fn = strip_tags($fn);
+				}
 //TODO don't repeat names for sequences
-				$names[] = str_replace($sep,$r,$fn);
+				$names[] = str_replace($sep, $r, $fn);
 			}
 			unset($one);
 			if ($names) {
-				$outstr = implode($sep,$names);
+				$outstr = implode($sep, $names);
 				$outstr .= PHP_EOL;
-			} else
+			} else {
 				return FALSE;
+			}
 			//data lines(s)
 			foreach ($all as $one) {
-				list($res,$browsedata) = $funcs->Load($mod,$pre,$one);
-				if (!$res)
-					continue;	//decryption error
+				list($res, $browsedata) = $funcs->Load($mod, $pre, $one);
+				if (!$res) {
+					continue;
+				}	//decryption error
 				$vals = array();
 				foreach ($browsedata as $field) { //$key unused
 					if (count($field) == 2) {
 						$fv = $field[1];
-						if ($strip)
+						if ($strip) {
 							$fv = strip_tags($fv);
-						$fv = str_replace($sep,$r,$fv);
-						$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+						}
+						$fv = str_replace($sep, $r, $fv);
+						$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 					} else { //format-parameter(s) present
-						PWFBrowse\Utils::FormatRecord($this,$field,$browsedata,FALSE);
+						PWFBrowse\Utils::FormatRecord($this, $field, $browsedata, FALSE);
 						if (!is_array($field[0])) {
 							$fv = $field[1];
-							if ($strip)
+							if ($strip) {
 								$fv = strip_tags($fv);
-							$fv = str_replace($sep,$r,$fv);
-							$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+							}
+							$fv = str_replace($sep, $r, $fv);
+							$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 						} else {
 							//output sequence-fields
 							foreach ($field[0] as $skey=>$sname) {
 								$fv = $field[1][$skey];
-								if ($strip)
+								if ($strip) {
 									$fv = strip_tags($fv);
-								$fv = str_replace($sep,$r,$fv);
-								$vals[] = preg_replace('/[\n\t\r]/',$sep2,$fv);
+								}
+								$fv = str_replace($sep, $r, $fv);
+								$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 							}
 						}
 					}
 				}
-				$outstr .= implode($sep,$vals);
+				$outstr .= implode($sep, $vals);
 				$outstr .= PHP_EOL;
 				if ($fp) {
 					if ($convert) {
@@ -157,25 +169,28 @@ class RecordExport
 					$outstr = '';
 				}
 			}
-			if ($fp)
+			if ($fp) {
 				return TRUE;
-			else
-				return $outstr; //encoding conversion upstream
+			} else {
+				return $outstr;
+			} //encoding conversion upstream
 		} else {
 			//no data, produce just a header line
 			$sql = 'SELECT name FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
-			$names = $db->GetCol($sql,array($params['browser_id']));
+			$names = $db->GetCol($sql, array($params['browser_id']));
 			//cleanup messy field-names
 			foreach ($names as $i => &$one) {
-				if ($strip)
+				if ($strip) {
 					$one = strip_tags($one);
-				$one = str_replace($sep,$r,$one);
+				}
+				$one = str_replace($sep, $r, $one);
 			}
 			unset($one);
 
-			$outstr = str_replace($sep,$r,$mod->Lang('title_submitted'));
-			if ($names)
-				$outstr .= $sep.implode($sep,$names);
+			$outstr = str_replace($sep, $r, $mod->Lang('title_submitted'));
+			if ($names) {
+				$outstr .= $sep.implode($sep, $names);
+			}
 			$outstr .= PHP_EOL;
 
 			if ($fp) {
@@ -203,17 +218,18 @@ class RecordExport
 	*/
 	public function Export(&$mod, $browser_id=FALSE, $record_id=FALSE, $sep = ',')
 	{
-		if (!($browser_id || $record_id))
+		if (!($browser_id || $record_id)) {
 			return 'error_system';
-		$fname = $this->ExportName($mod,$browser_id,$record_id);
+		}
+		$fname = $this->ExportName($mod, $browser_id, $record_id);
 
 		if ($mod->GetPreference('export_file')) {
 			$updir = Utils::GetUploadsPath($mod);
 			if ($updir) {
 				$filepath = $updir.DIRECTORY_SEPARATOR.$fname;
-				$fp = fopen($filepath,'w');
+				$fp = fopen($filepath, 'w');
 				if ($fp) {
-					$success = $this->CSV($mod,$browser_id,$record_id,$fp,$sep);
+					$success = $this->CSV($mod, $browser_id, $record_id, $fp, $sep);
 					fclose($fp);
 					if ($success) {
 						$url = Utils::GetUploadsUrl($mod).'/'.$fname;
@@ -225,17 +241,18 @@ class RecordExport
 				}
 			}
 		} else {
-			$csv = $this->CSV($mod,$browser_id,$record_id,FALSE,$sep);
+			$csv = $this->CSV($mod, $browser_id, $record_id, FALSE, $sep);
 			if ($csv) {
 				$config = \cmsms()->GetConfig();
-				if (!empty($config['default_encoding']))
+				if (!empty($config['default_encoding'])) {
 					$defchars = trim($config['default_encoding']);
-				else
+				} else {
 					$defchars = 'UTF-8';
+				}
 
 				if (ini_get('mbstring.internal_encoding') !== FALSE) { //conversion is possible
-					$expchars = $mod->GetPreference('export_file_encoding','ISO-8859-1');
-					$convert = (strcasecmp ($expchars,$defchars) != 0);
+					$expchars = $mod->GetPreference('export_file_encoding', 'ISO-8859-1');
+					$convert = (strcasecmp($expchars, $defchars) != 0);
 				} else {
 					$expchars = $defchars;
 					$convert = FALSE;
@@ -246,16 +263,17 @@ class RecordExport
 				header('Pragma: public');
 				header('Expires: 0');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Cache-Control: private',FALSE);
+				header('Cache-Control: private', FALSE);
 				header('Content-Description: File Transfer');
 				//note: some older HTTP/1.0 clients did not deal properly with an explicit charset parameter
 				header('Content-Type: text/csv; charset='.$expchars);
 				header('Content-Length: '.strlen($csv));
 				header('Content-Disposition: attachment; filename='.$fname);
-				if ($convert)
-					echo mb_convert_encoding($csv,$expchars,$defchars);
-				else
+				if ($convert) {
+					echo mb_convert_encoding($csv, $expchars, $defchars);
+				} else {
 					echo $csv;
+				}
 				return TRUE;
 			}
 		}

@@ -4,24 +4,26 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-if (!$this->_CheckAccess('modify')) exit;
+if (!$this->_CheckAccess('modify')) {
+	exit;
+}
 
 if (isset($params['cancel'])) {
 	unset($params);
-	$this->Redirect($id,'defaultadmin');
+	$this->Redirect($id, 'defaultadmin');
 } elseif (isset($params['submit'])) {
 	$funcs = new PWFBrowse\BrowserTasks();
-	$funcs->StoreBrowser($this,$params);
+	$funcs->StoreBrowser($this, $params);
 	unset($funcs);
-	$message = $this->Lang('browser2','\''.$params['browser_name'].'\'',$this->Lang('saved'));
+	$message = $this->Lang('browser2', '\''.$params['browser_name'].'\'', $this->Lang('saved'));
 	unset($params);
-	$this->Redirect($id,'defaultadmin','',array(
-		'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
+	$this->Redirect($id, 'defaultadmin', '', array(
+		'message'=>$this->_PrettyMessage($message, TRUE, FALSE)));
 } elseif (isset($params['apply'])) {
 	$funcs = new PWFBrowse\BrowserTasks();
-	$funcs->StoreBrowser($this,$params);
-	$message = $this->Lang('browser1',$this->Lang('updated'));
-	$params['message'] = $this->_PrettyMessage($message,TRUE,FALSE);
+	$funcs->StoreBrowser($this, $params);
+	$message = $this->Lang('browser1', $this->Lang('updated'));
+	$params['message'] = $this->_PrettyMessage($message, TRUE, FALSE);
 }
 
 $tplvars = array();
@@ -29,12 +31,13 @@ $tplvars = array();
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.browser.php';
 
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
-echo PWFBrowse\Utils::ProcessTemplate($this,'open_browser.tpl',$tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this, 'open_browser.tpl', $tplvars);
 
-if ($jsall)
+if ($jsall) {
 	echo $jsall;
+}

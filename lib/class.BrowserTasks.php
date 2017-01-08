@@ -42,19 +42,20 @@ class BrowserTasks
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$browser_id = (int)$params['browser_id'];
-		if (isset($params['browser_owner']))
+		if (isset($params['browser_owner'])) {
 			$owner = (int)$params['browser_owner'];
-		else
+		} else {
 			$owner = 0;
+		}
 		$sql = 'UPDATE '.$pre.'module_pwbr_browser SET name=?,owner=?,pagerows=? WHERE browser_id=?';
 		$db->Execute($sql,
-			array(trim($params['browser_name']),$owner,(int)$params['browser_pagerows'],$browser_id));
+			array(trim($params['browser_name']), $owner, (int)$params['browser_pagerows'], $browser_id));
 		$sql = 'UPDATE '.$pre.'module_pwbr_field set shown=?,frontshown=?,sorted=?,order_by=? WHERE field_id=?';
 		foreach ($params['orders'] as $indx=>$fid) {
-			$show = isset($params['shown']) && in_array($fid,$params['shown']);
-			$fshow = isset($params['frontshown']) && in_array($fid,$params['frontshown']);
-			$sort = isset($params['sortable']) && in_array($fid,$params['sortable']);
-			$db->Execute($sql,array($show,$fshow,$sort,$indx+1,$fid));
+			$show = isset($params['shown']) && in_array($fid, $params['shown']);
+			$fshow = isset($params['frontshown']) && in_array($fid, $params['frontshown']);
+			$sort = isset($params['sortable']) && in_array($fid, $params['sortable']);
+			$db->Execute($sql, array($show, $fshow, $sort, $indx+1, $fid));
 		}
 	}
 
@@ -69,11 +70,13 @@ class BrowserTasks
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
-		if (!$db->Execute($sql, array($browser_id)))
+		if (!$db->Execute($sql, array($browser_id))) {
 			return FALSE;
+		}
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-		if (!Utils::SafeExec($sql, array($browser_id)))
+		if (!Utils::SafeExec($sql, array($browser_id))) {
 			return FALSE;
+		}
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_field WHERE browser_id=?';
 		$db->Execute($sql, array($browser_id));
 		return TRUE;
@@ -90,10 +93,10 @@ class BrowserTasks
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
-		$formname = Utils::GetFormNameFromID($params['form_id'],FALSE);
+		$formname = Utils::GetFormNameFromID($params['form_id'], FALSE);
 		$db->Execute('INSERT INTO '.$pre.
 	'module_pwbr_browser (browser_id,form_id,name,form_name) VALUES (?,?,?,?)',
-			array($newid,$params['form_id'],$params['name'],$formname));
+			array($newid, $params['form_id'], $params['name'], $formname));
 		$funcs = new FormsIface();
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
@@ -101,15 +104,15 @@ class BrowserTasks
 (browser_id,name,shown,frontshown,sorted,order_by) VALUES (?,?,?,?,?,?)';
 			//record fake fields
 			$fieldname = $mod->Lang('title_submitted');
-			$db->Execute($sql,array($newid,$fieldname,1,0,1,1,0));
+			$db->Execute($sql, array($newid, $fieldname, 1, 0, 1, 1, 0));
 			$fieldname = $mod->Lang('title_modified');
-			$db->Execute($sql,array($newid,$fieldname,0,0,1,2,0));
+			$db->Execute($sql, array($newid, $fieldname, 0, 0, 1, 2, 0));
 			$ord = 3;
 			foreach ($list as &$fieldname) {
 				//arbitrary choice about display parameters, here
 				$show = ($ord < 8);
 				$sort = ($ord < 5);
-				$db->Execute($sql,array($newid,$fieldname,$show,$sort,$ord));
+				$db->Execute($sql, array($newid, $fieldname, $show, $sort, $ord));
 				$ord++;
 			}
 			unset($fieldname);
@@ -130,16 +133,16 @@ class BrowserTasks
 		$browser_id = (int)$params['browser_id'];
 		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
 
-		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?',array($browser_id));
+		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?', array($browser_id));
 		$row['browser_id'] = $newid;
 		$row['name'] =  (empty($params['browser_name'])) ?
 			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy'):
 			trim($params['browser_name']);
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser
-VALUES (?,?,?,?,?,?,?)',array_values($row));
+VALUES (?,?,?,?,?,?,?)', array_values($row));
 
 		$list = $db->GetArray('SELECT browser_id,name,shown,frontshown,sorted,order_by FROM '.
-			$pre.'module_pwbr_field WHERE browser_id=?',array($browser_id));
+			$pre.'module_pwbr_field WHERE browser_id=?', array($browser_id));
 		if ($list) {
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_field
 (browser_id,name,shown,frontshown,sorted,order_by) VALUES (?,?,?,?,?,?)';
@@ -147,9 +150,8 @@ VALUES (?,?,?,?,?,?,?)',array_values($row));
 				$row['browser_id'] = $newid;
 //				$row['shown'] = 1;
 //				$row['frontshown'] = 0;
-				$db->Execute($sql,array_values($row));
+				$db->Execute($sql, array_values($row));
 			}
 		}
 	}
-
 }

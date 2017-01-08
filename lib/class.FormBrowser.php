@@ -14,7 +14,7 @@ class FormBrowser extends FieldBase
 
 	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HideLabel = TRUE;
@@ -36,10 +36,11 @@ class FormBrowser extends FieldBase
 	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Form Browser]'; //by convention, not translated
-		if ($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function GetDisplayType()
@@ -49,7 +50,7 @@ class FormBrowser extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,FALSE,FALSE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -66,10 +67,11 @@ class FormBrowser extends FieldBase
 				//TODO other presentation control(s) if relevant
 				if ($obfld->IsTimeStamp) {
 					if ($obfld->ShowDate) {
-						if ($obfld->ShowTime)
+						if ($obfld->ShowTime) {
 							$save['dt'] = '';
-						else
+						} else {
 							$save['d'] = '';
+						}
 					} elseif ($obfld->ShowTime) {
 						$save['t'] = '';
 					} else {
@@ -78,7 +80,7 @@ class FormBrowser extends FieldBase
 				} elseif ($obfld->IsSequence) {
 					$save[0] = ''; //nothing displayed for these
 					$save[1] = '';
-					if($obfld->Type == 'SequenceStart') {
+					if ($obfld->Type == 'SequenceStart') {
 						$save['_ss'] = '';
 					} elseif ($obfld->LastBreak) {
 						$save['_se'] = ''; //final 'SequenceEnd'
@@ -95,15 +97,15 @@ class FormBrowser extends FieldBase
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 			$db = \cmsms()->GetDb();
 			$form_id = $this->formdata->Id;
-			$browsers = $db->GetCol($sql,array($form_id)); //TODO support high-load
+			$browsers = $db->GetCol($sql, array($form_id)); //TODO support high-load
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
 				$funcs = new \PWFBrowse\RecordContent();
 				foreach ($browsers as $browser_id) {
-					$funcs->Insert($this->mymodule,$pre,$browser_id,$form_id,$stamp,$browsedata);
+					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata);
 				}
 			} else {
-				return array(FALSE,$this->formdata->formsmodule->Lang('missing_type','browser for form')); //TODO lang
+				return array(FALSE,$this->formdata->formsmodule->Lang('missing_type', 'browser for form')); //TODO lang
 			}
 		}
 		return array(TRUE,'');
@@ -111,7 +113,7 @@ class FormBrowser extends FieldBase
 
 	public function __toString()
 	{
- 		$ob = $this->mymodule;
+		$ob = $this->mymodule;
 		$this->mymodule = NULL;
 		$ret = parent::__toString();
 		$this->mymodule = $ob;

@@ -27,41 +27,40 @@ class PWFBrowse extends CMSModule
 		parent::__construct();
 		$this->havemcrypt = function_exists('mcrypt_encrypt');
 		global $CMS_VERSION;
-		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
+		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
 
-//		spl_autoload_register(array($this,'cmsms_spacedload'));
-		if (!function_exists('cmsms_spacedload')) {
-			require __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'CMSMSSpacedClassLoader.php';
-			spl_autoload_register('cmsms_spacedload');
+		spl_autoload_register(array($this, 'cmsms_spacedload'));
+	}
+
+	public function __destruct()
+	{
+		spl_autoload_unregister(array($this, 'cmsms_spacedload'));
+		if (function_exists('parent::__destruct')) {
+			parent::__destruct();
 		}
 	}
 
-/*	public function __destruct()
-	{
-		spl_autoload_unregister(array($this,'cmsms_spacedload'));
-		if (function_exists('parent::__destruct'))
-			parent::__destruct();
-	}
-*/
 	/* namespace autoloader - CMSMS default autoloader doesn't do spacing */
-/*	private function cmsms_spacedload($class)
+	private function cmsms_spacedload($class)
 	{
 		$prefix = get_class().'\\'; //our namespace prefix
 		// ignore if $class doesn't have that
-		if (($p = strpos($class,$prefix)) === FALSE)
+		if (($p = strpos($class, $prefix)) === FALSE) {
 			return;
-		if (!($p === 0 || ($p === 1 && $class[0] == '\\')))
+		}
+		if (!($p === 0 || ($p === 1 && $class[0] == '\\'))) {
 			return;
+		}
 		// get the relative class name
 		$len = strlen($prefix);
 		if ($class[0] == '\\') {
 			$len++;
 		}
-		$relative_class = trim(substr($class,$len),'\\');
-		if (($p = strrpos($relative_class,'\\',-1)) !== FALSE) {
-			$relative_dir = str_replace('\\',DIRECTORY_SEPARATOR,$relative_class);
-			$base = substr($relative_dir,$p+1);
-			$relative_dir = substr($relative_dir,0,$p).DIRECTORY_SEPARATOR;
+		$relative_class = trim(substr($class, $len), '\\');
+		if (($p = strrpos($relative_class, '\\', -1)) !== FALSE) {
+			$relative_dir = str_replace('\\', DIRECTORY_SEPARATOR, $relative_class);
+			$base = substr($relative_dir, $p+1);
+			$relative_dir = substr($relative_dir, 0, $p).DIRECTORY_SEPARATOR;
 		} else {
 			$base = $relative_class;
 			$relative_dir = '';
@@ -73,11 +72,12 @@ class PWFBrowse extends CMSModule
 			include $fp;
 		} elseif ($relative_dir) {
 			$fp = $bp.$base.'.php';
-			if (file_exists($fp))
+			if (file_exists($fp)) {
 				include $fp;
+			}
 		}
 	}
-*/
+
 	public function AllowAutoInstall()
 	{
 		return FALSE;
@@ -106,14 +106,15 @@ class PWFBrowse extends CMSModule
 
 	public function GetHelp()
 	{
-		$fp = cms_join_path(dirname(__FILE__),'css','list-view.css');
+		$fp = cms_join_path(dirname(__FILE__), 'css', 'list-view.css');
 		$cont = @file_get_contents($fp);
 		if ($cont) {
-			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm','~\s?//.*$~m'),array('',''),$cont);
-			$example = str_replace(array(PHP_EOL.PHP_EOL,PHP_EOL,"\t"),array('<br />','<br />',' '),trim($example));
-		} else
+			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm', '~\s?//.*$~m'), array('', ''), $cont);
+			$example = str_replace(array(PHP_EOL.PHP_EOL, PHP_EOL, "\t"), array('<br />', '<br />', ' '), trim($example));
+		} else {
 			$example = $this->Lang('error_missing');
-		return $this->Lang('help_module',$example);
+		}
+		return $this->Lang('help_module', $example);
 	}
 
 	public function GetVersion()
@@ -133,7 +134,7 @@ class PWFBrowse extends CMSModule
 
 	public function GetChangeLog()
 	{
-		$fn = cms_join_path(dirname(__FILE__),'include','changelog.inc');
+		$fn = cms_join_path(dirname(__FILE__), 'include', 'changelog.inc');
 		return ''.@file_get_contents($fn);
 	}
 
@@ -213,10 +214,11 @@ EOS;
 	public function SuppressAdminOutput(&$request)
 	{
 		if (isset($_SERVER['QUERY_STRING'])) {
-//$adbg = $_SERVER;
+			//$adbg = $_SERVER;
 //$this->Crash();
-			if (strpos($_SERVER['QUERY_STRING'],'export') !== FALSE)
+			if (strpos($_SERVER['QUERY_STRING'], 'export') !== FALSE) {
 				return TRUE;
+			}
 		}
 /*		if (isset($request['mact'])) {
 			if (strpos($request['mact'],',export'))//export_browser or export_record
@@ -250,15 +252,15 @@ EOS;
 	{
 		$this->RegisterModulePlugin(TRUE);
 		$this->RestrictUnknownParams();
-		$this->SetParameterType('browser',CLEAN_STRING);
-		$this->SetParameterType('browser_id',CLEAN_INT);
+		$this->SetParameterType('browser', CLEAN_STRING);
+		$this->SetParameterType('browser_id', CLEAN_INT);
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
 	public function InitializeAdmin()
 	{
 		//document only the parameters relevant for external (page-tag) usage
-		$this->CreateParameter('browser','',$this->Lang('help_browser'),FALSE);
+		$this->CreateParameter('browser', '', $this->Lang('help_browser'), FALSE);
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
@@ -268,8 +270,12 @@ EOS;
 		switch ($permission) {
 		 case '':  // any module permission
 			$allow = $this->CheckPermission('ViewPwFormData');
-			if (!$allow) $allow = $this->CheckPermission('ModifyPwFormData');
-			if (!$allow) $allow = $this->CheckPermission('ModifyPwBrowsers');
+			if (!$allow) {
+				$allow = $this->CheckPermission('ModifyPwFormData');
+			}
+			if (!$allow) {
+				$allow = $this->CheckPermission('ModifyPwBrowsers');
+			}
 			break;
 		 case 'view':
 			$allow = $this->CheckPermission('ViewPwFormData');
@@ -290,15 +296,15 @@ EOS;
 	public function _PrettyMessage($text, $success=TRUE, $key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
-		if ($success)
+		if ($success) {
 			return $this->ShowMessage($base);
-		else {
+		} else {
 			$msg = $this->ShowErrors($base);
 			//strip the link
-			$pos = strpos($msg,'<a href=');
-			$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
-			$pos = strpos($msg,'</a>',$pos);
-			$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
+			$pos = strpos($msg, '<a href=');
+			$part1 = ($pos !== FALSE) ? substr($msg, 0, $pos) : '';
+			$pos = strpos($msg, '</a>', $pos);
+			$part2 = ($pos !== FALSE) ? substr($msg, $pos+4) : $msg;
 			$msg = $part1.$part2;
 			return $msg;
 		}
@@ -306,10 +312,11 @@ EOS;
 
 	public function _GetActiveTab(&$params)
 	{
-		if (!empty($params['active_tab']))
+		if (!empty($params['active_tab'])) {
 			return $params['active_tab'];
-		else
+		} else {
 			return 'maintab';
+		}
 	}
 
 	public function _BuildNav($id, $returnid, &$params, &$tplvars)
@@ -317,8 +324,8 @@ EOS;
 		$navstr = $this->CreateLink($id, 'defaultadmin', $returnid,
 		'&#171; '.$this->Lang('module_nav'));
 		if (isset($params['browser_id']) && isset($params['form_id']) && isset($params['record_id'])) {
-			$navstr .= ' '.$this->CreateLink($id,'browse_list',$returnid,
-			'&#171; '.$this->Lang('title_records'),array(
+			$navstr .= ' '.$this->CreateLink($id, 'browse_list', $returnid,
+			'&#171; '.$this->Lang('title_records'), array(
 			'form_id'=>$params['form_id'],
 			'browser_id'=>$params['browser_id']));
 		}

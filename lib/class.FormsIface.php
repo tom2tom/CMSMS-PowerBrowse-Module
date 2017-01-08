@@ -38,7 +38,7 @@ SELECT field_id,name,type FROM {$pre}module_pwf_field
 WHERE form_id=? ORDER BY order_by
 EOS;
 		$db = \cmsms()->GetDb();
-		$all = $db->GetAssoc($sql,array($form_id));
+		$all = $db->GetAssoc($sql, array($form_id));
 		$result = array();
 		if ($all) {
 			$mod = \cms_utils::get_module('PWForms');
@@ -46,9 +46,10 @@ EOS;
 			$params = array();
 			foreach ($all as $key=>&$row) {
 				$classPath = 'PWForms\\'.$row['type'];
-				$fld = new $classPath($dummy,$params);
-				if ($fld->IsInput || $fld->DisplayExternal) //TODO check
+				$fld = new $classPath($dummy, $params);
+				if ($fld->IsInput || $fld->DisplayExternal) { //TODO check
 					$result[$key] = $row['name'];
+				}
 				unset($fld);
 			}
 			unset($row);

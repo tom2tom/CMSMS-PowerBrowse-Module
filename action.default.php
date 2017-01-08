@@ -9,26 +9,29 @@ $pre = \cms_db_prefix();
 
 if (isset($params['browser'])) {
 	$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE name=?';
-	$bid = $db->GetOne($sql,array($params['browser']));
+	$bid = $db->GetOne($sql, array($params['browser']));
 } elseif (isset($params['browser_id'])) {
 	$bid = (int)$params['browser_id'];
 }
 
 $tplvars = array();
 
-if (!empty($params['message']))
+if (!empty($params['message'])) {
 	$tplvars['message'] = $params['message'];
+}
 
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
-$data = $db->GetRow($sql,array($bid));
+$data = $db->GetRow($sql, array($bid));
 $tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND frontshown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql,array($bid));
-$colnames = array_column($data,'name');
-$colsorts = array_map(function($v){ return (int)$v; },array_column($data,'sorted'));
+$data = PWFBrowse\Utils::SafeGet($sql, array($bid));
+$colnames = array_column($data, 'name');
+$colsorts = array_map(function ($v) {
+	return (int)$v;
+}, array_column($data, 'sorted'));
 $tplvars['colnames'] = $colnames;
 $tplvars['colsorts'] = $colsorts;
 
@@ -39,32 +42,32 @@ $jsloads = array();
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql,array($bid),'col');
+$data = PWFBrowse\Utils::SafeGet($sql, array($bid), 'col');
 $rows = array();
 //if ($data) {
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as $stored) {
 		$fields = array();
-		$browsedata = $funcs->Decrypt($this,$stored);
+		$browsedata = $funcs->Decrypt($this, $stored);
 		if ($browsedata) {
 			//include data for fields named in $colnames
 			foreach ($browsedata as $field) { //$key unused
 				if (count($field) == 2) {
-					$indx = array_search($field[0],$colnames);
+					$indx = array_search($field[0], $colnames);
 					if ($indx !== FALSE) {
 						$fields[$indx] = $field[1];
 					}
 				} else { //format-parameter(s) present
-					PWFBrowse\Utils::FormatRecord($this,$field,$browsedata);
+					PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
 					if (!is_array($field[0])) {
-						$indx = array_search($field[0],$colnames);
+						$indx = array_search($field[0], $colnames);
 						if ($indx !== FALSE) {
 							$fields[$indx] = $field[1];
 						}
 					} else {
 						//output sequence-fields
 						foreach ($field[0] as $skey=>$sname) {
-							$indx = array_search($sname,$colnames);
+							$indx = array_search($sname, $colnames);
 							if ($indx !== FALSE) {
 								$fields[$indx] = $field[1][$skey];
 							}
@@ -97,7 +100,7 @@ EOS;
   evenClass: 'row2',
   oddsortClass: 'row1s',
   evensortClass: 'row2s',
-  paginate: true,
+  paginate: TRUE,
   pagesize: {$pagerows},
   currentid: 'cpage',
   countid: 'tpage'
@@ -114,7 +117,7 @@ EOS;
   format: function(s,node) {
    return $.trim(node.childNodes[0].value);
   },
-  watch: true,
+  watch: TRUE,
   type: 'text'
  });
 EOS;
@@ -129,11 +132,13 @@ EOS;
 		$choices = array(strval($pagerows) => $pagerows);
 		$f = ($pagerows < 4) ? 5 : 2;
 		$n = $pagerows * $f;
-		if ($n < $rcount)
+		if ($n < $rcount) {
 			$choices[strval($n)] = $n;
+		}
 		$n *= 2;
-		if ($n < $rcount)
+		if ($n < $rcount) {
 			$choices[strval($n)] = $n;
+		}
 		$choices[$this->Lang('all')] = 0;
 
 		$tplvars = $tplvars + array(
@@ -142,8 +147,8 @@ EOS;
 			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
 			'next'=>'<a href="javascript:pageforw()">'.$this->Lang('next').'</a>',
 			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
-			'pageof'=>$this->Lang('pageof',$curpg,$totpg),
-			'rowchanger'=>$this->CreateInputDropdown($id,'pagerows',$choices,-1,$pagerows,'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
+			'pageof'=>$this->Lang('pageof', $curpg, $totpg),
+			'rowchanger'=>$this->CreateInputDropdown($id, 'pagerows', $choices, -1, $pagerows, 'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
 		);
 
 		$jsfuncs[] = <<<'EOS'
@@ -166,7 +171,6 @@ EOS;
 	} else { //rowscount <= pagerows
 		$tplvars['hasnav'] = 0;
 	}
-
 } else {
 	$tplvars['norecords'] = $this->Lang('norecords');
 }
@@ -187,15 +191,16 @@ if (\$linklast.length) {
 }
 EOS;
 $jsall = NULL;
-PWForms\Utils::MergeJS(FALSE,array($t),FALSE,$jsall);
+PWForms\Utils::MergeJS(FALSE, array($t), FALSE, $jsall);
 echo $jsall;
 
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
-echo PWFBrowse\Utils::ProcessTemplate($this,'default.tpl',$tplvars);
-if ($jsall)
+echo PWFBrowse\Utils::ProcessTemplate($this, 'default.tpl', $tplvars);
+if ($jsall) {
 	echo $jsall;
+}
