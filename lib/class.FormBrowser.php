@@ -39,7 +39,7 @@ class FormBrowser extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -51,7 +51,7 @@ class FormBrowser extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	/*
@@ -59,11 +59,11 @@ class FormBrowser extends FieldBase
 	*/
 	public function Dispose($id, $returnid)
 	{
-		$browsedata = array();
+		$browsedata = [];
 		foreach ($this->formdata->Fields as &$obfld) {
 			if (($obfld->IsInput && $obfld->DisplayInForm) //TODO is a browsable field methods: $obfld->IsInputField() && $obfld->DisplayInForm()
 				|| $obfld->IsSequence) {
-				$save = array($obfld->Name,$obfld->DisplayableValue());
+				$save = [$obfld->Name,$obfld->DisplayableValue()];
 				//TODO other presentation control(s) if relevant
 				if ($obfld->IsTimeStamp) {
 					if ($obfld->ShowDate) {
@@ -97,7 +97,7 @@ class FormBrowser extends FieldBase
 			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
 			$db = \cmsms()->GetDb();
 			$form_id = $this->formdata->Id;
-			$browsers = $db->GetCol($sql, array($form_id)); //TODO support high-load
+			$browsers = $db->GetCol($sql, [$form_id]); //TODO support high-load
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
 				$funcs = new \PWFBrowse\RecordContent();
@@ -105,10 +105,10 @@ class FormBrowser extends FieldBase
 					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata);
 				}
 			} else {
-				return array(FALSE,$this->formdata->formsmodule->Lang('missing_type', 'browser for form')); //TODO lang
+				return [FALSE,$this->formdata->formsmodule->Lang('missing_type', 'browser for form')]; //TODO lang
 			}
 		}
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 
 	public function __toString()

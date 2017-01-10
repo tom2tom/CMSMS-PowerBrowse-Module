@@ -17,8 +17,8 @@ if (isset($params['cancel'])) {
 	unset($funcs);
 	$message = $this->Lang('browser2', '\''.$params['browser_name'].'\'', $this->Lang('saved'));
 	unset($params);
-	$this->Redirect($id, 'defaultadmin', '', array(
-		'message'=>$this->_PrettyMessage($message, TRUE, FALSE)));
+	$this->Redirect($id, 'defaultadmin', '', [
+		'message'=>$this->_PrettyMessage($message, TRUE, FALSE)]);
 } elseif (isset($params['apply'])) {
 	$funcs = new PWFBrowse\BrowserTasks();
 	$funcs->StoreBrowser($this, $params);
@@ -26,7 +26,7 @@ if (isset($params['cancel'])) {
 	$params['message'] = $this->_PrettyMessage($message, TRUE, FALSE);
 }
 
-$tplvars = array();
+$tplvars = [];
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.browser.php';
 

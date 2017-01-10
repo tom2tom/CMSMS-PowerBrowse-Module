@@ -25,12 +25,12 @@ if (isset($params['submit'])) {
 		$funcs->CloneBrowser($this, $params);
 	}
 	unset($params);
-	$this->Redirect($id, 'open_browser', '', array(
+	$this->Redirect($id, 'open_browser', '', [
 		'form_id'=>$form_id,
-		'browser_id'=>$browser_id));
+		'browser_id'=>$browser_id]);
 }
 
-$tplvars = array();
+$tplvars = [];
 
 if ($params['browser_id'] == -1) { //add browser
 	//TODO c.f. BrowserTasks->AddBrowser(&$mod,&$params)
@@ -39,7 +39,7 @@ if ($params['browser_id'] == -1) { //add browser
 	if (!$formList) {
 		unset($params);
 		$message = $this->_PrettyMessage('noforms', FALSE);
-		$this->Redirect($id, 'defaultadmin', '', array('message' => $message));
+		$this->Redirect($id, 'defaultadmin', '', ['message' => $message]);
 	}
 	$tplvars['hidden'] = $this->CreateInputHidden($id, 'browser_id', -1);
 	$tplvars['title_form_name'] = $this->Lang('title_form_name');
@@ -51,7 +51,7 @@ if ($params['browser_id'] == -1) { //add browser
 	$formSelect = array_flip($formList);
 	//must return $params['form_id'],$params['name']
 	$tplvars['input_form_name'] = $this->CreateInputDropdown($id, 'form_id',
-		array_merge(array($this->Lang('select_form')=>-1), $formSelect), -1);
+		array_merge([$this->Lang('select_form')=>-1], $formSelect), -1);
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	$tplvars['input_browser_name'] = $this->CreateInputText($id, 'name', '', 50);
 	$tpl = 'add_browser.tpl';

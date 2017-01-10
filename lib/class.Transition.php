@@ -38,7 +38,7 @@ EOS;
 		if ($converts) {
 			$newfid = (int)reset($converts);
 			$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE form_id=?';
-			$data = Utils::SafeGet($sql, array($form_id));
+			$data = Utils::SafeGet($sql, [$form_id]);
 			if ($data) {
 				$converts = self::Get_Converts($db, $pre, 0);
 				if ($converts) {
@@ -46,7 +46,7 @@ EOS;
 					foreach ($data as &$one) {
 						$olddata = $funcs->Decrypt($mod, $one['contents']);
 						if ($olddata) {
-							$newdata = array();
+							$newdata = [];
 							foreach ($olddata as $key=>$field) {
 								if (is_numeric($key) && $key < 0) {
 									$key = -$key;
@@ -90,7 +90,7 @@ EOS;
 			$oc = count($olds);
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (browser_id,form_id,name,form_name) VALUES (?,?,?,?)';
-			$renums = array();
+			$renums = [];
 			$converts = self::Get_Converts($db, $pre, 0); //field_id translations
 			foreach ($olds as $row) {
 				$newbid = $db->GenID($pre.'module_pwbr_browser_seq');
@@ -103,7 +103,7 @@ EOS;
 				}
 				if (self::Get_Data($mod, $db, $pre, $newbid, $oldbid, $newfid, $row['form_id'], $converts)) {
 					$renums[$newbid] = $oldbid;
-					$db->Execute($sql, array($newbid, $newfid, $row['name'], $row['formname']));
+					$db->Execute($sql, [$newbid, $newfid, $row['name'], $row['formname']]);
 				}
 			}
 			if ($renums) {
@@ -111,11 +111,11 @@ EOS;
 					self::Get_Attrs($mod, $db, $pre, $newbid, $oldbid, $converts);
 				}
 				$ic = count($renums);
-				return array($ic,$oc-$ic);
+				return [$ic,$oc-$ic];
 			}
-			return array(0,$oc);
+			return [0,$oc];
 		}
-		return array(0,0);
+		return [0,0];
 	}
 
 /* example data from FormBuilder::GetSortedResponses()
@@ -165,22 +165,22 @@ $vals = array (size=whatever)
 	private function Get_Data(&$mod, &$db, $pre, $newbid, $oldbid, $newfid, $oldfid, &$fieldconverts)
 	{
 		$fb = \cms_utils::get_module('FormBuilder');
-		$flds = array();
-		$parms = array();
+		$flds = [];
+		$parms = [];
 //GetSortedResponses($form_id,$start_point,$number=100,$admin_approved=FALSE,$user_approved=FALSE,$field_list=array(),$dateFmt='d F y',&$params)
 		list($count, $names, $details) = $fb->GetSortedResponses($oldfid,	-1, -1,
 			FALSE, FALSE, $flds, 'Y-m-d', $parms);
 		if ($count > 0) {
 			$funcs = new RecordContent();
 			foreach ($details as &$one) {
-				$olddata = array();
+				$olddata = [];
 				foreach ($one->fields as $fid=>$fval) {
 					if ($fieldconverts && array_key_exists($fid, $fieldconverts)) {
 						$nid = (int)$fieldconverts[$fid];
 					} else {
 						$nid = -$fid; //id < 0 signals FormBuilder field
 					}
-					$olddata[$nid] = array($names[$fid],$fval);
+					$olddata[$nid] = [$names[$fid],$fval];
 				}
 				$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata);
 			}
@@ -197,7 +197,7 @@ SELECT * FROM {$pre}module_fbr_browser_attr WHERE browser_id=?
 AND (name='admin_list_fields' OR name='admin_rows_per_page')
 ORDER BY browser_attr_id
 EOS;
-		$data = $db->GetArray($sql, array($oldbid));
+		$data = $db->GetArray($sql, [$oldbid]);
 		if ($data) {
 			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET pagerows=? WHERE browser_id=?';
 			foreach ($data as &$row) {
@@ -206,7 +206,7 @@ EOS;
 					self::Get_Fields($mod, $db, $pre, $oldbid, $newbid, $row['value'], $fieldconverts);
 					break;
 				case 'admin_rows_per_page':
-					$db->Execute($sql, array((int)$row['value'], $newbid));
+					$db->Execute($sql, [(int)$row['value'], $newbid]);
 					break;
 				}
 			}
@@ -224,7 +224,7 @@ JOIN {$pre}module_fbr_browser B ON F.form_id=B.form_id
 WHERE B.browser_id=?
 ORDER BY F.field_id
 EOS;
-		$names = $db->GetAssoc($sql, array($oldbid));
+		$names = $db->GetAssoc($sql, [$oldbid]);
 		$parts = explode(':', $value);
 		$i = 3;
 		$l = count($parts);
@@ -232,9 +232,9 @@ EOS;
 (browser_id,name,shown,frontshown,sorted,order_by,form_field) VALUES (?,?,?,?,?,?,?)';
 		//record internal-use fields
 		$nm = $mod->Lang('title_submitted');
-		$db->Execute($sql, array($newbid, $nm, 1, 0, 1, 1, 0));
+		$db->Execute($sql, [$newbid, $nm, 1, 0, 1, 1, 0]);
 		$nm = $mod->Lang('title_modified');
-		$db->Execute($sql, array($newbid, $nm, 0, 0, 1, 2, 0));
+		$db->Execute($sql, [$newbid, $nm, 0, 0, 1, 2, 0]);
 		foreach ($parts as $one) {
 			list($indx, $order) = explode(',', $one);
 			if ($order != -1) {
@@ -251,7 +251,7 @@ EOS;
 			} else {
 				$fid = -$fid; //id < 0 signals FormBuilder field id
 			}
-			$db->Execute($sql, array($newbid, $nm, $see, 0, 0, $order, $fid));
+			$db->Execute($sql, [$newbid, $nm, $see, 0, 0, $order, $fid]);
 			$i++;
 		}
 	}
@@ -265,10 +265,10 @@ EOS;
 		$sql = 'SELECT old_id,new_id FROM '.$pre.'module_pwf_trans WHERE ';
 		if ($form_id) {
 			$sql .= 'isform AND old_id=?';
-			$args = array($form_id);
+			$args = [$form_id];
 		} else {
 			$sql .= 'NOT isform ORDER BY old_id';
-			$args = array();
+			$args = [];
 		}
 		return $db->GetAssoc($sql, $args);
 	}

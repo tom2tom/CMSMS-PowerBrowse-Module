@@ -14,7 +14,7 @@ if ($pconfig || $this->_CheckAccess('modify')) {
 	exit;
 }
 
-$tplvars = array();
+$tplvars = [];
 $tplvars['pconfig'] = ($pconfig)?1:0;
 $tplvars['pmod'] = ($pmod)?1:0;
 
@@ -27,7 +27,7 @@ $fid = (int)$params['form_id'];
 
 $this->_BuildNav($id, $returnid, $params, $tplvars);
 $tplvars['start_form'] = $this->CreateFormStart($id, 'multi_record', $returnid, 'POST', '', '', '',
-	array('browser_id'=>$bid, 'form_id'=>$fid));
+	['browser_id'=>$bid, 'form_id'=>$fid]);
 $tplvars['end_form'] = $this->CreateFormEnd();
 
 if (!empty($params['message'])) {
@@ -36,13 +36,13 @@ if (!empty($params['message'])) {
 
 $pre = cms_db_prefix();
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
-$data = $db->GetRow($sql, array($bid));
+$data = $db->GetRow($sql, [$bid]);
 $tplvars['browser_title'] = $data['name'];
 $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql, array($params['browser_id']));
+$data = PWFBrowse\Utils::SafeGet($sql, [$params['browser_id']]);
 $colnames = array_column($data, 'name');
 $colsorts = array_map(function ($v) {
 	return (int)$v;
@@ -54,14 +54,14 @@ $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
 
 //script accumulators
-$jsincs = array();
-$jsfuncs = array();
-$jsloads = array();
+$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql, array($params['browser_id']));
-$rows = array();
+$data = PWFBrowse\Utils::SafeGet($sql, [$params['browser_id']]);
+$rows = [];
 //if ($data) {
 	$icon_view = $theme->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon');
 	if ($pmod) {
@@ -72,7 +72,7 @@ $rows = array();
 
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
-		$fields = array();
+		$fields = [];
 		$browsedata = $funcs->Decrypt($this, $one['contents']);
 		if ($browsedata) {
 			//include data for fields named in $colnames
@@ -107,16 +107,16 @@ $rows = array();
 			ksort($fields); //conform order to titles
 			$oneset->fields = $fields;
 			$oneset->view = $this->CreateLink($id, 'browse_record', '', $icon_view,
-				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid));
+				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid]);
 			if ($pmod) {
 				$oneset->edit = $this->CreateLink($id, 'browse_record', '', $icon_edit,
-				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid, 'edit'=>1));
+				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid, 'edit'=>1]);
 			}
 			$oneset->export = $this->CreateLink($id, 'export_record', '', $icon_export,
-				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid));
+				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid]);
 			if ($pmod) {
 				$oneset->delete = $this->CreateLink($id, 'delete_record', '', $icon_delete,
-				array('record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid),
+				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid],
 				$this->Lang('confirm_delete_record'));
 			}
 			$oneset->selected = $this->CreateInputCheckbox($id, 'sel[]', $rid, -1);
@@ -182,7 +182,7 @@ EOS;
 		$curpg='<span id="cpage">1</span>';
 		$totpg='<span id="tpage">'.ceil($rcount/$pagerows).'</span>';
 
-		$choices = array(strval($pagerows) => $pagerows);
+		$choices = [strval($pagerows) => $pagerows];
 		$f = ($pagerows < 4) ? 5 : 2;
 		$n = $pagerows * $f;
 		if ($n < $rcount) {
@@ -194,7 +194,7 @@ EOS;
 		}
 		$choices[$this->Lang('all')] = 0;
 
-		$tplvars = $tplvars + array(
+		$tplvars = $tplvars + [
 			'hasnav'=>1,
 			'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
 			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',
@@ -202,7 +202,7 @@ EOS;
 			'last'=>'<a href="javascript:pagelast()">'.$this->Lang('last').'</a>',
 			'pageof'=>$this->Lang('pageof', $curpg, $totpg),
 			'rowchanger'=>$this->CreateInputDropdown($id, 'pagerows', $choices, -1, $pagerows, 'onchange="pagerows(this);"').'&nbsp;&nbsp;'.$this->Lang('pagerows')
-		);
+		];
 
 		$jsfuncs[] = <<<'EOS'
 function pagefirst() {
@@ -259,9 +259,9 @@ if ($pmod) {
 	$t = $this->Lang('title_add_record');
 	$icon_add = $theme->DisplayImage('icons/system/newobject.gif', $t, '', '', 'systemicon');
 	$tplvars['iconlinkadd'] = $this->CreateLink($id, 'add_record', '', $icon_add,
-			array('form_id'=>$fid, 'browser_id'=>$bid));
+			['form_id'=>$fid, 'browser_id'=>$bid]);
 	$tplvars['textlinkadd'] = $this->CreateLink($id, 'add_record', '', $t,
-			array('form_id'=>$fid, 'browser_id'=>$bid));
+			['form_id'=>$fid, 'browser_id'=>$bid]);
 }
 
 //replace href attribute in existing stylesheet link (early in page-processing)

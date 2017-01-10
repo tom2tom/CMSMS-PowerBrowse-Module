@@ -18,7 +18,7 @@ if ($padmin) {
 }
 $t .= $this->endtabheaders().$this->starttabcontent();
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'tabs_header'=>$t,
 	'start_browsers_tab'=>$this->StartTab('browsers'),
 	'tabs_footer'=>$this->EndTabContent(),
@@ -26,14 +26,14 @@ $tplvars = $tplvars + array(
 
 	'start_browsersform'=>$this->CreateFormStart($id, 'multi_browser', $returnid),
 	'end_form'=>$this->CreateFormEnd()
-);
+];
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
 //script accumulators
-$jsfuncs = array();
-$jsloads = array();
-$jsincs = array();
+$jsfuncs = [];
+$jsloads = [];
+$jsincs = [];
 $baseurl = $this->GetModuleURLPath();
 
 $pre = cms_db_prefix();
@@ -62,7 +62,7 @@ if ($browsers) {
 	$icon_edit = $theme->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon');
 	$icon_export = $theme->DisplayImage('icons/system/export.gif', $this->Lang('export'), '', '', 'systemicon');
 	$icon_view = $theme->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon');
-	$data = array();
+	$data = [];
 	foreach ($browsers as &$one) {
 		$oneset = new stdClass();
 		$num = $one['record_count'];
@@ -71,22 +71,22 @@ if ($browsers) {
 		$fid = (int)$one['form_id'];
 		if ($pmod) {
 			$oneset->name = $this->CreateLink($id, 'open_browser', '',
-				$one['name'], array('form_id'=>$fid, 'browser_id'=>$bid));
+				$one['name'], ['form_id'=>$fid, 'browser_id'=>$bid]);
 			$oneset->editlink = $this->CreateLink($id, 'open_browser', '',
-				$icon_edit, array('form_id'=>$fid, 'browser_id'=>$bid));
+				$icon_edit, ['form_id'=>$fid, 'browser_id'=>$bid]);
 			if ($num > 0) {
 				$oneset->adminlink = $this->CreateLink($id, 'browse_list', '',
 					$icon_admin,
-					array('form_id'=>$fid, 'browser_id'=>$bid));
+					['form_id'=>$fid, 'browser_id'=>$bid]);
 			} else {
 				$oneset->adminlink = '';
 			}
 			$oneset->clonelink = $this->CreateLink($id, 'add_browser', '',
 				$icon_clone,
-				array('form_id'=>$fid, 'browser_id'=>$bid));
+				['form_id'=>$fid, 'browser_id'=>$bid]);
 			$oneset->deletelink = $this->CreateLink($id, 'delete_browser', '',
 				$icon_delete,
-				array('form_id'=>$fid, 'browser_id'=>$bid),
+				['form_id'=>$fid, 'browser_id'=>$bid],
 				$this->Lang('confirm_delete_browser', $one['name']));
 		} else {
 			$oneset->name = $one['name'];
@@ -95,11 +95,11 @@ if ($browsers) {
 				if ($padmin) {
 					$oneset->adminlink = $this->CreateLink($id, 'browse_list', '',
 					$icon_admin,
-					array('form_id'=>$fid, 'browser_id'=>$bid));
+					['form_id'=>$fid, 'browser_id'=>$bid]);
 				} else {
 					$oneset->adminlink = $this->CreateLink($id, 'browse_list', '',
 					$icon_view,
-					array('form_id'=>$fid, 'browser_id'=>$bid));
+					['form_id'=>$fid, 'browser_id'=>$bid]);
 				}
 			} else {
 				$oneset->adminlink = '';
@@ -109,7 +109,7 @@ if ($browsers) {
 		}
 		if ($num > 0) {
 			$oneset->exportlink = $this->CreateLink($id, 'export_browser', '',
-				$icon_export, array('browser_id'=>$bid));
+				$icon_export, ['browser_id'=>$bid]);
 		} else {
 			$oneset->exportlink = '';
 		}
@@ -175,10 +175,10 @@ EOS;
 if ($padmin || $pmod) {
 	$tplvars['addlink'] = $this->CreateLink($id, 'add_browser', '',
 		$theme->DisplayImage('icons/system/newobject.gif', $this->Lang('title_add_browser'), '', '', 'systemicon'),
-		array('browser_id'=>-1));
+		['browser_id'=>-1]);
 	$tplvars['addbrowser'] = $this->CreateLink($id, 'add_browser', '',
 		$this->Lang('title_add_browser'),
-		array('browser_id'=>-1));
+		['browser_id'=>-1]);
 
 	$fb = $this->GetModuleInstance('FormBuilder');
 	if ($fb) {
@@ -192,7 +192,7 @@ if ($padmin || $pmod) {
 if ($padmin) {
 	$tplvars['start_settingsform'] = $this->CreateFormStart($id, 'defaultadmin', $returnid);
 
-	$configs = array();
+	$configs = [];
 
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_uploads_dir');
@@ -249,7 +249,7 @@ if ($padmin) {
 	if (ini_get('mbstring.internal_encoding') !== FALSE) { //PHP's encoding-conversion capability is installed
 		$oneset = new stdClass();
 		$oneset->title = $this->Lang('title_export_file_encoding');
-		$encodings = array('utf-8'=>'UTF-8','windows-1252'=>'Windows-1252','iso-8859-1'=>'ISO-8859-1');
+		$encodings = ['utf-8'=>'UTF-8','windows-1252'=>'Windows-1252','iso-8859-1'=>'ISO-8859-1'];
 		$expchars = $this->GetPreference('export_file_encoding', 'ISO-8859-1');
 		$oneset->input = $this->CreateInputRadioGroup($id, 'export_file_encoding', $encodings, $expchars, '', '&nbsp;&nbsp;');
 		$configs[] = $oneset;

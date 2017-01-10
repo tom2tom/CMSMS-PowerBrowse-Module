@@ -22,9 +22,9 @@ if ($pf) {
 	} else {
 		$fid = $params['form_id'];
 	}
-	$parms = array(
+	$parms = [
 		'form_id'=>$fid,
-'preload'=>array(
+'preload'=>[
 	305=>'MyFirstname',
 	306=>'MySurname',
 	307=>'J', //Membership type RadioGroup
@@ -39,12 +39,12 @@ if ($pf) {
 	316=>'Woopwoop, Cranross',
 	317=>'1',
 	318=>'0',
-	319=>array('yes','yes','no'), //I'd like to play competition CheckboxGroup
+	319=>['yes','yes','no'], //I'd like to play competition CheckboxGroup
 	320=>'N/A'
-),
+],
 		'resume'=>'PWFBrowse,browse_list', //parameters for cancellation-redirect
 		'passthru'=>serialize($params) //scalar data to be provided as a parameter to the 'resume' action
-	);
+	];
 	$pf->DoAction('show_form', $id, $parms, $returnid);
 	return;
 } else {

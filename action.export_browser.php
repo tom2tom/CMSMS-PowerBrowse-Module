@@ -16,4 +16,4 @@ if ($res === TRUE) {
 unset($funcs);
 
 $this->Redirect($id, 'defaultadmin', $returnid,
-	array('message' => $this->_PrettyMessage($res, FALSE)));
+	['message' => $this->_PrettyMessage($res, FALSE)]);

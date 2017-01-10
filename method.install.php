@@ -14,8 +14,8 @@ if (!$pfmod) {
 	return $this->_PrettyMessage('error_module_forms', FALSE);
 }
 
-$taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
- 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
+$taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
+ 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci'];
 $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
 

@@ -16,7 +16,7 @@ $tplvars['tabs_start'] = $this->StartTabHeaders().
 	$this->SetTabHeader('listtab', $this->Lang('tab_list'), ($tab == 'listtab')).
 	$this->EndTabHeaders() . $this->StartTabContent();
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'start_form'=>$this->CreateFormStart($id, 'open_browser', $returnid),
 	'end_form'=>$this->CreateFormEnd(),
 	'hidden'=>$this->CreateInputHidden($id, 'browser_id', $params['browser_id']).
@@ -25,28 +25,28 @@ $tplvars = $tplvars + array(
 	'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
 	'maintab_start'=>$this->StartTab('maintab'),
 	'listtab_start'=>$this->StartTab('listtab')
-);
+];
 
 //script accumulators
-$jsincs = array();
-$jsfuncs = array();
-$jsloads = array();
+$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
 //======= MAIN TAB ========
 
 $pre = cms_db_prefix();
-$row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?', array($params['browser_id']));
+$row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?', [$params['browser_id']]);
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'title_form_name'=>$this->Lang('title_form_name'),
 	'form_name'=>$row['form_name'],
 	'title_browser_name'=>$this->Lang('title_browser_name'),
 	'input_browser_name'=>$this->CreateInputText($id, 'browser_name', $row['name'], 50, 256)
-);
+];
 
 if ($this->GetPreference('owned_forms')) {
-	$sel = array('&lt;'.$this->Lang('all').'&gt;' => 0);
+	$sel = ['&lt;'.$this->Lang('all').'&gt;' => 0];
 	//find all valid owners
 	//NOTE cmsms function check_permission() always returns FALSE for everyone
 	//except the current user, so we replicate its backend operation here
@@ -84,16 +84,16 @@ $tplvars['help_pagerows'] = $this->Lang('help_pagerows');
 
 $sql = 'SELECT field_id,name,shown,frontshown,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? ORDER BY order_by';
-$fields = $db->GetArray($sql, array($params['browser_id']));
+$fields = $db->GetArray($sql, [$params['browser_id']]);
 if ($fields) {
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'title_data'=>$this->Lang('title_data'),
 		'title_name'=>$this->Lang('title_field_identity'),
 		'title_admdisplay'=>$this->Lang('title_display'),
 		'title_frntdisplay'=>$this->Lang('title_display2'),
 		'title_sort'=>$this->Lang('title_sort'),
 		'title_move'=>$this->Lang('title_move')
-	);
+	];
 
 	$mc = 0;
 	$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
@@ -101,7 +101,7 @@ if ($fields) {
 	$iconup = $theme->DisplayImage('icons/system/arrow-u.gif', $this->Lang('up'), '', '', 'systemicon');
 	$icondn = $theme->DisplayImage('icons/system/arrow-d.gif', $this->Lang('down'), '', '', 'systemicon');
 
-	$formatted = array();
+	$formatted = [];
 	foreach ($fields as &$one) {
 		$fid = (int)$one['field_id'];
 		$oneset = new stdClass();
@@ -114,9 +114,9 @@ if ($fields) {
 		if ($mc) {
 			//there's a previous item,create the appropriate links
 			$oneset->up = $this->CreateLink($id, 'move_field', $returnid,
-				$iconup, array('field_id'=>$fid, 'prev_id'=>$previd));
+				$iconup, ['field_id'=>$fid, 'prev_id'=>$previd]);
 			$formatted[($mc-1)]->down = $this->CreateLink($id, 'move_field', $returnid,
-				$icondn, array('field_id'=>$previd, 'next_id'=>$fid));
+				$icondn, ['field_id'=>$previd, 'next_id'=>$fid]);
 		} else {
 			$oneset->up = '';
 		}
@@ -189,19 +189,19 @@ function select_all(cb) {
  }
 }
 EOS;
-		$tplvars = $tplvars + array(
+		$tplvars = $tplvars + [
 			'select_all1'=>$this->CreateInputCheckbox($id, 'allshow', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'select_all2'=>$this->CreateInputCheckbox($id, 'allfshow', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'select_all3'=>$this->CreateInputCheckbox($id, 'allsort', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'help_order'=>$this->Lang('help_order'),
 			'help_dnd'=>$this->Lang('help_dnd')
-		);
+		];
 	}
 } else {
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'nofields'=>$this->Lang('nofields'),
 		'rc'=>0
-	);
+	];
 }
 
 $jsfuncs[] = <<<EOS
@@ -211,8 +211,8 @@ function set_tab() {
 }
 EOS;
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'save'=>$this->CreateInputSubmit($id, 'submit', $this->Lang('save'), 'onclick="set_tab();"'),
 	'apply'=>$this->CreateInputSubmit($id, 'apply', $this->Lang('apply'), 'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
 	'cancel'=>$this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'), 'onclick="set_tab();"')
-);
+];

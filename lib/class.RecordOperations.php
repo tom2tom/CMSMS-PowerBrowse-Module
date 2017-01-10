@@ -24,7 +24,7 @@ class RecordOperations
 			$args = $record_id;
 		} else {
 			$sql .= '=?';
-			$args = array($record_id);
+			$args = [$record_id];
 		}
 		return Utils::SafeExec($sql, $args);
 	}

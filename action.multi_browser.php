@@ -17,12 +17,12 @@ if (isset($params['import'])) {
 	list($done, $skips) = $funcs->ImportBrowsers($this);
 	if ($done) {
 		if ($skips) {
-			$parms = array('message' => $this->_PrettyMessage('error_data_incomplete', FALSE));
+			$parms = ['message' => $this->_PrettyMessage('error_data_incomplete', FALSE)];
 		} else {
-			$parms = array();
+			$parms = [];
 		}
 	} else {
-		$parms = array('message' => $this->_PrettyMessage('error_database', FALSE));
+		$parms = ['message' => $this->_PrettyMessage('error_database', FALSE)];
 	}
 	$this->Redirect($id, 'defaultadmin', '', $parms);
 }
@@ -42,7 +42,7 @@ if (isset($params['clone'])) {
 		$funcs->CloneBrowser($this, $params);
 	}
 	unset($funcs);
-	$params = array(); //nothing to report
+	$params = []; //nothing to report
 } elseif (isset($params['delete'])) {
 	if (!($this->_CheckAccess('modify') || $this->_CheckAccess('admin'))) {
 		exit;
@@ -57,8 +57,8 @@ if (isset($params['clone'])) {
 	}
 	unset($funcs);
 	$params = ($success)?
-		array():
-		array('message' => $this->_PrettyMessage('error_failed', FALSE));
+		[]:
+		['message' => $this->_PrettyMessage('error_failed', FALSE)];
 } elseif (isset($params['export'])) {
 	if (!$this->_CheckAccess()) {
 		exit;
@@ -71,7 +71,7 @@ if (isset($params['clone'])) {
 		if ($res === TRUE) {
 			exit;
 		}
-		$params = array('message' => $this->_PrettyMessage($res, FALSE));
+		$params = ['message' => $this->_PrettyMessage($res, FALSE)];
 	} else {
 		//cannot export multi browsers as a single item, so stuff em into a zip
 		$fn = $this->GetName().$this->Lang('export').
@@ -109,7 +109,7 @@ if (isset($params['clone'])) {
 				exit;
 			}
 		}
-		$params = array('message'=>$this->_PrettyMessage('error_zip', FALSE));
+		$params = ['message'=>$this->_PrettyMessage('error_zip', FALSE)];
 	}
 	unset($funcs);
 }

@@ -12,7 +12,7 @@ if (!$this->_CheckAccess('modify')) {
 $funcs = new PWFBrowse\BrowserTasks();
 $res = $funcs->DeleteBrowser($params['browser_id']);
 $args = ($res) ?
-	array('message' => $this->_PrettyMessage('browser_deleted')):
-	array('message' => $this->_PrettyMessage('error_failed', FALSE));
+	['message' => $this->_PrettyMessage('browser_deleted')]:
+	['message' => $this->_PrettyMessage('error_failed', FALSE)];
 
 $this->Redirect($id, 'defaultadmin', '', $args);

@@ -91,7 +91,7 @@ class Utils
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_record WHERE record_id=?';
-		return self::SafeGet($sql, array($record_id), 'one');
+		return self::SafeGet($sql, [$record_id], 'one');
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Utils
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 		$db = \cmsms()->GetDb();
-		return $db->GetOne($sql, array($browser_id));
+		return $db->GetOne($sql, [$browser_id]);
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Utils
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT form_id FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 		$db = \cmsms()->GetDb();
-		return $db->GetOne($sql, array($browser_id));
+		return $db->GetOne($sql, [$browser_id]);
 	}
 
 	/**
@@ -132,7 +132,7 @@ class Utils
 		} else {
 			$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		}
-		return $db->GetOne($sql, array($form_id));
+		return $db->GetOne($sql, [$form_id]);
 	}
 
 	/**
@@ -266,8 +266,8 @@ class Utils
 	*/
 	private static function MergeSequenceData(&$allfields, $htmlout=TRUE)
 	{
-		$names = array();
-		$vals = array();
+		$names = [];
+		$vals = [];
 		$first = TRUE;
 		$joiner = ($htmlout) ? '<br />':PHP_EOL;
 		$si = 0;
@@ -275,7 +275,7 @@ class Utils
 			$field =& next($allfields);
 			if ($field === FALSE) {
 				//TODO handle error
-				return array(NULL,NULL);
+				return [NULL,NULL];
 			}
 			if (count($field) > 2) {
 				if (isset($field['_sb'])) { //field is intermediate SequenceEnd
@@ -284,10 +284,10 @@ class Utils
 					continue;
 				} elseif (isset($field['_se'])) { //field is final SequenceEnd
 					next($allfields); //skip this member
-					return array($names,$vals); //i.e. data + multi-store indicator
+					return [$names,$vals]; //i.e. data + multi-store indicator
 				} elseif (isset($field['_ss'])) { //field is SequenceStart (nested)
 					list($subnames, $subvals) = self::MergeSequenceData($allfields, $htmlout); //recurse
-					$field = array($subnames[0].',etc',implode($joiner, $subvals)); //TODO something to store in $names,$vals
+					$field = [$subnames[0].',etc',implode($joiner, $subvals)]; //TODO something to store in $names,$vals
 				} else {
 					self::FormatRecord($mod, $field, $allfields, $htmlout);
 				}
@@ -320,7 +320,7 @@ class Utils
 		static $tfmt = FALSE;
 		static $dtfmt = FALSE;
 
-		foreach (array('dt', 'd', 't', '_ss', '_se', '_sb') as $f) {
+		foreach (['dt', 'd', 't', '_ss', '_se', '_sb'] as $f) {
 			if (isset($field[$f])) {
 				switch ($f) {
 				 case 'dt':
@@ -412,9 +412,9 @@ class Utils
 		if (is_array($jsincs)) {
 			$all = $jsincs;
 		} elseif ($jsincs) {
-			$all = array($jsincs);
+			$all = [$jsincs];
 		} else {
-			$all = array();
+			$all = [];
 		}
 		if ($jsfuncs || $jsloads) {
 			$all[] =<<<'EOS'

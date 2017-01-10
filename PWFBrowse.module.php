@@ -29,12 +29,12 @@ class PWFBrowse extends CMSModule
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
 
-		spl_autoload_register(array($this, 'cmsms_spacedload'));
+		spl_autoload_register([$this, 'cmsms_spacedload']);
 	}
 
 	public function __destruct()
 	{
-		spl_autoload_unregister(array($this, 'cmsms_spacedload'));
+		spl_autoload_unregister([$this, 'cmsms_spacedload']);
 		if (function_exists('parent::__destruct')) {
 			parent::__destruct();
 		}
@@ -109,8 +109,8 @@ class PWFBrowse extends CMSModule
 		$fp = cms_join_path(dirname(__FILE__), 'css', 'list-view.css');
 		$cont = @file_get_contents($fp);
 		if ($cont) {
-			$example = preg_replace(array('~\s?/\*(.*)?\*/~Usm', '~\s?//.*$~m'), array('', ''), $cont);
-			$example = str_replace(array(PHP_EOL.PHP_EOL, PHP_EOL, "\t"), array('<br />', '<br />', ' '), trim($example));
+			$example = preg_replace(['~\s?/\*(.*)?\*/~Usm', '~\s?//.*$~m'], ['', ''], $cont);
+			$example = str_replace([PHP_EOL.PHP_EOL, PHP_EOL, "\t"], ['<br />', '<br />', ' '], trim($example));
 		} else {
 			$example = $this->Lang('error_missing');
 		}
@@ -140,7 +140,7 @@ class PWFBrowse extends CMSModule
 
 	public function GetDependencies()
 	{
-		return array('PWForms'=>'0.7');
+		return ['PWForms'=>'0.7'];
 	}
 
 	public function MinimumCMSVersion()
@@ -325,9 +325,9 @@ EOS;
 		'&#171; '.$this->Lang('module_nav'));
 		if (isset($params['browser_id']) && isset($params['form_id']) && isset($params['record_id'])) {
 			$navstr .= ' '.$this->CreateLink($id, 'browse_list', $returnid,
-			'&#171; '.$this->Lang('title_records'), array(
+			'&#171; '.$this->Lang('title_records'), [
 			'form_id'=>$params['form_id'],
-			'browser_id'=>$params['browser_id']));
+			'browser_id'=>$params['browser_id']]);
 		}
 		$tplvars['inner_nav'] = $navstr;
 	}

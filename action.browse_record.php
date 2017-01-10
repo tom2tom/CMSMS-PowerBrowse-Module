@@ -16,9 +16,9 @@ if (isset($params['cancel'])) {
 $funcs = new PWFBrowse\RecordContent();
 $pre = cms_db_prefix();
 if (isset($params['submit'])) {
-	$collapsed = array();
+	$collapsed = [];
 	foreach ($params['field'] as $key=>$name) {
-		$collapsed[$key] = array($name, html_entity_decode($params['value'][$key])); //decode probably not needed
+		$collapsed[$key] = [$name, html_entity_decode($params['value'][$key])]; //decode probably not needed
 	}
 	$funcs->Update($this, $pre, $params['record_id'], $collapsed);
 	$this->Redirect($id, 'browse_list', $returnid, $params);
@@ -30,20 +30,20 @@ if (!$res) {
 	$this->Redirect($id, 'browse_list', $returnid, $params);
 }
 
-$tplvars = array();
+$tplvars = [];
 $this->_BuildNav($id, $returnid, $params, $tplvars);
 
 $tplvars['start_form'] =
 	$this->CreateFormStart($id, 'browse_record', $returnid, 'POST', '', '', '',
-		array('record_id'=>$params['record_id'],
+		['record_id'=>$params['record_id'],
 		'browser_id'=>$params['browser_id'],
-		'form_id'=>$params['form_id']));
+		'form_id'=>$params['form_id']]);
 $tplvars['end_form'] = $this->CreateFormEnd();
 
 $bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
-$content = array();
+$content = [];
 if (isset($params['edit'])) {
-	$hidden = array();
+	$hidden = [];
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit', $bname);
 	foreach ($browsedata as $key=>$field) {
 		$title = $field[0];
@@ -54,10 +54,10 @@ if (isset($params['edit'])) {
 			if (!is_array($field[0])) {
 				if ($key[0] == '_') { //internal-use fake field, not editable
 					$hidden[] = $this->CreateInputHidden($id, 'value['.$key.']', $value); //un-formatted value
-					$content[] = array(htmlentities($title),$field[1]); //no change for this value
+					$content[] = [htmlentities($title),$field[1]]; //no change for this value
 				} else {
 					$input = $this->CreateInputText($id, 'value['.$key.']', $field[1], 60); //TODO reconvert when saving
-					$content[] = array(htmlentities($title),$input);
+					$content[] = [htmlentities($title),$input];
 				}
 				continue;
 			} else {
@@ -66,10 +66,10 @@ if (isset($params['edit'])) {
 				foreach ($field[0] as $skey=>$sname) {
 					if ($skey[0] == '_') { //internal-use fake field, not editable
 						$hidden[] = $this->CreateInputHidden($id, 'value['.$key.']', $field[1][$skey]); //un-formatted value
-						$content[] = array(htmlentities($title),$field[1][$skey]); //no change for this value
+						$content[] = [htmlentities($title),$field[1][$skey]]; //no change for this value
 					} else {
 						$input = $this->CreateInputText($id, 'value['.$key.']', $field[1][$skey], 60); //TODO reconvert when saving
-						$content[] = array(htmlentities($title),$input);
+						$content[] = [htmlentities($title),$input];
 					}
 				}
 			}
@@ -85,7 +85,7 @@ if (isset($params['edit'])) {
 		} else {
 			$input = $this->CreateInputText($id, 'value['.$key.']', $value, 60, 250);
 		}
-		$content[] = array(htmlentities($title),$input);
+		$content[] = [htmlentities($title),$input];
 	}
 	$tplvars['submit'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('submit'));
 	$tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
@@ -98,12 +98,12 @@ if (isset($params['edit'])) {
 			if (is_array($field[0])) {
 				//output sequence-fields
 				foreach ($field[0] as $skey=>$sname) {
-					$content[] = array(htmlentities($sname),htmlentities($field[1][$skey]));
+					$content[] = [htmlentities($sname),htmlentities($field[1][$skey])];
 				}
 				continue;
 			}
 		}
-		$content[] = array(htmlentities($field[0]),htmlentities($field[1]));
+		$content[] = [htmlentities($field[0]),htmlentities($field[1])];
 	}
 	$tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('close'));
 }

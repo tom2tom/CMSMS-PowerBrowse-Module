@@ -38,12 +38,12 @@ SELECT field_id,name,type FROM {$pre}module_pwf_field
 WHERE form_id=? ORDER BY order_by
 EOS;
 		$db = \cmsms()->GetDb();
-		$all = $db->GetAssoc($sql, array($form_id));
-		$result = array();
+		$all = $db->GetAssoc($sql, [$form_id]);
+		$result = [];
 		if ($all) {
 			$mod = \cms_utils::get_module('PWForms');
 			$dummy = $mod->_GetFormData();
-			$params = array();
+			$params = [];
 			foreach ($all as $key=>&$row) {
 				$classPath = 'PWForms\\'.$row['type'];
 				$fld = new $classPath($dummy, $params);

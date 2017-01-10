@@ -51,7 +51,7 @@ if (isset($params['submit'])) {
 				while (!$rst->EOF) {
 					$val = PWFBrowse\Utils::decrypt_value($this, $rst->fields[1], $old);
 					$val = PWFBrowse\Utils::encrypt_value($this, $val, $t);
-					if (!PWFBrowse\Utils::SafeExec($sql, array($val, $rst->fields[0]))) {
+					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields[0]])) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext()) {
@@ -73,7 +73,7 @@ if (isset($params['submit'])) {
 	$params['active_tab'] = 'settings';
 }
 
-$tplvars = array();
+$tplvars = [];
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 

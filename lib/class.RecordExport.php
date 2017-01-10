@@ -54,12 +54,12 @@ class RecordExport
 		$pre = \cms_db_prefix();
 		if ($browser_id) {
 			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY record_id';
-			$all = Utils::SafeGet($sql, array($browser_id), 'col');
+			$all = Utils::SafeGet($sql, [$browser_id], 'col');
 		} elseif ($record_id) {
 			if (is_array($record_id)) {
 				$all = $record_id;
 			} else {
-				$all = array($record_id);
+				$all = [$record_id];
 			}
 		} else {
 			return FALSE;
@@ -103,7 +103,7 @@ class RecordExport
 			if (!$res) {
 				return FALSE;
 			} //TODO report message
-			$names = array();
+			$names = [];
 			foreach ($browsedata as &$one) {
 				$fn = $one[0];
 				if ($strip) {
@@ -125,7 +125,7 @@ class RecordExport
 				if (!$res) {
 					continue;
 				}	//decryption error
-				$vals = array();
+				$vals = [];
 				foreach ($browsedata as $field) { //$key unused
 					if (count($field) == 2) {
 						$fv = $field[1];
@@ -177,7 +177,7 @@ class RecordExport
 		} else {
 			//no data, produce just a header line
 			$sql = 'SELECT name FROM '.$pre.'module_pwbr_field WHERE browser_id=? ORDER BY order_by';
-			$names = $db->GetCol($sql, array($params['browser_id']));
+			$names = $db->GetCol($sql, [$params['browser_id']]);
 			//cleanup messy field-names
 			foreach ($names as $i => &$one) {
 				if ($strip) {
