@@ -1,6 +1,6 @@
 <?php
 
-$lang['accessdenied']='Access denied. Please check your permissions.';
+//$lang['accessdenied']='Access denied. You don\'t have %s permission.';
 $lang['add']='Add';
 $lang['added']='Added';
 $lang['admindescription']='Administer, edit, configure browsers';
@@ -178,7 +178,7 @@ a website page or template will cause that browser to be displayed.</p>
 <h3>Requirements</h3>
 <ul>
 <li>CMS Made Simple 1.10+</li>
-<li>PHP 5.3+</li>
+<li>PHP 5.4+</li>
 <li>PHP extension mbstring</li>
 </ul>
 <h3>Support</h3>
