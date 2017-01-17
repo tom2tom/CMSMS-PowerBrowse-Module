@@ -24,7 +24,6 @@
  * Requires:
  * mcrypt extension
  */
- 
 namespace PWFBrowse;
 
 class Encryption
