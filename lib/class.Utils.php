@@ -8,7 +8,7 @@ namespace PWFBrowse;
 
 class Utils
 {
-	const STRETCHES = 10000;
+	const STRETCHES = 10240;
 
 	/**
 	SafeGet:
@@ -192,7 +192,7 @@ class Utils
 				$passwd = self::unfusc($mod->GetPreference('masterpass'));
 			}
 			if ($passwd && $mod->havemcrypt) {
-				$e = new Encryption(MCRYPT_TWOFISH, MCRYPT_MODE_CBC, self::STRETCHES);
+				$e = new Encryption('BF-CBC', 'default', self::STRETCHES);
 				$value = $e->encrypt($value, $passwd);
 				if ($based) {
 					$value = base64_encode($value);
@@ -222,7 +222,7 @@ class Utils
 				if ($based) {
 					$value = base64_decode($value);
 				}
-				$e = new Encryption(MCRYPT_TWOFISH, MCRYPT_MODE_CBC, self::STRETCHES);
+				$e = new Encryption('BF-CBC', 'default', self::STRETCHES);
 				$value = $e->decrypt($value, $passwd);
 			} else {
 				$value = substr(strlen($passwd), self::unfusc($value));
