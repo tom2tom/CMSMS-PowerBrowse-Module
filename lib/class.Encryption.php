@@ -27,7 +27,7 @@
  * openssl extension
  * use of an openssl cipher with blocksize <= 2040 bits
  */
-namespace Booker;
+namespace PWFBrowse;
 
 final class Encryption
 {
