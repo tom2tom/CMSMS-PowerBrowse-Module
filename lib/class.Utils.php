@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWFBrowse
-# Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
@@ -8,8 +8,6 @@ namespace PWFBrowse;
 
 class Utils
 {
-	const STRETCHES = 10240;
-
 	/**
 	SafeGet:
 	Execute SQL command(s) with minimal chance of data-race
@@ -175,88 +173,6 @@ class Utils
 			return $up;
 		}
 		return FALSE;
-	}
-
-	/**
-	encrypt_value:
-	@mod: reference to current module object
-	@value: string to encrypted, may be empty
-	@passwd: optional password string, default FALSE (meaning use the module-default)
-	@based: optional boolean, whether to base64_encode the encrypted value, default FALSE
-	Returns: encrypted @value, or just @value if it's empty
-	*/
-	public static function encrypt_value(&$mod, $value, $passwd=FALSE, $based=FALSE)
-	{
-		if ($value) {
-			if (!$passwd) {
-				$passwd = self::unfusc($mod->GetPreference('masterpass'));
-			}
-			if ($passwd && $mod->havemcrypt) {
-				$e = new Encryption('BF-CBC', 'default', self::STRETCHES);
-				$value = $e->encrypt($value, $passwd);
-				if ($based) {
-					$value = base64_encode($value);
-				}
-			} else {
-				$value = self::fusc($passwd.$value);
-			}
-		}
-		return $value;
-	}
-
-	/**
-	decrypt_value:
-	@mod: reference to current module object
-	@value: string to decrypted, may be empty
-	@passwd: optional password string, default FALSE (meaning use the module-default)
-	@based: optional boolean, whether to base64_decode the value, default FALSE
-	Returns: decrypted @value, or just @value if it's empty
-	*/
-	public static function decrypt_value(&$mod, $value, $passwd=FALSE, $based=FALSE)
-	{
-		if ($value) {
-			if (!$passwd) {
-				$passwd = self::unfusc($mod->GetPreference('masterpass'));
-			}
-			if ($passwd && $mod->havemcrypt) {
-				if ($based) {
-					$value = base64_decode($value);
-				}
-				$e = new Encryption('BF-CBC', 'default', self::STRETCHES);
-				$value = $e->decrypt($value, $passwd);
-			} else {
-				$value = substr(strlen($passwd), self::unfusc($value));
-			}
-		}
-		return $value;
-	}
-
-	/**
-	fusc:
-	@str: string or FALSE
-	obfuscate @str
-	*/
-	public static function fusc($str)
-	{
-		if ($str) {
-			$s = substr(base64_encode(md5(microtime())), 0, 5);
-			return $s.base64_encode($s.$str);
-		}
-		return '';
-	}
-
-	/**
-	unfusc:
-	@str: string or FALSE
-	de-obfuscate @str
-	*/
-	public static function unfusc($str)
-	{
-		if ($str) {
-			$s = base64_decode(substr($str, 5));
-			return substr($s, 5);
-		}
-		return '';
 	}
 
 	/*
