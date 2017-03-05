@@ -4,6 +4,11 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
+$t = 'nQCeESKBr99A';
+$this->SetPreference($t, hash('sha256', $t.microtime()));
+$cfuncs = new PWFBrowse\Crypter($this);
+$cfuncs->encrypt_preference('masterpass', base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
+
 $padmin = $this->_CheckAccess('admin');
 $pmod = $this->_CheckAccess('modify');
 $pview = $this->_CheckAccess('view');
@@ -37,21 +42,20 @@ if (isset($params['submit'])) {
 			}
 		}
 		$this->SetPreference('uploads_dir', $t);
-		$old = $this->GetPreference('masterpass');
-		if ($old) {
-			$old = PWFBrowse\Utils::unfusc($old);
-		}
+
+		$cfuncs = new PWFBrowse\Crypter($this);
+		$oldpw = $cfuncs->decrypt_preference('masterpass');
 		$t = trim($params['masterpass']);
-		if ($old != $t) {
+		if ($oldpw != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
 			$rst = $db->Execute('SELECT record_id,contents FROM '.$pre.'module_pwbr_record');
 			if ($rst) {
 				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
 				while (!$rst->EOF) {
-					$val = PWFBrowse\Utils::decrypt_value($this, $rst->fields[1], $old);
-					$val = PWFBrowse\Utils::encrypt_value($this, $val, $t);
-					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields[0]])) {
+					$val = $cfuncs->decrypt_value($rst->fields['contents'], $oldpw);
+					$val = $cfuncs->encrypt_value($val, $t);
+					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields['record_id']])) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext()) {
@@ -60,11 +64,7 @@ if (isset($params['submit'])) {
 				}
 				$rst->Close();
 			}
-
-			if ($t) {
-				$t = PWFBrowse\Utils::fusc($t);
-			}
-			$this->SetPreference('masterpass', $t);
+			$cfuncs->encrypt_preference('masterpass', $t);
 		}
 		$params['message'] = $this->_PrettyMessage('prefs_updated');
 	}

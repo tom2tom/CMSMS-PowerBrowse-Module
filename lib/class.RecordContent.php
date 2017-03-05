@@ -26,7 +26,8 @@ class RecordContent
 	{
 		//insert fake field with read-only key and datetime marker
 		$store = ['_s'=>[0=>$mod->Lang('title_submitted'),1=>$stamp,'dt'=>'']] + $data;
-		$cont = Utils::encrypt_value($mod, serialize($store));
+		$cfuncs = new Crypter($mod);
+		$cont = $cfuncs->encrypt_value(serialize($store));
 		unset($store);
 		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,contents) VALUES (?,?,?)',
 			[$browser_id, $form_id, $cont]);
@@ -54,7 +55,8 @@ class RecordContent
 				$stamp = time();
 				$store = ['_m'=>[0=>$mod->Lang('title_modified'),1=>$stamp,'dt'=>'']] + $data;
 			}
-			$cont = Utils::encrypt_value($mod, serialize($store));
+			$cfuncs = new Crypter($mod);
+			$cont = $cfuncs->encrypt_value(serialize($store));
 			unset($store);
 		}
 		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?',
@@ -70,7 +72,8 @@ class RecordContent
 	public function Decrypt(&$mod, $source, $raw=FALSE)
 	{
 		if ($source) {
-			$decrypted = Utils::decrypt_value($mod, $source);
+			$cfuncs = new Crypter($mod);
+			$decrypted = $cfuncs->decrypt_value($source);
 			if ($decrypted) {
 				if ($raw) {
 					return $decrypted;
