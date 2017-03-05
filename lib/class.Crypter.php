@@ -10,14 +10,19 @@ class Crypter Extends Encryption
 {
 	const STRETCHES = 8192;
 	protected $mod;
+	protected $custom;
 
 	/*
+	constructor:
 	@mod: reference to current module object
+	@method: optional openssl cipher type to use, default 'BF-CBC'
+	@stretches: optional number of extension-rounds to apply, default 8192
 	*/
-	public function __construct(&$mod, $algo='BF-CBC', $stretches=self::STRETCHES)
+	public function __construct(&$mod, $method='BF-CBC', $stretches=self::STRETCHES)
 	{
 		$this->mod = $mod;
-		parent::__construct($algo, 'default', $stretches);
+		$this->custom = \cmsms()->GetConfig()['ssl_url'].$mod->GetModulePath(); //site&module-dependent
+		parent::__construct($method, 'default', $stretches);
 	}
 
 	/**
@@ -27,7 +32,7 @@ class Crypter Extends Encryption
 	*/
 	public function encrypt_preference($key, $value)
 	{
-		$pw = hash('crc32b', $this->mod->GetPreference('nQCeESKBr99A').$this->mod->GetModulePath()); //site&module-dependent
+		$pw = hash('crc32b', $this->mod->GetPreference('nQCeESKBr99A').$this->custom);
 		$s = parent::encrypt($value, $pw);
 		$this->mod->SetPreference($key, base64_encode($s));
 	}
@@ -40,7 +45,7 @@ class Crypter Extends Encryption
 	public function decrypt_preference($key)
 	{
 		$s = base64_decode($this->mod->GetPreference($key));
-		$pw = hash('crc32b', $this->mod->GetPreference('nQCeESKBr99A').$this->mod->GetModulePath());
+		$pw = hash('crc32b', $this->mod->GetPreference('nQCeESKBr99A').$this->custom);
 		return parent::decrypt($s, $pw);
 	}
 
