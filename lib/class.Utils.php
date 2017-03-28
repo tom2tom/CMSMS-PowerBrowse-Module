@@ -296,13 +296,13 @@ class Utils
 	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
-		if ($mod->before20) {
+//		if ($mod->before20) {
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
-		} else {
+/*		} else {
 			if ($cache) {
 				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
-				$lang = CmsNlsOperations::get_current_language();
+				$lang = \CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwbr'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);
 				if (!$tpl->isCached()) {
@@ -313,6 +313,7 @@ class Utils
 			}
 			return $tpl->fetch();
 		}
+*/
 	}
 
 	/**
