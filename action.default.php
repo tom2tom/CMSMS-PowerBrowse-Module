@@ -141,7 +141,7 @@ EOS;
 		}
 		$choices[$this->Lang('all')] = 0;
 
-		$tplvars = $tplvars + [
+		$tplvars += [
 			'hasnav'=>1,
 			'first'=>'<a href="javascript:pagefirst()">'.$this->Lang('first').'</a>',
 			'prev'=>'<a href="javascript:pageback()">'.$this->Lang('previous').'</a>',

@@ -16,13 +16,14 @@ $tplvars['tabs_start'] = $this->StartTabHeaders().
 	$this->SetTabHeader('listtab', $this->Lang('tab_list'), ($tab == 'listtab')).
 	$this->EndTabHeaders() . $this->StartTabContent();
 
-$tplvars = $tplvars + [
+//workaround CMSMS2 crap 'auto-end', EndTab() & EndTabContent() before [1st] StartTab()
+$tplvars += [
 	'start_form'=>$this->CreateFormStart($id, 'open_browser', $returnid),
 	'end_form'=>$this->CreateFormEnd(),
 	'hidden'=>$this->CreateInputHidden($id, 'browser_id', $params['browser_id']).
 		$this->CreateInputHidden($id, 'active_tab', ''),
+	'tab_end'=>$this->EndTab(),
 	'tabs_end'=>$this->EndTabContent(),
-	'tab_end'=>$this->EndTab(), //must be after EndTabContent() - CMSMS2 workaround
 	'maintab_start'=>$this->StartTab('maintab'),
 	'listtab_start'=>$this->StartTab('listtab')
 ];
@@ -38,7 +39,7 @@ $baseurl = $this->GetModuleURLPath();
 $pre = cms_db_prefix();
 $row = $db->GetRow('SELECT * FROM '.$pre.'module_pwbr_browser WHERE browser_id=?', [$params['browser_id']]);
 
-$tplvars = $tplvars + [
+$tplvars += [
 	'title_form_name'=>$this->Lang('title_form_name'),
 	'form_name'=>$row['form_name'],
 	'title_browser_name'=>$this->Lang('title_browser_name'),
@@ -86,7 +87,7 @@ $sql = 'SELECT field_id,name,shown,frontshown,sorted FROM '.$pre.'module_pwbr_fi
 WHERE browser_id=? ORDER BY order_by';
 $fields = $db->GetArray($sql, [$params['browser_id']]);
 if ($fields) {
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'title_data'=>$this->Lang('title_data'),
 		'title_name'=>$this->Lang('title_field_identity'),
 		'title_admdisplay'=>$this->Lang('title_display'),
@@ -189,7 +190,7 @@ function select_all(cb) {
  }
 }
 EOS;
-		$tplvars = $tplvars + [
+		$tplvars += [
 			'select_all1'=>$this->CreateInputCheckbox($id, 'allshow', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'select_all2'=>$this->CreateInputCheckbox($id, 'allfshow', TRUE, FALSE, 'onclick="select_all(this);"'),
 			'select_all3'=>$this->CreateInputCheckbox($id, 'allsort', TRUE, FALSE, 'onclick="select_all(this);"'),
@@ -198,7 +199,7 @@ EOS;
 		];
 	}
 } else {
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'nofields'=>$this->Lang('nofields'),
 		'rc'=>0
 	];
@@ -211,7 +212,7 @@ function set_tab() {
 }
 EOS;
 
-$tplvars = $tplvars + [
+$tplvars += [
 	'save'=>$this->CreateInputSubmit($id, 'submit', $this->Lang('save'), 'onclick="set_tab();"'),
 	'apply'=>$this->CreateInputSubmit($id, 'apply', $this->Lang('apply'), 'title="'.$this->Lang('save_and_continue').'" onclick="set_tab();"'),
 	'cancel'=>$this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'), 'onclick="set_tab();"')
