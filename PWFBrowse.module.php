@@ -19,16 +19,16 @@
 
 class PWFBrowse extends CMSModule
 {
-	public $havemcrypt;	//whether password encryption is supported
 	public $before20;
+	public $oldtemplates;
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->havemcrypt = function_exists('mcrypt_encrypt');
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
-
+		$this->oldtemplates = $this->before20 || 1; //TODO
+		//TODO detect whether customised autoloader is in place, if so don't autoregister here
 		spl_autoload_register([$this, 'cmsms_spacedload']);
 	}
 
@@ -40,7 +40,7 @@ class PWFBrowse extends CMSModule
 		}
 	}
 
-	/* namespace autoloader - CMSMS default autoloader doesn't do spacing */
+	/* namespace autoloader - CMSMS 2.1- default autoloader doesn't do spacing for modules */
 	private function cmsms_spacedload($class)
 	{
 		$prefix = get_class().'\\'; //our namespace prefix
