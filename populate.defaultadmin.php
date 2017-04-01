@@ -9,24 +9,24 @@ $iseditor = $this->CheckPermission('Modify Any Page');
 $tplvars['message'] = (isset($params['message']))?$params['message']:NULL;
 
 $tab = $this->_GetActiveTab($params);
-
 $t = $this->starttabheaders().
 	$this->settabheader('browsers', $this->lang('title_browsers'), ($tab == 'maintab'));
 if ($padmin) {
 	$t .= $this->settabheader('settings', $this->lang('tab_settings'), ($tab == 'settings'));
-	$tplvars['start_settings_tab'] = $this->StartTab('settings');
 }
 $t .= $this->endtabheaders().$this->starttabcontent();
-
-$tplvars = $tplvars + [
+//workaround CMSMS2 crap 'auto-end', EndTab() & EndTabContent() before [1st] StartTab()
+$tplvars += [
 	'tabs_header'=>$t,
-	'start_browsers_tab'=>$this->StartTab('browsers'),
+	'end_tab'=>$this->EndTab(),
 	'tabs_footer'=>$this->EndTabContent(),
-	'end_tab'=>$this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
-
+	'start_browsers_tab'=>$this->StartTab('browsers'),
 	'start_browsersform'=>$this->CreateFormStart($id, 'multi_browser', $returnid),
 	'end_form'=>$this->CreateFormEnd()
 ];
+if ($padmin) {
+	$tplvars['start_settings_tab'] = $this->StartTab('settings');
+}
 
 $theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
