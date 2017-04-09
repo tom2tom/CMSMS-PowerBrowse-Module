@@ -299,6 +299,9 @@ class Utils
 			global $smarty;
 		} else {
 			$smarty = $mod->GetActionTemplateObject();
+			if (!$smarty) {
+				global $smarty;
+			}
 		}
 		$smarty->assign($tplvars);
 		if ($mod->oldtemplates) {
