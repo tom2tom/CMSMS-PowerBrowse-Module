@@ -133,7 +133,7 @@ if ($fields) {
 
 	if ($rc > 1) {
 		$jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.tablednd.min.js"></script>
 EOS;
 		$jsloads[] = <<<'EOS'
  $('.updown').css('display','none');

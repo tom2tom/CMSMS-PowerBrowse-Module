@@ -88,8 +88,8 @@ $tplvars['rcount'] = $rcount;
 if ($rcount) {
 	if ($rcount > 1) {
 		$jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery.metadata.min.js"></script>
-<script type="text/javascript" src="{$baseurl}/include/jquery.SSsort.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.metadata.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.SSsort.min.js"></script>
 EOS;
 		$jsloads[] = <<<EOS
  $('#submissions').addClass('table_sort').SSsort({
