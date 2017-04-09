@@ -56,7 +56,7 @@ if ($browsers) {
 
 	$alt = $this->Lang('inspect');
 	$icon_admin =
-	'<img class="systemicon" src="'.$this->GetModuleURLPath().'/images/inspect.png" alt="'.$alt.'" title="'.$alt.'" />';
+	'<img class="systemicon" src="'.$this->GetModuleURLPath().'/images/administer.png" alt="'.$alt.'" title="'.$alt.'" />';
 	$icon_clone = $theme->DisplayImage('icons/system/copy.gif', $this->Lang('clone'), '', '', 'systemicon');
 	$icon_delete = $theme->DisplayImage('icons/system/delete.gif', $this->Lang('delete'), '', '', 'systemicon');
 	$icon_edit = $theme->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon');
@@ -264,7 +264,7 @@ if ($padmin) {
 	$configs[] = $oneset;
 
 	$jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery-inputCloak.min.js"></script>
 EOS;
 	$jsloads[] = <<<EOS
  $('#{$id}passwd').inputCloak({
