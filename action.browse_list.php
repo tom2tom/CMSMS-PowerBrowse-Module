@@ -144,7 +144,7 @@ EOS;
   evenClass: 'row2',
   oddsortClass: 'row1s',
   evensortClass: 'row2s',
-  paginate: TRUE,
+  paginate: true,
   pagesize: {$pagerows},
   currentid: 'cpage',
   countid: 'tpage'
