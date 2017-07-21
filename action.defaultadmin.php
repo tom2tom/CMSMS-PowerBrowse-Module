@@ -4,11 +4,6 @@
 # Refer to licence and other details at the top of file PWFBrowse.module.php
 # More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
 
-$t = 'nQCeESKBr99A';
-$this->SetPreference($t, hash('sha256', $t.microtime()));
-$cfuncs = new PWFBrowse\Crypter($this);
-$cfuncs->encrypt_preference('masterpass', base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
-
 $padmin = $this->_CheckAccess('admin');
 $pmod = $this->_CheckAccess('modify');
 $pview = $this->_CheckAccess('view');
@@ -44,8 +39,9 @@ if (isset($params['submit'])) {
 		$this->SetPreference('uploads_dir', $t);
 
 		$cfuncs = new PWFBrowse\Crypter($this);
-		$oldpw = $cfuncs->decrypt_preference('masterpass');
-		$t = trim($params['masterpass']);
+		$key = PWFBrowse\Crypter::MKEY;
+		$oldpw = $cfuncs->decrypt_preference($key);
+		$t = trim($params[$key]);
 		if ($oldpw != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
@@ -64,7 +60,7 @@ if (isset($params['submit'])) {
 				}
 				$rst->Close();
 			}
-			$cfuncs->encrypt_preference('masterpass', $t);
+			$cfuncs->encrypt_preference($key, $t);
 		}
 		$params['message'] = $this->_PrettyMessage('prefs_updated');
 	}

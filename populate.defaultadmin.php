@@ -256,10 +256,11 @@ if ($padmin) {
 	}
 
 	$cfuncs = new PWFBrowse\Crypter($this);
-	$t = $cfuncs->decrypt_preference('masterpass');
+	$key = PWFBrowse\Crypter::MKEY;
+	$t = $cfuncs->decrypt_preference($key);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
-	$oneset->input = $this->CreateTextArea(FALSE, $id, $t, 'masterpass', 'cloaked',
+	$oneset->input = $this->CreateTextArea(FALSE, $id, $t, $key, 'cloaked',
 		$id.'passwd', '', '', 40, 2);
 	$configs[] = $oneset;
 
