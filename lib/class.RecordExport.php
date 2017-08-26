@@ -134,7 +134,7 @@ class RecordExport
 						$fv = str_replace($sep, $r, $fv);
 						$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 					} else { //format-parameter(s) present
-						PWFBrowse\Utils::FormatRecord($this, $field, $browsedata, FALSE);
+						Utils::FormatRecord($mod, $field, $browsedata, FALSE);
 						if (!is_array($field[0])) {
 							$fv = $field[1];
 							if ($strip) {
