@@ -10,7 +10,7 @@ if (!$this->_CheckAccess('modify')) {
 
 switch ($oldversion) {
 /* case '0.8':
-	$cfuncs = new PWFBrowse\Crypter($this);
+	$cfuncs = new PWFBrowse\CryptInit($this);
 	$key = 'masterpass';
 	$s = base64_decode($this->GetPreference($key));
 	$t = $config['ssl_url'].$this->GetModulePath();

@@ -44,20 +44,15 @@ form_field I(2) DEFAULT 0
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwbr_field_seq');
-$sqlarray = $dict->CreateIndexSQL('idx_fieldbrowser', $pre.'module_pwbr_field', 'browser_id');
-$dict->ExecuteSQLArray($sqlarray);
-
 $flds = '
 record_id I(4) AUTO KEY,
 browser_id I(2),
 form_id I(2),
-contents B
+contents B(16364)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_record', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwbr_record_seq');
 $sqlarray = $dict->CreateIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record', 'browser_id');
 $dict->ExecuteSQLArray($sqlarray);
 
@@ -65,9 +60,11 @@ $this->CreatePermission('ModifyPwBrowsers', $this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData', $this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData', $this->Lang('perm_see'));
 
-$cfuncs = new PWFBrowse\Crypter($this);
+$cfuncs = new PWFBrowse\CryptInit($this);
 $cfuncs->init_crypt();
-$cfuncs->encrypt_preference(PWFBrowse\Crypter::MKEY, base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
+$t = substr(str_shuffle(base64_encode(time().$config['root_url'].rand(10000000, 99999999))), 0, 10);
+$t = sprintf(base64_decode('Q3JhY2tlcnMgd2lsbCBoYXZlIHRvIGZpZ3VyZSBvdXQgJXMh'), $t);
+$cfuncs->encrypt_preference(PWFBrowse\Crypter::MKEY, $t);
 
 $this->SetPreference('date_format', 'Y-m-d');
 $this->SetPreference('export_file', 0);
