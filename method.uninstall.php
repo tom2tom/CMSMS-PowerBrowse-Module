@@ -40,13 +40,11 @@ $sql = $dict->DropIndexSQL('idx_fieldbrowser', $pre.'module_pwbr_field');
 $dict->ExecuteSQLArray($sql);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwbr_field');
 $dict->ExecuteSQLArray($sqlarray);
-$db->DropSequence($pre.'module_pwbr_field_seq');
 
 $sql = $dict->DropIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record');
 $dict->ExecuteSQLArray($sql);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwbr_record');
 $dict->ExecuteSQLArray($sqlarray);
-$db->DropSequence($pre.'module_pwbr_record_seq');
 
 // remove permissions
 $this->RemovePermission('ModifyPwBrowsers');
