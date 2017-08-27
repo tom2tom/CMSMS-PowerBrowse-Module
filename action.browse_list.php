@@ -150,6 +150,38 @@ EOS;
   countid: 'tpage'
  });
 EOS;
+		$jsloads[] = <<<'EOS'
+ var shifted = false,
+  firstClicked = null;
+ $checks = $('#submissions > tbody').find('input[type="checkbox"]');
+ $checks.click(function() {
+  if (shifted && firstClicked) {
+   var i,
+    first = $checks.index(firstClicked),
+    last = $checks.index(this),
+    chk = firstClicked.checked;
+   if (first < last) {
+    for (i = first; i <= last; i++) {
+     $checks[i].checked = chk;
+    }
+   } else if (first > last) {
+    for (i = first; i >= last; i--) {
+     $checks[i].checked = chk;
+    }
+   }
+  }
+  firstClicked = this;
+ });
+ $(this).keydown(function(e) {
+  if (e.keyCode == 16) {
+   shifted = true;
+  }
+ }).keyup(function(e) {
+  if (e.keyCode == 16) {
+   shifted = false;
+  }
+ });
+EOS;
 /*TODO js-equivalent of mb_sort
 	$jsfuncs[] = <<<'EOS'
  $.SSsort.addParser({
@@ -167,8 +199,9 @@ EOS;
 EOS;
 */
 		$jsfuncs[] = <<<'EOS'
+var $checks;
 function select_all(cb) {
- $('#submissions > tbody').find('input[type="checkbox"]').attr('checked',cb.checked);
+ $checks.attr('checked',cb.checked);
 }
 EOS;
 		$tplvars['header_checkbox'] =
@@ -225,16 +258,19 @@ EOS;
 		$tplvars['hasnav'] = 0;
 	}
 
-	$jsfuncs[] = <<<EOS
-function sel_count() {
- var cb = $('input[name="{$id}sel[]"]:checked');
- return cb.length;
-}
-function any_selected() {
- return (sel_count() > 0);
+	$jsfuncs[] = <<<'EOS'
+function issel() {
+ var c = false;
+ $checks.each(function() {
+  if (this.checked) {
+   c = true;
+   return false;
+  }
+ });
+ return c;
 }
 function confirm_selected(msg) {
- if (sel_count() > 0) {
+ if (issel()) {
   return confirm(msg);
  } else {
   return false;
@@ -244,7 +280,7 @@ EOS;
 	if ($this->_CheckAccess('view') || $this->_CheckAccess('admin')) {
 		$tplvars['export'] = $this->CreateInputSubmit($id, 'export', $this->Lang('export'),
 		'title="'.$this->Lang('tip_export_selected_records').
-		'"  onclick="return any_selected();"');
+		'" onclick="return issel();"');
 	}
 	if ($pmod) {
 		$tplvars['delete'] = $this->CreateInputSubmit($id, 'delete', $this->Lang('delete'),
