@@ -147,7 +147,7 @@ class PWFBrowse extends CMSModule
 
 	public function MinimumCMSVersion()
 	{
-		return '1.10'; //class auto-loading needed in PWForms
+		return '1.11'; //same as dependent PWForms
 	}
 
 /*	public function MaximumCMSVersion()
