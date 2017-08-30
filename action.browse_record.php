@@ -87,10 +87,10 @@ if (isset($params['edit'])) {
 		}
 		$content[] = [htmlentities($title),$input];
 	}
+	$tplvars['hidden'] = implode(PHP_EOL, $hidden);
 	$tplvars['submit'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('submit'));
 	$tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 } else { //view
-	$hidden = NULL;
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as', $bname);
 	foreach ($browsedata as $key=>$field) {
 		if (count($field) > 2) { //format-parameter(s) present
@@ -105,9 +105,9 @@ if (isset($params['edit'])) {
 		}
 		$content[] = [htmlentities($field[0]),htmlentities($field[1])];
 	}
+	$tplvars['hidden'] = NULL;
 	$tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('close'));
 }
 $tplvars['content'] = $content;
-$tplvars['hidden'] = implode(PHP_EOL, $hidden);
 
 echo PWFBrowse\Utils::ProcessTemplate($this, 'browse_record.tpl', $tplvars);
