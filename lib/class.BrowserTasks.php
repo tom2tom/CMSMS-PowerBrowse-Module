@@ -70,7 +70,8 @@ class BrowserTasks
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
-		if (!$db->Execute($sql, [$browser_id])) {
+		$db->Execute($sql, [$browser_id]);
+		if ($db->Affected_Rows() == 0) {
 			return FALSE;
 		}
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
