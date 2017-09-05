@@ -60,16 +60,16 @@ JOIN {$pre}groups GR ON GR.group_id=UG.group_id
 WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND P.permission_name IN('ModifyPwBrowsers','ModifyPwFormData')
 ORDER BY U.last_name,U.first_name
 EOS;
-	$rs = $db->Execute($sql);
-	if ($rs) {
-		while ($urow = $rs->FetchRow()) {
+	$rst = $db->Execute($sql);
+	if ($rst) {
+		while ($urow = $rst->FetchRow()) {
 			$name = trim($urow['first_name'].' '.$urow['last_name']);
 			if ($name == '') {
 				$name = trim($urow['username']);
 			}
 			$sel[$name] = (int)$urow['user_id'];
 		}
-		$rs->Close();
+		$rst->Close();
 	}
 	$tplvars['title_browser_owner'] = $this->Lang('title_browser_owner');
 	$tplvars['input_browser_owner'] =
