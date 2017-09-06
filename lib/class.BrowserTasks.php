@@ -138,7 +138,7 @@ class BrowserTasks
 		$row['name'] = (empty($params['browser_name'])) ?
 			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy'):
 			trim($params['browser_name']);
-		$fields = implode(',', array_keys($row);
+		$fields = implode(',', array_keys($row));
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser ('.$fields.')
 VALUES (?,?,?,?,?,?,?)', array_values($row));
 		$newid = $db->Insert_ID();
