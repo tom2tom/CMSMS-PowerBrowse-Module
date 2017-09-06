@@ -1,16 +1,17 @@
 <?php
-# This file is part of CMS Made Simple module: PWFBrowse
-# Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWFBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
-
+/*
+This file is part of CMS Made Simple module: PWFBrowse
+Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWFBrowse.module.php
+More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
+*/
 //functions involving FormBrowser and/or FormBuilder modules (assumed present)
 
 namespace PWFBrowse;
 
 class Transition
 {
-	/*	//FormBrowser/Builder-module table use here
+/*	//FormBrowser/Builder-module table use here
 	public function GetBrowsersSummary()
 	{
 		$pre = \cms_db_prefix();
@@ -36,7 +37,7 @@ EOS;
 		$pre = \cms_db_prefix();
 		$converts = self::Get_Converts($db, $pre, $form_id);
 		if ($converts) {
-			$newfid = (int)reset($converts);
+			$newfid = (int) reset($converts);
 			$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE form_id=?';
 			$data = Utils::SafeGet($sql, [$form_id]);
 			if ($data) {
@@ -47,12 +48,12 @@ EOS;
 						$olddata = $funcs->Decrypt($mod, $one['contents']);
 						if ($olddata) {
 							$newdata = [];
-							foreach ($olddata as $key=>$field) {
+							foreach ($olddata as $key => $field) {
 								if (is_numeric($key) && $key < 0) {
 									$key = -$key;
 								}
 								if (array_key_exists($key, $converts)) {
-									$key = (int)$converts[$key];
+									$key = (int) $converts[$key];
 								}
 								$newdata[$key] = $field;
 							}
@@ -72,7 +73,7 @@ EOS;
 	ImportBrowsers:
 	@mod: reference to PWFBrowse module object
 	FormBrowser/Builder-module table use here
-	Returns: 2-member array:
+	Returns: 2-member array,
 	 [0] = no. of browsers processed
 	 [1] = no. of browsers skipped due to no data
 	*/
@@ -82,40 +83,60 @@ EOS;
 		$sql = <<<EOS
 SELECT B.browser_id,B.form_id,B.name,F.name AS formname FROM {$pre}module_fbr_browser B
 LEFT JOIN {$pre}module_fb_form F ON B.form_id=F.form_id
-ORDER BY B.browser_id
+ORDER BY B.form_id
 EOS;
 		$db = \cmsms()->GetDb();
 		$olds = $db->GetArray($sql);
 		if ($olds) {
-			$oc = count($olds);
+			$fb = \cms_utils::get_module('FormBuilder');
+			$funcs = new RecordContent();
+
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
-(browser_id,form_id,name,form_name) VALUES (?,?,?,?)';
+(form_id,name,form_name) VALUES (?,?,?)';
 			$renums = [];
 			$converts = self::Get_Converts($db, $pre, 0); //field_id translations
 			foreach ($olds as $row) {
-				$newbid = $db->GenID($pre.'module_pwbr_browser_seq');
-				$oldbid = (int)$row['browser_id'];
-				$fconv = self::Get_Converts($db, $pre, $row['form_id']);
-				if ($fconv) {
-					$newfid = reset($fconv);
-				} else {
-					$newfid = -$row['form_id']; //form id < 0 signals FormBuilder form id
-				}
-				if (self::Get_Data($mod, $db, $pre, $newbid, $oldbid, $newfid, $row['form_id'], $converts)) {
-					$renums[$newbid] = $oldbid;
-					$db->Execute($sql, [$newbid, $newfid, $row['name'], $row['formname']]);
+				$oldfid = (int) $row['form_id'];
+				$flds = [];
+				$parms = [];
+//GetSortedResponses($form_id,$start_point,$number=100,$admin_approved=FALSE,$user_approved=FALSE,$field_list=array(),$dateFmt='d F y',&$params)
+				list($count, $names, $details) = $fb->GetSortedResponses($oldfid,	-1, -1,
+					FALSE, FALSE, $flds, 'Y-m-d', $parms);
+				if ($count > 0) {
+					$fconv = self::Get_Converts($db, $pre, $oldfid);
+					$newfid = ($fconv) ? reset($fconv) : -$row['form_id']; //form id < 0 signals FormBuilder form id
+
+					$db->Execute($sql, [$newfid, $row['name'], $row['formname']]);
+					$newbid = $db->Insert_ID();
+					$renums[$newbid] = (int) $row['browser_id']; //a.k.a. oldbid
+
+					foreach ($details as &$one) {
+						$olddata = [];
+						foreach ($one->fields as $fid => $fval) {
+							if ($converts && array_key_exists($fid, $converts)) {
+								$nid = (int) $converts[$fid];
+							} else {
+								$nid = -$fid; //id < 0 signals FormBuilder field
+							}
+							$olddata[$nid] = [$names[$fid], $fval];
+						}
+						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata);
+					}
+					unset($one);
 				}
 			}
+
+			$oc = count($olds);
 			if ($renums) {
-				foreach ($renums as $newbid=>$oldbid) {
+				foreach ($renums as $newbid => $oldbid) {
 					self::Get_Attrs($mod, $db, $pre, $newbid, $oldbid, $converts);
 				}
 				$ic = count($renums);
-				return [$ic,$oc-$ic];
+				return [$ic, $oc - $ic];
 			}
-			return [0,$oc];
+			return [0, $oc];
 		}
-		return [0,0];
+		return [0, 0];
 	}
 
 /* example data from FormBuilder::GetSortedResponses()
@@ -161,34 +182,6 @@ $vals = array (size=whatever)
   1 =>
   and so on
 */
-	//this saves nothing and returns FALSE if there's no recorded response to interrogate
-	private function Get_Data(&$mod, &$db, $pre, $newbid, $oldbid, $newfid, $oldfid, &$fieldconverts)
-	{
-		$fb = \cms_utils::get_module('FormBuilder');
-		$flds = [];
-		$parms = [];
-//GetSortedResponses($form_id,$start_point,$number=100,$admin_approved=FALSE,$user_approved=FALSE,$field_list=array(),$dateFmt='d F y',&$params)
-		list($count, $names, $details) = $fb->GetSortedResponses($oldfid,	-1, -1,
-			FALSE, FALSE, $flds, 'Y-m-d', $parms);
-		if ($count > 0) {
-			$funcs = new RecordContent();
-			foreach ($details as &$one) {
-				$olddata = [];
-				foreach ($one->fields as $fid=>$fval) {
-					if ($fieldconverts && array_key_exists($fid, $fieldconverts)) {
-						$nid = (int)$fieldconverts[$fid];
-					} else {
-						$nid = -$fid; //id < 0 signals FormBuilder field
-					}
-					$olddata[$nid] = [$names[$fid],$fval];
-				}
-				$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata);
-			}
-			unset($one);
-			return TRUE;
-		}
-		return FALSE;
-	}
 
 	private function Get_Attrs(&$mod, &$db, $pre, $newbid, $oldbid, &$fieldconverts)
 	{
@@ -206,7 +199,7 @@ EOS;
 					self::Get_Fields($mod, $db, $pre, $oldbid, $newbid, $row['value'], $fieldconverts);
 					break;
 				case 'admin_rows_per_page':
-					$db->Execute($sql, [(int)$row['value'], $newbid]);
+					$db->Execute($sql, [(int) $row['value'], $newbid]);
 					break;
 				}
 			}
@@ -242,12 +235,12 @@ EOS;
 				$order += 2;
 			} else {
 				$see = 0;
-				$order = $l+$i;
+				$order = $l + $i;
 			}
 			$nm = ($indx && !empty($names[$indx])) ? $names[$indx] : 'unnamed-'.$oldbid.':'.$i;
-			$fid = (int)$one['field_id'];
+			$fid = (int) $one['field_id'];
 			if ($fieldconverts && array_key_exists($fid, $fieldconverts)) {
-				$fid = (int)$fieldconverts[$fid];
+				$fid = (int) $fieldconverts[$fid];
 			} else {
 				$fid = -$fid; //id < 0 signals FormBuilder field id
 			}
