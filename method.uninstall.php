@@ -34,7 +34,6 @@ $pre = cms_db_prefix();
 
 $sqlarray = $dict->DropTableSQL($pre.'module_pwbr_browser');
 $dict->ExecuteSQLArray($sqlarray);
-$db->DropSequence($pre.'module_pwbr_browser_seq');
 
 $sql = $dict->DropIndexSQL('idx_fieldbrowser', $pre.'module_pwbr_field');
 $dict->ExecuteSQLArray($sql);

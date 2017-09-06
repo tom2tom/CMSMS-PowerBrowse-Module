@@ -93,11 +93,11 @@ class BrowserTasks
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
 		$formname = Utils::GetFormNameFromID($params['form_id'], FALSE);
-		$db->Execute('INSERT INTO '.$pre.
-	'module_pwbr_browser (browser_id,form_id,name,form_name) VALUES (?,?,?,?)',
-			[$newid, $params['form_id'], $params['name'], $formname]);
+		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser
+(form_id,name,form_name) VALUES (?,?,?)',
+			[$params['form_id'], $params['name'], $formname]);
+		$newid = $db->Insert_ID();
 		$funcs = new FormsIface();
 		$list = $funcs->GetBrowsableFields($params['form_id']);
 		if ($list) {
@@ -132,15 +132,16 @@ class BrowserTasks
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$browser_id = (int)$params['browser_id'];
-		$newid = $db->GenID($pre.'module_pwbr_browser_seq');
 
 		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?', [$browser_id]);
-		$row['browser_id'] = $newid;
-		$row['name'] =  (empty($params['browser_name'])) ?
+		unset($row['browser_id']);
+		$row['name'] = (empty($params['browser_name'])) ?
 			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy'):
 			trim($params['browser_name']);
-		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser
+		$fields = implode(',', array_keys($row);
+		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser ('.$fields.')
 VALUES (?,?,?,?,?,?,?)', array_values($row));
+		$newid = $db->Insert_ID();
 
 		$list = $db->GetArray('SELECT browser_id,name,shown,frontshown,sorted,order_by FROM '.
 			$pre.'module_pwbr_field WHERE browser_id=?', [$browser_id]);

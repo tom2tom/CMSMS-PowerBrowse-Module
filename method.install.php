@@ -20,7 +20,7 @@ $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
 
 $flds = '
-browser_id I(2) KEY,
+browser_id I(2) AUTO KEY,
 form_id I(2),
 name C(256),
 form_name C(256),
@@ -29,7 +29,6 @@ pagerows I(2) DEFAULT 10
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_browser', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-$db->CreateSequence($pre.'module_pwbr_browser_seq');
 
 $flds = '
 field_id I(2) AUTO KEY,
