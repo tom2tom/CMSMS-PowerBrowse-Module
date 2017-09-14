@@ -103,7 +103,7 @@ EOS;
 				}
 			}
 			$count = Crypter::BATCHED;
-			$rounds = 5 * $count * ($interval - 1) / $total; //fudge
+			$rounds = $mod->GetPreference('rounds_factor') * $count * ($interval - 1) / $total;
 			$rounds = (int) ($rounds/100) * 100;
 			if ($rounds > $count) {
 				$rounds = $count;

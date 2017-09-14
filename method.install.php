@@ -72,6 +72,7 @@ $this->SetPreference('export_file_encoding', 'ISO-8859-1');
 $this->SetPreference('list_cssfile', '');
 $this->SetPreference('onchange_notices', 0);
 $this->SetPreference('owned_forms', 0);	//enable user-specific browsing
+$this->SetPreference('rounds_factor', 5);
 $this->SetPreference('strip_on_export', 0);
 $this->SetPreference('time_format', 'H:i:s');
 $fp = $config['uploads_path'];

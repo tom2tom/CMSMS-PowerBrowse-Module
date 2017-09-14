@@ -13,6 +13,13 @@ if (!($padmin || $pmod || $pview)) {
 
 if (isset($params['submit'])) {
 	if ($padmin) {
+		$t = $params['rounds_factor'] + 0;
+		if ($t < 0.1) {
+			$t = 0.1;
+		} elseif ($t > 20) {
+			$t = 20;
+		}
+		$this->SetPreference('rounds_factor', $t);
 		$this->SetPreference('date_format', trim($params['date_format']));
 		$this->SetPreference('export_file', !empty($params['export_file']));
 		$this->SetPreference('export_file_encoding', trim($params['export_file_encoding']));
@@ -47,11 +54,12 @@ if (isset($params['submit'])) {
 			$pre = cms_db_prefix();
 			$rst = $db->Execute('SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record');
 			if ($rst) {
-				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds=?,contents=? WHERE record_id=?';
+				$rounds = (int)($this->GetPreference('rounds_factor') * 100); //update to default rounds (if not already there)
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',contents=? WHERE record_id=?';
 				while (!$rst->EOF) {
 					$val = $cfuncs->decrypt_value($rst->fields['contents'], $rst->fields['rounds'], $oldpw);
-					$val = $cfuncs->encrypt_value($val, 0, $t); //update to default rounds (if not already there)
-					if (!PWFBrowse\Utils::SafeExec($sql, [0, $val, $rst->fields['record_id']])) {
+					$val = $cfuncs->encrypt_value($val, $rounds, $t);
+					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields['record_id']])) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext()) {

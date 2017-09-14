@@ -65,8 +65,9 @@ class RecordContent
 			if ($cfuncs == NULL) {
 				$cfuncs = new Crypter($mod);
 			}
-// TODO set rounds per browser-records-count
-			$cont = $cfuncs->encrypt_value(serialize($store)); //default (aka 0) rounds
+			//update to default rounds (if not already there)
+			$rounds = (int)($mod->GetPreference('rounds_factor') * 100);
+			$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 			unset($store);
 		}
 		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds=0,contents=? WHERE record_id=?',

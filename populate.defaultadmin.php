@@ -195,6 +195,12 @@ if ($padmin) {
 	$configs = [];
 
 	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_rounds_factor');
+	$oneset->input = $this->CreateInputText($id, 'rounds_factor', $this->GetPreference('rounds_factor'), 3, 3);
+	$oneset->help = $this->Lang('help_rounds_factor');
+	$configs[] = $oneset;
+
+	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_uploads_dir');
 	$oneset->input = $this->CreateInputText($id, 'uploads_dir', $this->GetPreference('uploads_dir'), 40, 255);
 	$oneset->help = $this->Lang('help_uploads_dir');
@@ -282,7 +288,7 @@ function set_tab() {
 }
 EOS;
 	$tplvars['save'] =
-		$this->CreateInputSubmit($id, 'submit', $this->Lang('save'),
+		$this->CreateInputSubmit($id, 'submit', $this->Lang('apply'),
 		'onclick="set_tab();"');
 	$tplvars['cancel'] =
 		$this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'),
