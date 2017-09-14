@@ -20,6 +20,12 @@ if (isset($params['submit'])) {
 	foreach ($params['field'] as $key=>$name) {
 		$collapsed[$key] = [$name, html_entity_decode($params['value'][$key])]; //decode probably not needed
 	}
+	if (isset($params['extra'])) {
+		foreach ($params['extra'] as $key=>$value) {
+			list($name, $skey) = explode('.', $key);
+			$collapsed[$name][$skey] = $value;
+		}
+	}
 	$funcs->Update($this, $pre, $params['record_id'], $collapsed);
 	$this->Redirect($id, 'browse_list', $returnid, $params);
 }
@@ -47,14 +53,19 @@ if (isset($params['edit'])) {
 	$tplvars['title_browser'] = $this->Lang('title_submitted_edit', $bname);
 	foreach ($browsedata as $key=>$field) {
 		$title = $field[0];
+		$value = $field[1];
 		$hidden[] = $this->CreateInputHidden($id, 'field['.$key.']', $title);
-		if (count($field) > 2) { //format-parameter(s) present
-			$value = $field[1]; //log current value
+		if (($c = count($field)) > 2) { //format-parameter(s) present
 			PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
 			if (!is_array($field[0])) {
 				if ($key[0] == '_') { //internal-use fake field, not editable
 					$hidden[] = $this->CreateInputHidden($id, 'value['.$key.']', $value); //un-formatted value
 					$content[] = [htmlentities($title),$field[1]]; //no change for this value
+					$all = array_keys($field);
+					for ($i=2; $i<$c; $i++) {
+						$skey = $all[$i];
+						$hidden[] = $this->CreateInputHidden($id, 'extra['.$key.'.'.$skey.']', $field[$skey]);
+					}
 				} else {
 					$input = $this->CreateInputText($id, 'value['.$key.']', $field[1], 60); //TODO reconvert when saving
 					$content[] = [htmlentities($title),$input];
@@ -74,7 +85,7 @@ if (isset($params['edit'])) {
 				}
 			}
 		}
-		$value = $field[1];
+
 		$len = strlen($value);
 		$newline = strpos($value, PHP_EOL) !== FALSE || strpos($value, "<br") !== FALSE;
 		if ($len > 50 || $newline) {
