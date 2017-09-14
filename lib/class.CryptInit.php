@@ -14,9 +14,9 @@ class CryptInit Extends Crypter
 	@method: optional openssl cipher type to use, default 'BF-CBC'
 	@stretches: optional number of extension-rounds to apply, default 8192
 	*/
-	public function __construct(&$mod, $method='BF-CBC', $stretches=parent::STRETCHES)
+	public function __construct(&$mod, $method='BF-CBC')
 	{
-		parent::__construct($mod, $method, $stretches);
+		parent::__construct($mod, $method);
 	}
 
 	/**
