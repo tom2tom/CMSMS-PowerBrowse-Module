@@ -38,14 +38,14 @@ EOS;
 		$converts = self::Get_Converts($db, $pre, $form_id);
 		if ($converts) {
 			$newfid = (int) reset($converts);
-			$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE form_id=?';
+			$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE form_id=?';
 			$data = Utils::SafeGet($sql, [$form_id]);
 			if ($data) {
 				$converts = self::Get_Converts($db, $pre, 0);
 				if ($converts) {
 					$funcs = new RecordContent();
 					foreach ($data as &$one) {
-						$olddata = $funcs->Decrypt($mod, $one['contents']);
+						$olddata = $funcs->Decrypt($mod, $one['rounds'], $one['contents']);
 						if ($olddata) {
 							$newdata = [];
 							foreach ($olddata as $key => $field) {
@@ -62,6 +62,7 @@ EOS;
 							//TODO warn user
 						}
 					}
+					unset($one);
 				}
 			}
 			return $newfid;
@@ -88,6 +89,25 @@ EOS;
 		$db = \cmsms()->GetDb();
 		$olds = $db->GetArray($sql);
 		if ($olds) {
+			$sql = 'SELECT COUNT(1) FROM '.$pre.'module_fb_formbrowser';
+			$total = $db->GetOne($sql);
+			if ($total == 0) {
+				//TODO import browser-data only
+				return [0, 0];
+			}
+			$interval = ini_get('max_input_time');
+			if (!$interval) {
+				$interval = ini_get('max_execution_time');
+				if (!$interval) {
+					$interval = 60;
+				}
+			}
+			$count = Crypter::BATCHED;
+			$rounds = $count * 3 * ($interval - 1) / $total; //fudge
+			$rounds = (int) ($rounds/100) * 100;
+			if ($rounds > $count) {
+				$rounds = $count;
+			}
 			$fb = \cms_utils::get_module('FormBuilder');
 			$funcs = new RecordContent();
 
@@ -95,21 +115,20 @@ EOS;
 (form_id,name,form_name) VALUES (?,?,?)';
 			$renums = [];
 			$converts = self::Get_Converts($db, $pre, 0); //field_id translations
-			foreach ($olds as $row) {
+			foreach ($olds as &$row) {
 				$oldfid = (int) $row['form_id'];
 				$flds = [];
 				$parms = [];
 //GetSortedResponses($form_id,$start_point,$number=100,$admin_approved=FALSE,$user_approved=FALSE,$field_list=array(),$dateFmt='d F y',&$params)
-				list($count, $names, $details) = $fb->GetSortedResponses($oldfid,	-1, -1,
+				list($count, $names, $details) = $fb->GetSortedResponses($oldfid, -1, -1,
 					FALSE, FALSE, $flds, 'Y-m-d', $parms);
 				if ($count > 0) {
 					$fconv = self::Get_Converts($db, $pre, $oldfid);
-					$newfid = ($fconv) ? reset($fconv) : -$row['form_id']; //form id < 0 signals FormBuilder form id
+					$newfid = ($fconv) ? reset($fconv) : -$oldfid; //form id < 0 signals FormBuilder form id
 
 					$db->Execute($sql, [$newfid, $row['name'], $row['formname']]);
 					$newbid = $db->Insert_ID();
 					$renums[$newbid] = (int) $row['browser_id']; //a.k.a. oldbid
-
 					foreach ($details as &$one) {
 						$olddata = [];
 						foreach ($one->fields as $fid => $fval) {
@@ -120,11 +139,12 @@ EOS;
 							}
 							$olddata[$nid] = [$names[$fid], $fval];
 						}
-						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata);
+						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, $rounds);
 					}
 					unset($one);
 				}
 			}
+			unset($row);
 
 			$oc = count($olds);
 			if ($renums) {
