@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWFBrowse
-# Copyright (C) 2011-2016 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBrowser-module file (C) 2006-2011 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWFBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
+/*
+This file is part of CMS Made Simple module: PWFBrowse
+Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWFBrowse.module.php
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
+*/
 
 if (!$this->_CheckAccess('modify')) {
 	exit;
@@ -25,7 +26,8 @@ form_id I(2),
 name C(256),
 form_name C(256),
 owner I(4) DEFAULT 0,
-pagerows I(2) DEFAULT 10
+pagerows I(2) DEFAULT 10,
+flags I(1) DEFAULT 0
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_browser', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -48,6 +50,7 @@ record_id I(4) AUTO KEY,
 browser_id I(2),
 form_id I(2),
 rounds I(2) DEFAULT 0,
+flags I(1) DEFAULT 0,
 contents B(16364)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_record', $flds, $taboptarray);
