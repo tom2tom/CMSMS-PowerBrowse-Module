@@ -16,21 +16,22 @@ class RecordContent
 	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
 	@stamp: timestamp for form submission
 	@data: reference to array of plaintext form-data to be stored
+	@rounds: optional no. of key-stretches, default 0
 	 Each member of @data is array:
 	 [0] = (public) title
 	 [1] = value
 	 [2] (maybe) = extra stuff e.g. 'stamp' flag
 	Returns: boolean indicating success
 	*/
-	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data)
+	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data, $rounds=0)
 	{
 		//insert fake field with read-only key and datetime marker
 		$store = ['_s'=>[0=>$mod->Lang('title_submitted'),1=>$stamp,'dt'=>'']] + $data;
 		$cfuncs = new Crypter($mod);
-		$cont = $cfuncs->encrypt_value(serialize($store));
+		$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 		unset($store);
-		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,contents) VALUES (?,?,?)',
-			[$browser_id, $form_id, $cont]);
+		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,contents) VALUES (?,?,?,?)',
+			[$browser_id, $form_id, $rounds, $cont]);
 	}
 
 	/**
@@ -40,7 +41,7 @@ class RecordContent
 	@record_id: identifier of record to which the data belong
 	@data: reference to array of plaintext form-data to be stored, or if @raw=TRUE, serialized form-data
 	@stamp: optional boolean, whether to skip adding a modification-time, default FALSE
-	@raw: optional boolean, whether to skip serialization of @data, default FALSE
+	@raw: optional boolean, whether to skip serialization & encryption of @data, default FALSE
 	Returns: boolean indicating success
 	*/
 	public function Update(&$mod, $pre, $record_id, &$data, $stamp=FALSE, $raw=FALSE)
@@ -56,24 +57,25 @@ class RecordContent
 				$store = ['_m'=>[0=>$mod->Lang('title_modified'),1=>$stamp,'dt'=>'']] + $data;
 			}
 			$cfuncs = new Crypter($mod);
-			$cont = $cfuncs->encrypt_value(serialize($store));
+			$cont = $cfuncs->encrypt_value(serialize($store)); //default (aka 0) rounds
 			unset($store);
 		}
-		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?',
+		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds=0,contents=? WHERE record_id=?',
 			[$cont, $record_id]);
 	}
 
 	/*
 	@mod: reference to PWFBrowse module object
+	@rounds: number of key-stretches
 	@source: string to be decrypted
 	@raw: optional boolean, whether to skip unserialization of decrypted value, default FALSE
 	Must be compatible with self::Insert/Update
 	*/
-	public function Decrypt(&$mod, $source, $raw=FALSE)
+	public function Decrypt(&$mod, $rounds, $source, $raw=FALSE)
 	{
 		if ($source) {
 			$cfuncs = new Crypter($mod);
-			$decrypted = $cfuncs->decrypt_value($source);
+			$decrypted = $cfuncs->decrypt_value($source, $rounds);
 			if ($decrypted) {
 				if ($raw) {
 					return $decrypted;
@@ -97,10 +99,10 @@ class RecordContent
 	public function Load(&$mod, $pre, $record_id)
 	{
 		$data = Utils::SafeGet(
-		'SELECT contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
-			[$record_id], 'one');
+		'SELECT rounds,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
+			[$record_id], 'row');
 		if ($data) {
-			$browsedata = self::Decrypt($mod, $data);
+			$browsedata = self::Decrypt($mod, $data['rounds'], $data['contents']);
 			if ($browsedata) {
 				return [TRUE,$browsedata];
 			}
