@@ -47,6 +47,7 @@ $flds = '
 record_id I(4) AUTO KEY,
 browser_id I(2),
 form_id I(2),
+rounds I(2) DEFAULT 0,
 contents B(16364)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_record', $flds, $taboptarray);
