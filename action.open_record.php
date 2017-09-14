@@ -3,7 +3,7 @@
 This file is part of CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWFBrowse.module.php
-More info at http://dev.cmsmadesimple..org/projects/pwfbrowse
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 
 if (!($this->_CheckAccess('admin') || $this->_CheckAccess('view'))) {
@@ -23,7 +23,7 @@ if (isset($params['submit'])) {
 	}
 	if (isset($params['extra'])) {
 		foreach ($params['extra'] as $key=>$value) {
-			list($name, $skey) = explode('.', $key);
+			list($name, $skey) = explode('%27', $key);
 			$collapsed[$name][$skey] = $value;
 		}
 	}
@@ -65,7 +65,7 @@ if (isset($params['edit'])) {
 					$all = array_keys($field);
 					for ($i=2; $i<$c; $i++) {
 						$skey = $all[$i];
-						$hidden[] = $this->CreateInputHidden($id, 'extra['.$key.'.'.$skey.']', $field[$skey]);
+						$hidden[] = $this->CreateInputHidden($id, 'extra['.$key.'%27'.$skey.']', $field[$skey]);
 					}
 				} else {
 					$input = $this->CreateInputText($id, 'value['.$key.']', $field[1], 60); //TODO reconvert when saving

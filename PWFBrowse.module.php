@@ -3,7 +3,7 @@
 This is CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <@>
 Inspired by and derived in part from FormBrowser module, copyright (C) 2006-2011, Samuel Goldstein <sjg@cmsmodules.com>
-This project's forge-page is: http://dev.cmsmadesimple..org/projects/pwfbrowse
+This project's forge-page is: http://dev.cmsmadesimple.org/projects/pwfbrowse
 
 This module is free software. You can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free
