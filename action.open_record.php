@@ -34,7 +34,7 @@ $tplvars = [];
 $this->_BuildNav($id, $returnid, $params, $tplvars);
 
 $tplvars['start_form'] =
-	$this->CreateFormStart($id, 'browse_record', $returnid, 'POST', '', '', '',
+	$this->CreateFormStart($id, 'open_record', $returnid, 'POST', '', '', '',
 		['record_id'=>$params['record_id'],
 		'browser_id'=>$params['browser_id'],
 		'form_id'=>$params['form_id']]);
@@ -110,4 +110,4 @@ if (isset($params['edit'])) {
 }
 $tplvars['content'] = $content;
 
-echo PWFBrowse\Utils::ProcessTemplate($this, 'browse_record.tpl', $tplvars);
+echo PWFBrowse\Utils::ProcessTemplate($this, 'open_record.tpl', $tplvars);
