@@ -3,7 +3,7 @@
 This file is part of CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWFBrowse.module.php
-More info at http://dev.cmsmadesimple..org/projects/pwfbrowse
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 
 namespace PWForms;
@@ -12,7 +12,7 @@ class FormBrowser extends FieldBase
 {
 	const MODNAME = 'PWFBrowse'; //initiator/owner module name
 	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
-	public $mymodule; //used also by PWForms, do not rename
+	public $mymodule = NULL; //used also by PWForms, do not rename
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -22,7 +22,13 @@ class FormBrowser extends FieldBase
 		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'FormBrowser';
-		$this->mymodule = \cms_utils::get_module(self::MODNAME);
+	}
+
+	protected function GetModule()
+	{
+		if (!$this->mymodule) {
+			$this->mymodule = \ModuleOperations::get_instance()->get_module_instance(self::MODNAME, '', TRUE);
+		}
 	}
 
 /*	public function GetMutables($nobase=TRUE, $actual=TRUE)
@@ -32,6 +38,7 @@ class FormBrowser extends FieldBase
 */
 /*	public function GetSynopsis()
 	{
+		$this->GetModule();
  		return $this->mymodule->Lang('').': STUFF';
 	}
 */
@@ -47,6 +54,7 @@ class FormBrowser extends FieldBase
 
 	public function GetDisplayType()
 	{
+		$this->GetModule();
 		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
 
@@ -113,8 +121,9 @@ class FormBrowser extends FieldBase
 			if ($browsers) {
 				$stamp = time(); //TODO default locale OK?
 				$funcs = new \PWFBrowse\RecordContent();
+				$this->GetModule();
 				foreach ($browsers as $browser_id) {
-					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata);
+					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata, 0);
 				}
 			} else {
 				return [FALSE,$this->formdata->formsmodule->Lang('missing_type', 'browser for form')]; //TODO lang
@@ -132,9 +141,10 @@ class FormBrowser extends FieldBase
 		return $ret;
 	}
 
-	public function unserialize($serialized)
+/*	public function unserialize($serialized)
 	{
 		parent::unserialize($serialized);
-		$this->mymodule = \cms_utils::get_module(self::MODNAME);
+		//$this->mymodule stays NULL
 	}
+*/
 }
