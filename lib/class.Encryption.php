@@ -27,19 +27,15 @@
  * openssl extension
  * use of an openssl cipher with blocksize <= 2040 bits
  */
+
 namespace PWFBrowse;
 
 class Encryption
 {
 	/*
-	Default value of $rounds
-	*/
+	 * Default value of $rounds
+	 */
 	const STRETCHES = 8000;
-	/*
-	Maximum value of $rounds which will be exponentiated to 2**$rounds
-	*/
-	const POWERMAX = 31;
-
 	/**
 	 * @var string $method the openssl cipher method to use for this instance
 	 */
@@ -67,19 +63,17 @@ class Encryption
 
 	/**
 	 * Set the number of rounds to be used for 'stretching'
-	 * @param int $rounds the number of rounds to feed into PBKDF2 for key generation
-	 * This can be 0 (in which case 2 will be applied) or 1..POWERMAX which will
-	 * be exponentiated, or any explicit number > POWERMAX which will be rounded
-	 * up to nearest hundred
+	 * @param int/float $rounds the number of rounds to feed into PBKDF2 for key generation
+	 * If 0, STRETCHES will be used, or if < 0, 2 will be used
 	 *
 	 * @returns int
 	 */
 	protected function rounder($rounds)
 	{
-		if ($rounds > self::POWERMAX) {
-			return ceil($rounds / 100) * 100;
-		} elseif ($rounds > 0) {
-			return 1 << $rounds; //exponential
+		if ($rounds >= 0.999) {
+			return (int)($rounds + 0.1);
+		elseif ($rounds > -0.001) {
+			return self::STRETCHES;
 		} else {
 			return 2; //quickie !
 		}
