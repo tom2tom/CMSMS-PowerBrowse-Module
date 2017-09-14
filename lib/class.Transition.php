@@ -103,13 +103,14 @@ EOS;
 				}
 			}
 			$count = Crypter::BATCHED;
-			$rounds = $count * 3 * ($interval - 1) / $total; //fudge
+			$rounds = 5 * $count * ($interval - 1) / $total; //fudge
 			$rounds = (int) ($rounds/100) * 100;
 			if ($rounds > $count) {
 				$rounds = $count;
 			}
 			$fb = \cms_utils::get_module('FormBuilder');
 			$funcs = new RecordContent();
+			$cfuncs = new Crypter($mod); //avoid repeated construction downstream
 
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (form_id,name,form_name) VALUES (?,?,?)';
@@ -139,7 +140,7 @@ EOS;
 							}
 							$olddata[$nid] = [$names[$fid], $fval];
 						}
-						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, $rounds);
+						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, $rounds, $cfuncs);
 					}
 					unset($one);
 				}
