@@ -3,7 +3,7 @@
 This file is part of CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWFBrowse.module.php
-More info at http://dev.cmsmadesimple..org/projects/pwfbrowse
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 
 $iseditor = $this->CheckPermission('Modify Any Page');
@@ -198,7 +198,7 @@ if ($padmin) {
 
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_rounds_factor');
-	$oneset->input = $this->CreateInputText($id, 'rounds_factor', $this->GetPreference('rounds_factor'), 3, 3);
+	$oneset->input = $this->CreateInputText($id, 'rounds_factor', $this->GetPreference('rounds_factor'), 4, 4);
 	$oneset->help = $this->Lang('help_rounds_factor');
 	$configs[] = $oneset;
 
