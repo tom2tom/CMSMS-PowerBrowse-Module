@@ -10,7 +10,7 @@ class Crypter Extends Encryption
 {
 	const MKEY = 'masterpass';
 	const SKEY = 'prefsalt';
-	const STRETCHES = 8192;
+	const BATCHED = 1000;
 	protected $mod;
 
 	/**
@@ -19,10 +19,10 @@ class Crypter Extends Encryption
 	@method: optional openssl cipher type to use, default 'BF-CBC'
 	@stretches: optional number of extension-rounds to apply, default 8192
 	*/
-	public function __construct(&$mod, $method='BF-CBC', $stretches=self::STRETCHES)
+	public function __construct(&$mod, $method='BF-CBC')
 	{
 		$this->mod = $mod;
-		parent::__construct($method, 'default', $stretches);
+		parent::__construct($method, 'default');
 	}
 
 	/*
@@ -74,23 +74,27 @@ class Crypter Extends Encryption
 	/**
 	encrypt_value:
 	@value: value to encrypted, may be empty string
+	@stretches: optional number of rounds to be used for key 'stretching', default 1024 (0 sets this too)
 	@pw: optional password string, default FALSE (meaning use the module-default)
 	@based: optional boolean, whether to base64_encode the encrypted value, default FALSE
 	@escaped: optional boolean, whether to escape single-quote chars in the (raw) encrypted value, default FALSE
 	Returns: encrypted @value, or just @value if it's empty or if password is empty
 	*/
-	public function encrypt_value($value, $pw=FALSE, $based=FALSE, $escaped=FALSE)
+	public function encrypt_value($value, $stretches=self::BATCHED, $pw=FALSE, $based=FALSE, $escaped=FALSE)
 	{
-		if ($value) {
+		if ($value || is_numeric($value)) {
 			if (!$pw) {
 				$pw = self::decrypt_preference(self::MKEY);
 			}
 			if ($pw) {
-				$value = parent::encrypt(''.$value, $pw);
+				if ($stretches < 1) {
+					$stretches = self::BATCHED;
+				}
+				$value = parent::encrypt(''.$value, $pw, $stretches);
 				if ($based) {
-					$value = base64_encode($value);
+					return base64_encode($value);
 				} elseif ($escaped) {
-					$value = str_replace('\'', '\\\'', $value); //facilitate db-field storage
+					return str_replace('\'', '\\\'', $value); //facilitate db-field storage
 				}
 			}
 		}
@@ -100,12 +104,13 @@ class Crypter Extends Encryption
 	/**
 	decrypt_value:
 	@value: string to be decrypted, may be empty
+	@stretches: optional number of rounds to be used for key 'stretching', default 1024 (0 sets this too)
 	@pw: optional password string, default FALSE (meaning use the module-default)
 	@based: optional boolean, whether @value is base64_encoded, default FALSE
 	@escaped: optional boolean, whether single-quote chars in (raw) @value have been escaped, default FALSE
 	Returns: decrypted @value, or just @value if it's empty or if password is empty
 	*/
-	public function decrypt_value($value, $pw=FALSE, $based=FALSE, $escaped=FALSE)
+	public function decrypt_value($value, $stretches=self::BATCHED, $pw=FALSE, $based=FALSE, $escaped=FALSE)
 	{
 		if ($value) {
 			if (!$pw) {
@@ -117,7 +122,10 @@ class Crypter Extends Encryption
 				} elseif ($escaped) {
 					$value = str_replace('\\\'', '\'', $value);
 				}
-				$value = parent::decrypt($value, $pw);
+				if ($stretches < 1) {
+					$stretches = self::BATCHED;
+				}
+				return parent::decrypt($value, $pw, $stretches);
 			}
 		}
 		return $value;

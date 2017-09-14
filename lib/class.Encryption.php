@@ -32,6 +32,10 @@ namespace PWFBrowse;
 class Encryption
 {
 	/*
+	Default value of $rounds
+	*/
+	const STRETCHES = 8000;
+	/*
 	Maximum value of $rounds which will be exponentiated to 2**$rounds
 	*/
 	const POWERMAX = 31;
@@ -44,13 +48,6 @@ class Encryption
 	 * @var string $method the hash cipher method to use for this instance
 	 */
 	protected $hasher;
-	/**
-	 * @var int $rounds the number of rounds to feed into PBKDF2 for key generation
-	 * This can be 0 (in which case 2 will be applied) or 1..POWERMAX which will
-	 * be exponentiated, or any explicit number > POWERMAX which will be rounded
-	 * up to a power of 2
-	 */
-	protected $rounds;
 
 	/**
 	 * Constructor
@@ -58,23 +55,34 @@ class Encryption
 	 * @param string $method the openssl cipher type to use for this instance
 	 *  see http://php.net/manual/en/function.openssl-get-cipher-methods.php for examples
 	 * @param string $hasher the algorithm to use for HMAC hashing, default 'sha256', may actually be 'default'
-	 * @param int	 $rounds the number of extension-rounds to apply to the key, default = 1024
 	 */
-	public function __construct($method, $hasher='sha256', $rounds=10)
+	public function __construct($method, $hasher='sha256')
 	{
 		$this->method = $method;
 		if ($hasher == 'default') {
 			$hasher = 'sha256';
 		}
 		$this->hasher = $hasher;
+	}
+
+	/**
+	 * Set the number of rounds to be used for 'stretching'
+	 * @param int $rounds the number of rounds to feed into PBKDF2 for key generation
+	 * This can be 0 (in which case 2 will be applied) or 1..POWERMAX which will
+	 * be exponentiated, or any explicit number > POWERMAX which will be rounded
+	 * up to nearest hundred
+	 *
+	 * @returns int
+	 */
+	protected function rounder($rounds)
+	{
 		if ($rounds > self::POWERMAX) {
-			$rounds = ceil($rounds / 100) * 100;
+			return ceil($rounds / 100) * 100;
 		} elseif ($rounds > 0) {
-			$rounds = 1 << $rounds; //exponential
+			return 1 << $rounds; //exponential
 		} else {
-			$rounds = 2; //quickie !
+			return 2; //quickie !
 		}
-		$this->rounds = $rounds;
 	}
 
 	/**
@@ -82,14 +90,16 @@ class Encryption
 	 *
 	 * @param string $data the data to encrypt
 	 * @param string $key  the key to encrypt with
+	 * @param int	 $rounds the number of extension-rounds to apply to the key, default = 8192 (hence 8200)
 	 *
 	 * @returns string the encrypted data
 	 */
-	public function encrypt($data, $key)
+	public function encrypt($data, $key, $rounds=self::STRETCHES)
 	{
 		//salt size - see https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
 		$salt = openssl_random_pseudo_bytes(64);
-		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
+		$rounds = $this->rounder($rounds);
+		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key, $rounds);
 
 		$data = $this->pad($data);
 
@@ -104,18 +114,19 @@ class Encryption
 	 *
 	 * @param string $data The encrypted datat to decrypt
 	 * @param string $key  The key to use for decryption
+	 * @param int	 $rounds the number of extension-rounds to apply to the key, default = 8192 (hence 8200)
 	 *
 	 * @returns string|FALSE The returned string if decryption is successful
 	 *						   FALSE if it is not
 	 */
-	public function decrypt($data, $key)
+	public function decrypt($data, $key, $rounds=self::STRETCHES)
 	{
 		$salt = $this->byte_substr($data, 0, 64);
-		$enc = $this->byte_substr($data, 64, -32);
+		$rounds = $this->rounder($rounds);
+		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key, $rounds);
+
 		$mac = $this->byte_substr($data, -32);
-
-		list($cipherKey, $macKey, $iv) = $this->getKeys($salt, $key);
-
+		$enc = $this->byte_substr($data, 64, -32);
 		if ($mac !== hash_hmac($this->hasher, $enc, $macKey, TRUE)) {
 			return FALSE;
 		}
@@ -127,21 +138,22 @@ class Encryption
 		return $data;
 	}
 
-	/*
+	/**
 	 * Generates a set of keys given a random salt and a master key
 	 *
 	 * @param string $salt A random string to change the keys each encryption
 	 * @param string $key  The supplied key to encrypt with
+	 * @param int    $rounds The number of extension-rounds to apply
 	 *
 	 * @returns array of keys [cipher key, mac key, IV]
 	 */
-	protected function getKeys($salt, $key)
+	protected function getKeys($salt, $key, $rounds)
 	{
 		$ivSize = openssl_cipher_iv_length($this->method);
 		$keySize = $this->getOpenSSLKeysize();
 		$length = 2 * $keySize + $ivSize;
 
-		$key = $this->extendKey($this->hasher, $key, $salt, $this->rounds, $length); //TODO stretch replacement
+		$key = $this->extendKey($this->hasher, $key, $salt, $rounds, $length); //TODO stretch replacement
 
 		$cipherKey = $this->byte_substr($key, 0, $keySize);
 		$macKey = $this->byte_substr($key, $keySize, $keySize);
