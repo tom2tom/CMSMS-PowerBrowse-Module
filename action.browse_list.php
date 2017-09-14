@@ -59,7 +59,7 @@ $jsfuncs = [];
 $jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
-$sql = 'SELECT record_id,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
+$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = PWFBrowse\Utils::SafeGet($sql, [$params['browser_id']]);
 $rows = [];
 //if ($data) {
@@ -73,7 +73,7 @@ $rows = [];
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
 		$fields = [];
-		$browsedata = $funcs->Decrypt($this, $one['contents']);
+		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents']);
 		if ($browsedata) {
 			//include data for fields named in $colnames
 			foreach ($browsedata as $field) { //$key unused
@@ -106,10 +106,10 @@ $rows = [];
 			$oneset = new stdClass();
 			ksort($fields); //conform order to titles
 			$oneset->fields = $fields;
-			$oneset->view = $this->CreateLink($id, 'browse_record', '', $icon_view,
+			$oneset->view = $this->CreateLink($id, 'open_record', '', $icon_view,
 				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid]);
 			if ($pmod) {
-				$oneset->edit = $this->CreateLink($id, 'browse_record', '', $icon_edit,
+				$oneset->edit = $this->CreateLink($id, 'open_record', '', $icon_edit,
 				['record_id'=>$rid, 'browser_id'=>$bid, 'form_id'=>$fid, 'edit'=>1]);
 			}
 			$oneset->export = $this->CreateLink($id, 'export_record', '', $icon_export,
