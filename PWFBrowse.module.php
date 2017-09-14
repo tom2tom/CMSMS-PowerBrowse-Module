@@ -1,21 +1,21 @@
 <?php
-#------------------------------------------------------------------------
-# This is CMS Made Simple module: PWFBrowse
-# Copyright (C) 2011-2016 Tom Phane <@>
-# Derived in part from FormBrowser module, copyright (C) 2006-2011, Samuel Goldstein <sjg@cmsmodules.com>
-# This project's forge-page is: http://dev.cmsmadesimple.org/projects/PWFBrowse
-#
-# This module is free software. You can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, either version 3 of that License, or (at your option)
-# any later version.
-#
-# This module is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-# Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
-#-----------------------------------------------------------------------
+/*
+This is CMS Made Simple module: PWFBrowse
+Copyright (C) 2011-2017 Tom Phane <@>
+Inspired by and derived in part from FormBrowser module, copyright (C) 2006-2011, Samuel Goldstein <sjg@cmsmodules.com>
+This project's forge-page is: http://dev.cmsmadesimple..org/projects/pwfbrowse
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of that License, or (at your option)
+any later version.
+
+This module is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
+*/
 
 class PWFBrowse extends CMSModule
 {
