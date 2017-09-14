@@ -45,13 +45,13 @@ if (isset($params['submit'])) {
 		if ($oldpw != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
-			$rst = $db->Execute('SELECT record_id,contents FROM '.$pre.'module_pwbr_record');
+			$rst = $db->Execute('SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record');
 			if ($rst) {
-				$sql = 'UPDATE '.$pre.'module_pwbr_record SET contents=? WHERE record_id=?';
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds=?,contents=? WHERE record_id=?';
 				while (!$rst->EOF) {
-					$val = $cfuncs->decrypt_value($rst->fields['contents'], $oldpw);
-					$val = $cfuncs->encrypt_value($val, $t);
-					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields['record_id']])) {
+					$val = $cfuncs->decrypt_value($rst->fields['contents'], $rst->fields['rounds'], $oldpw);
+					$val = $cfuncs->encrypt_value($val, 0, $t); //update to default rounds (if not already there)
+					if (!PWFBrowse\Utils::SafeExec($sql, [0, $val, $rst->fields['record_id']])) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext()) {

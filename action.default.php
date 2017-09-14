@@ -41,14 +41,14 @@ $jsfuncs = [];
 $jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
-$sql = 'SELECT contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql, [$bid], 'col');
+$sql = 'SELECT rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
+$data = PWFBrowse\Utils::SafeGet($sql, [$bid]);
 $rows = [];
 //if ($data) {
 	$funcs = new PWFBrowse\RecordContent();
-	foreach ($data as $stored) {
+	foreach ($data as &$one) {
 		$fields = [];
-		$browsedata = $funcs->Decrypt($this, $stored);
+		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents']);
 		if ($browsedata) {
 			//include data for fields named in $colnames
 			foreach ($browsedata as $field) { //$key unused
@@ -81,6 +81,7 @@ $rows = [];
 			$rows[] = $fields;
 		}
 	}
+	unset($one);
 //}
 $tplvars['rows'] = $rows;
 $rcount = count($rows);
