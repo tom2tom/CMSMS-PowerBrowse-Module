@@ -23,16 +23,16 @@ class FormBrowser extends FieldBase
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
-	public function Load($id, &$params)
+/*	public function GetMutables($nobase=TRUE, $actual=TRUE)
 	{
-		return TRUE;
+		return parent::GetMutables($nobase) + [];
 	}
-
-	public function Store($deep=FALSE)
+*/
+/*	public function GetSynopsis()
 	{
-		return TRUE;
+ 		return $this->mymodule->Lang('').': STUFF';
 	}
-
+*/
 	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Form Browser]'; //by convention, not translated
@@ -48,9 +48,19 @@ class FormBrowser extends FieldBase
 		return '*'.$this->mymodule->Lang($this->MenuKey); //disposition-prefix
 	}
 
+	public function Load($id, &$params)
+	{
+		return TRUE;
+	}
+
+	public function Store($deep=FALSE)
+	{
+		return TRUE;
+	}
+
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_smarty_eval', FALSE, FALSE);
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
