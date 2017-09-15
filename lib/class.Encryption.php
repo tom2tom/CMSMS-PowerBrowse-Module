@@ -72,7 +72,7 @@ class Encryption
 	{
 		if ($rounds >= 0.999) {
 			return (int)($rounds + 0.1);
-		elseif ($rounds > -0.001) {
+		} elseif ($rounds > -0.001) {
 			return self::STRETCHES;
 		} else {
 			return 2; //quickie !
