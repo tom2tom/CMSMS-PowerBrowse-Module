@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWFBrowse
-# Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWFBrowse.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+/*
+This file is part of CMS Made Simple module: PWFBrowse
+Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWFBrowse.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerbrowse
+*/
 
 $padmin = $this->_CheckAccess('admin');
 $pmod = $this->_CheckAccess('modify');
@@ -14,12 +16,25 @@ if (!($padmin || $pmod || $pview)) {
 if (isset($params['submit'])) {
 	if ($padmin) {
 		$t = $params['rounds_factor'] + 0;
-		if ($t < 0.1) {
-			$t = 0.1;
-		} elseif ($t > 20) {
-			$t = 20;
+		if ($t < 0.01) {
+			$t = 0.01;
+		} elseif ($t > 15) {
+			$t = 15;
 		}
+		$oldrounds = $this->GetPreference('rounds_factor') + 0;
+		$rehash = $oldrounds != $t;
 		$this->SetPreference('rounds_factor', $t);
+
+		$cfuncs = new PWFBrowse\Crypter($this);
+		$key = PWFBrowse\Crypter::MKEY;
+		$oldpw = $cfuncs->decrypt_preference($key);
+		$t = trim($params[$key]);
+		if ($oldpw != $t) {
+			$cfuncs->encrypt_preference($key, $t);
+			$cfuncs->encrypt_preference($key.'OLD', $oldpw);
+			$rehash = TRUE;
+		}
+
 		$this->SetPreference('date_format', trim($params['date_format']));
 		$this->SetPreference('export_file', !empty($params['export_file']));
 		$this->SetPreference('export_file_encoding', trim($params['export_file_encoding']));
@@ -45,30 +60,11 @@ if (isset($params['submit'])) {
 		}
 		$this->SetPreference('uploads_dir', $t);
 
-		$cfuncs = new PWFBrowse\Crypter($this);
-		$key = PWFBrowse\Crypter::MKEY;
-		$oldpw = $cfuncs->decrypt_preference($key);
-		$t = trim($params[$key]);
-		if ($oldpw != $t) {
-			//re-encrypt all stored records
+		if ($rehash) {
+			//flag all records for update
 			$pre = cms_db_prefix();
-			$rst = $db->Execute('SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record');
-			if ($rst) {
-				$rounds = (int)($this->GetPreference('rounds_factor') * 100); //update to default rounds (if not already there)
-				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',contents=? WHERE record_id=?';
-				while (!$rst->EOF) {
-					$val = $cfuncs->decrypt_value($rst->fields['contents'], $rst->fields['rounds'], $oldpw);
-					$val = $cfuncs->encrypt_value($val, $rounds, $t);
-					if (!PWFBrowse\Utils::SafeExec($sql, [$val, $rst->fields['record_id']])) {
-						//TODO handle error
-					}
-					if (!$rst->MoveNext()) {
-						break;
-					}
-				}
-				$rst->Close();
-			}
-			$cfuncs->encrypt_preference($key, $t);
+			$sql = 'UPDATE '.$pre.'module_pwbr_record SET flags=1'; 
+			//TODO trigger async RecordsUpdate task
 		}
 		$params['message'] = $this->_PrettyMessage('prefs_updated');
 	}
