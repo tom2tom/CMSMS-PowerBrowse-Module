@@ -70,13 +70,14 @@ $rows = [];
 		$icon_delete = $theme->DisplayImage('icons/system/delete.gif', $this->Lang('delete'), '', '', 'systemicon');
 	}
 	$icon_export = $theme->DisplayImage('icons/system/export.gif', $this->Lang('export'), '', '', 'systemicon');
-
+	$c = count($colnames);
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
 		$fields = [];
 		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents']);
 		if ($browsedata) {
-			//include data for fields named in $colnames
+			$fields = array_fill(0, $c, NULL); //init all fields in case data is N/A e.g. modified date
+			//get actual data for fields named in $colnames
 			foreach ($browsedata as $field) { //$key unused
 				if (count($field) == 2) {
 					$indx = array_search($field[0], $colnames);
