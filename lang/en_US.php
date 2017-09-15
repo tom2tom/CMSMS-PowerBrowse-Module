@@ -1,5 +1,10 @@
 <?php
-
+/*
+This file is part of CMS Made Simple module: PWFBrowse
+Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWFBrowse.module.php
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
+*/
 //$lang['accessdenied']='Access denied. You don\'t have %s permission.';
 $lang['add']='Add';
 $lang['added']='Added';
@@ -45,8 +50,8 @@ $lang['field_label']='Store results for browsing';
 $lang['first']='first';
 $lang['friendlyname']='Forms Data';
 
-$lang['help_date'] = 'A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
-$lang['help_browser'] = 'Display recorded data for this browser (name)';
+$lang['help_date']='A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
+$lang['help_browser']='Display recorded data for this browser (name)';
 //$lang['help_browser_css_class']='Optional name of class, or space-separated series of class names, applied to list views';
 $lang['help_dnd']='You can change the order by dragging any row, or double-click on any number of rows prior to dragging them all.';
 $lang['help_export_file']='Progressively create each .csv file in the general or specific <em>uploads</em> directory, instead of processing the export in memory. This may be wise if there is a lot of data to export. The downside is that someone needs to get that file and (usually) then delete it.';
@@ -56,9 +61,9 @@ $lang['help_onchange_notices']='If a form has disposition(s) that send email or 
 $lang['help_order']='Row-order here corresponds to column-order for listed data.';
 $lang['help_owned_forms']='Enable blocking of form-data access by any non-administrator other than a specified user';
 $lang['help_pagerows']='This is the minimum length of displayed pages. The length can be increased, while browsing.';
-$lang['help_rounds_factor'] = 'Integer or decimal number 0..20. Set this as high as the consequent delays are tolerable.';
+$lang['help_rounds_factor']='Blank or 0 to use the system default, or otherwise an integer or decimal number 0..15. Set this as high as the consequent delays are tolerable.';
 $lang['help_strip_on_export']='Remove all HTML tags from records when exported to .csv';
-$lang['help_time'] = 'See advice for date format.';
+$lang['help_time']='See advice for date format.';
 $lang['help_uploads_dir']='A filesystem path relative to website-host <em>uploads</em> directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default directory will be used.';
 
 $lang['import_browsers']='Import FormBrowsers';
@@ -99,6 +104,7 @@ $lang['submit']='Submit';
 $lang['tab_list']='Display';
 $lang['tab_main']='Browser';
 $lang['tab_settings']='Settings';
+$lang['taskdescription_dataupdate']='Update stored form-data records';
 $lang['tip_clone_selected_browsers']='clone selected browsers';
 $lang['tip_delete_selected_browsers']='delete selected browsers';
 $lang['tip_delete_selected_records']='delete selected records';
@@ -114,7 +120,7 @@ $lang['title_browser_owner']='Responsible person';
 $lang['title_browser_search_field']='Field to display as the record\'s title when a record is shown in site search results';
 $lang['title_browsers']='Browsers';
 $lang['title_data']='List data';
-$lang['title_dateformat'] = 'Template for formatting displayed dates';
+$lang['title_dateformat']='Template for formatting displayed dates';
 $lang['title_display']='Admin List';
 $lang['title_display2']='FrontEnd List';
 $lang['title_export_file']='Export to host';
@@ -126,18 +132,18 @@ $lang['title_list_cssfile']='File containing styles for data lists';
 $lang['title_modified']='Modified';
 $lang['title_move']='Change order';
 $lang['title_onchange_notices']='Notice after record change';
-$lang['title_owned_forms'] = 'Enable user-specific browsing';
+$lang['title_owned_forms']='Enable user-specific browsing';
 $lang['title_records']='Submissions';
 $lang['title_related_form']='Related form';
 $lang['title_pagerows']='Default rows-per-page';
 $lang['title_password']='Pass-phrase for securing sensitive data';
-$lang['title_rounds_factor'] = 'Munge-factor for data encryption';
+$lang['title_rounds_factor']='Munge-factor for data encryption';
 $lang['title_sort']='Sortable';
 $lang['title_strip_on_export']='Strip HTML tags on export';
 $lang['title_submitted']='Submitted';
 $lang['title_submitted_as']='\'%s\' form submission';
 $lang['title_submitted_edit']='Edit \'%s\' form submission';
-$lang['title_timeformat'] = 'Template for formatting displayed times';
+$lang['title_timeformat']='Template for formatting displayed times';
 $lang['title_uploads_dir']='Sub-directory for module-specific file uploads';
 
 $lang['up']='Move up';
@@ -192,7 +198,7 @@ a website page or template will cause that browser to be displayed.</p>
 <li>perhaps you might have some success emailing the author directly.</li>
 </ul>
 <h3>Copyright and license</h3>
-<p>Copyright &copy; 2011-2016, Tom Phane &lt;tpgww@onepost.net&gt;.<br />
+<p>Copyright &copy; 2011-2017, Tom Phane &lt;tpgww@onepost.net&gt;.<br />
 Derived in part from FormBrowser module, copyright &copy; 2006-2011, Samuel Goldstein &lt;sjg@cmsmodules.com&gt;.<br />
 All rights reserved.</p>
 <p>This module has been released under the <a href="http://www.gnu.org/licenses/licenses.html#AGPL">GNU Affero General Public License</a> version 3. The module must not be used otherwise than in accordance with that licence.</p>
