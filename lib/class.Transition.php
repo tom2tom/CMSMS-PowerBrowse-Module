@@ -3,7 +3,7 @@
 This file is part of CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWFBrowse.module.php
-More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 //functions involving FormBrowser and/or FormBuilder modules (assumed present)
 
@@ -89,29 +89,8 @@ EOS;
 		$db = \cmsms()->GetDb();
 		$olds = $db->GetArray($sql);
 		if ($olds) {
-			$sql = 'SELECT COUNT(1) FROM '.$pre.'module_fb_formbrowser';
-			$total = $db->GetOne($sql);
-			if ($total == 0) {
-				//TODO import browser-data only
-				return [0, 0];
-			}
-			$interval = ini_get('max_input_time');
-			if (!$interval) {
-				$interval = ini_get('max_execution_time');
-				if (!$interval) {
-					$interval = 60;
-				}
-			}
-			$count = Crypter::BATCHED;
-			$rounds = $mod->GetPreference('rounds_factor') * $count * ($interval - 1) / $total;
-			$rounds = (int) ($rounds/100) * 100;
-			if ($rounds > $count) {
-				$rounds = $count;
-			}
 			$fb = \cms_utils::get_module('FormBuilder');
 			$funcs = new RecordContent();
-			$cfuncs = new Crypter($mod); //avoid repeated construction downstream
-
 			$sql = 'INSERT INTO '.$pre.'module_pwbr_browser
 (form_id,name,form_name) VALUES (?,?,?)';
 			$renums = [];
@@ -140,7 +119,7 @@ EOS;
 							}
 							$olddata[$nid] = [$names[$fid], $fval];
 						}
-						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, $rounds, $cfuncs);
+						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, 0);
 					}
 					unset($one);
 				}
@@ -156,6 +135,7 @@ EOS;
 				return [$ic, $oc - $ic];
 			}
 			return [0, $oc];
+			//TODO initiate RecordsUpdate task
 		}
 		return [0, 0];
 	}
