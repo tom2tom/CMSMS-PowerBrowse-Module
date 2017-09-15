@@ -174,6 +174,16 @@ class PWFBrowse extends CMSModule
 		return TRUE;
 	}
 
+	public function HasCapability($capability, $params = [])
+	{
+		switch ($capability) {
+			case CmsCoreCapabilities::PLUGIN_MODULE:
+			case CmsCoreCapabilities::TASKS:
+				return TRUE;
+		}
+		return FALSE;
+	}
+
 	public function HasAdmin()
 	{
 		return TRUE;
@@ -264,6 +274,12 @@ EOS;
 		//document only the parameters relevant for external (page-tag) usage
 		$this->CreateParameter('browser', '', $this->Lang('help_browser'), FALSE);
 	}
+
+/*	public function get_tasks()
+	{
+		return new PWFBrowse\RecordsUpdateTask();
+	}
+*/
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
