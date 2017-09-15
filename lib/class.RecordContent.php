@@ -3,7 +3,7 @@
 This file is part of CMS Made Simple module: PWFBrowse
 Copyright (C) 2011-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWFBrowse.module.php
-More info at http://dev.cmsmadesimple.org/projects/PWFBrowse
+More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 
 namespace PWFBrowse;
@@ -18,7 +18,7 @@ class RecordContent
 	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
 	@stamp: timestamp for form submission
 	@data: reference to array of plaintext form-data to be stored
-	@rounds: optional no. of key-stretches, default 0
+	@rounds: no. of key-stretches, 0 if no encryption
 	@cfuncs: optional Crypter-object, default NULL (populate this when batching)
 	 Each member of @data is array:
 	 [0] = (public) title
@@ -26,17 +26,25 @@ class RecordContent
 	 [2] (maybe) = extra stuff e.g. 'stamp' flag
 	Returns: boolean indicating success
 	*/
-	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data, $rounds=0, &$cfuncs=NULL)
+	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data, $rounds, &$cfuncs=NULL)
 	{
 		//insert fake field with read-only key and datetime marker
 		$store = ['_s'=>[0=>$mod->Lang('title_submitted'),1=>$stamp,'dt'=>'']] + $data;
-		if ($cfuncs == NULL) {
-			$cfuncs = new Crypter($mod);
+		if ($rounds > 0) {
+			$defr = (int)($mod->GetPreference('rounds_factor') * 100); //maybe 0
+			$status = ($defr == $rounds) ? 0 : 1;
+			if ($cfuncs == NULL) {
+				$cfuncs = new Crypter($mod);
+			}
+			$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
+		} else {
+			$status = 1;
+			$cont = serialize($store);
 		}
-		$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 		unset($store);
-		return Utils::SafeExec('INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,contents) VALUES (?,?,?,?)',
-			[$browser_id, $form_id, $rounds, $cont]);
+		return Utils::SafeExec(
+'INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,flags,contents) VALUES ('.$browser_id.','.$form_id.','.$rounds.','.$status.',?)',
+			[$cont]);
 	}
 
 	/**
@@ -66,17 +74,17 @@ class RecordContent
 				$cfuncs = new Crypter($mod);
 			}
 			//update to default rounds (if not already there)
-			$rounds = (int)($mod->GetPreference('rounds_factor') * 100);
+			$rounds = (int)($mod->GetPreference('rounds_factor') * 100); //maybe 0
 			$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 			unset($store);
 		}
-		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds=0,contents=? WHERE record_id=?',
-			[$cont, $record_id]);
+		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',flags=0,contents=? WHERE record_id='.$record_id,
+			[$cont]);
 	}
 
 	/**
 	@mod: reference to PWFBrowse module object
-	@rounds: number of key-stretches
+	@rounds: number of key-stretches, 0 if no encryption
 	@source: string to be decrypted
 	@raw: optional boolean, whether to skip unserialization of decrypted value, default FALSE
 	@cfuncs: optional Crypter-object, default NULL (populate this when batching)
@@ -85,10 +93,20 @@ class RecordContent
 	public function Decrypt(&$mod, $rounds, $source, $raw=FALSE, &$cfuncs=NULL)
 	{
 		if ($source) {
-			if ($cfuncs == NULL) {
-				$cfuncs = new Crypter($mod);
+			if ($rounds > 0) {
+				if ($cfuncs == NULL) {
+					$cfuncs = new Crypter($mod);
+				}
+				$decrypted = $cfuncs->decrypt_value($source, $rounds);
+				if (!$decrypted) {
+					$pw = $cfuncs->decrypt_preference(Crypter::MKEY.'OLD');
+					if ($pw) {
+						$decrypted = $cfuncs->decrypt_value($source, $rounds, $pw);
+					}
+				}
+			} else {
+				$decrypted = $source;
 			}
-			$decrypted = $cfuncs->decrypt_value($source, $rounds);
 			if ($decrypted) {
 				if ($raw) {
 					return $decrypted;
