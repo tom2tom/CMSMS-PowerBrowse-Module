@@ -39,10 +39,10 @@ class FormBrowser extends FieldBase
 /*	public function GetSynopsis()
 	{
 		$this->GetModule();
- 		return $this->mymodule->Lang('').': STUFF';
+		return $this->mymodule->Lang('').': STUFF';
 	}
 */
-	public function DisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string = TRUE)
 	{
 		$ret = '[Form Browser]'; //by convention, not translated
 		if ($as_string) {
@@ -63,7 +63,7 @@ class FormBrowser extends FieldBase
 		return TRUE;
 	}
 
-	public function Store($deep=FALSE)
+	public function Store($deep = FALSE)
 	{
 		return TRUE;
 	}
@@ -71,11 +71,11 @@ class FormBrowser extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_smarty_eval', FALSE, FALSE);
-		return ['main'=>$main,'adv'=>$adv];
+		return ['main' => $main, 'adv' => $adv];
 	}
 
 	/*
-	NOTE: presentation control(s) here must be suitably replicated in Utils::FormatRecord()
+	NOTE: presentation control(s) here must be suitably replicated in RecordContent::Format()
 	*/
 	public function Dispose($id, $returnid)
 	{
@@ -83,7 +83,7 @@ class FormBrowser extends FieldBase
 		foreach ($this->formdata->Fields as &$obfld) {
 			if (($obfld->IsInput && $obfld->DisplayInForm) //TODO is a browsable field methods: $obfld->IsInputField() && $obfld->DisplayInForm()
 				|| $obfld->IsSequence) {
-				$save = [$obfld->Name,$obfld->DisplayableValue()];
+				$save = [$obfld->Name, $obfld->DisplayableValue()];
 				//TODO other presentation control(s) if relevant
 				if ($obfld->IsTimeStamp) {
 					if ($obfld->ShowDate) {
@@ -101,11 +101,11 @@ class FormBrowser extends FieldBase
 					$save[0] = ''; //nothing displayed for these
 					$save[1] = '';
 					if ($obfld->Type == 'SequenceStart') {
-						$save['_ss'] = '';
+						$save['_ss'] = 'TODO'; //identifier
 					} elseif ($obfld->LastBreak) {
-						$save['_se'] = ''; //final 'SequenceEnd'
+						$save['_se'] = 'TODO'; //final 'SequenceEnd' + corresponding identifier
 					} else {
-						$save['_sb'] = ''; //intermediate 'SequenceEnd'
+						$save['_sb'] = 'TODO'; //intermediate 'SequenceEnd' + corresponding identifier
 					}
 				}
 				$browsedata[$obfld->Id] = $save;
@@ -126,10 +126,10 @@ class FormBrowser extends FieldBase
 					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata, 0);
 				}
 			} else {
-				return [FALSE,$this->formdata->formsmodule->Lang('missing_type', 'browser for form')]; //TODO lang
+				return [FALSE, $this->formdata->formsmodule->Lang('missing_type', 'browser for form')]; //TODO lang
 			}
 		}
-		return [TRUE,''];
+		return [TRUE, ''];
 	}
 
 	public function __toString()

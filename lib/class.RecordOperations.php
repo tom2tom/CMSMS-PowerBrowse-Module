@@ -21,7 +21,7 @@ class RecordOperations
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE record_id';
 		$db = \cmsms()->GetDb();
 		if (is_array($record_id)) {
-			$fillers = str_repeat('?,', count($record_id)-1);
+			$fillers = str_repeat('?,', count($record_id) - 1);
 			$sql .= ' IN('.$fillers.'?)';
 			$args = $record_id;
 		} else {

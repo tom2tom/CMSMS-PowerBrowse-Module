@@ -18,7 +18,7 @@ class Utils
 	@mode: optional type of get - 'one','row','col','assoc' or 'all', default 'all'
 	Returns: boolean indicating successful completion
 	*/
-	public static function SafeGet($sql, $args, $mode='all')
+	public static function SafeGet($sql, $args, $mode = 'all')
 	{
 		$db = \cmsms()->GetDb();
 		$nt = 10;
@@ -67,7 +67,7 @@ class Utils
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
 			$db->StartTrans();
 			if (is_array($sql)) {
-				foreach ($sql as $i=>$cmd) {
+				foreach ($sql as $i => $cmd) {
 					$db->Execute($cmd, $args[$i]);
 				}
 			} else {
@@ -123,7 +123,7 @@ class Utils
 	@form_id: form identifier
 	@internal: optional, default TRUE
 	*/
-	public static function GetFormNameFromID($form_id, $internal=TRUE)
+	public static function GetFormNameFromID($form_id, $internal = TRUE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -164,7 +164,7 @@ class Utils
 	public static function GetUploadsUrl(&$mod)
 	{
 		$config = \cmsms()->GetConfig();
-		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url':'ssl_uploads_url';
+		$key = (empty($_SERVER['HTTPS'])) ? 'uploads_url' : 'ssl_uploads_url';
 		$up = $config[$key];
 		if ($up) {
 			$rp = $mod->GetPreference('uploads_dir');
@@ -295,7 +295,7 @@ class Utils
 	@cache: optional boolean, default TRUE
 	Returns: string, processed template
 	*/
-	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
+	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache = TRUE)
 	{
 		if ($mod->before20) {
 			global $smarty;
@@ -342,7 +342,7 @@ class Utils
 			$all = [];
 		}
 		if ($jsfuncs || $jsloads) {
-			$all[] =<<<'EOS'
+			$all[] = <<<'EOS'
 <script type="text/javascript">
 //<![CDATA[
 EOS;
@@ -352,7 +352,7 @@ EOS;
 				$all[] = $jsfuncs;
 			}
 			if ($jsloads) {
-				$all[] =<<<'EOS'
+				$all[] = <<<'EOS'
 $(document).ready(function() {
 EOS;
 				if (is_array($jsloads)) {
@@ -360,11 +360,11 @@ EOS;
 				} else {
 					$all[] = $jsloads;
 				}
-				$all[] =<<<'EOS'
+				$all[] = <<<'EOS'
 });
 EOS;
 			}
-			$all[] =<<<'EOS'
+			$all[] = <<<'EOS'
 //]]>
 </script>
 EOS;

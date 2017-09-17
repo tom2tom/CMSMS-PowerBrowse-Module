@@ -16,7 +16,7 @@ class RecordExport
 	@browser_id: index of the form browser to process, or FALSE if @record_id is provided
 	@record_id: index of the record to process, or array of such, or FALSE if @record_id is provided
 	*/
-	public function ExportName(&$mod, $browser_id=FALSE, $record_id=FALSE)
+	public function ExportName(&$mod, $browser_id = FALSE, $record_id = FALSE)
 	{
 		if (!$browser_id) {
 			if (is_array($record_id)) {
@@ -49,7 +49,7 @@ class RecordExport
 	(except when the separator is '&', '#' or ';', those become %...%)
 	Returns: TRUE/string, or FALSE on error
 	*/
-	public function CSV(&$mod, $browser_id=FALSE, $record_id=FALSE, $fp = FALSE, $sep = ',')
+	public function CSV(&$mod, $browser_id = FALSE, $record_id = FALSE, $fp = FALSE, $sep = ',')
 	{
 		global $db; //$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -79,7 +79,7 @@ class RecordExport
 			$convert = FALSE;
 		}
 
-		$sep2 = ($sep != ' ')?' ':',';
+		$sep2 = ($sep != ' ') ? ' ' : ',';
 		switch ($sep) {
 		 case '&':
 			$r = '%38%';
@@ -110,7 +110,7 @@ class RecordExport
 				if ($strip) {
 					$fn = strip_tags($fn);
 				}
-//TODO don't repeat names for sequences
+		//TODO don't repeat names for sequences
 				$names[] = str_replace($sep, $r, $fn);
 			}
 			unset($one);
@@ -146,7 +146,7 @@ class RecordExport
 							$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 						} else {
 							//output sequence-fields
-							foreach ($field[0] as $skey=>$sname) {
+							foreach ($field[0] as $skey => $sname) {
 								$fv = $field[1][$skey];
 								if ($strip) {
 									$fv = strip_tags($fv);
@@ -217,7 +217,7 @@ class RecordExport
 	At least one of @browser_id, @record_id must be provided
 	Returns: TRUE on success, or lang key for error message upon failure
 	*/
-	public function Export(&$mod, $browser_id=FALSE, $record_id=FALSE, $sep = ',')
+	public function Export(&$mod, $browser_id = FALSE, $record_id = FALSE, $sep = ',')
 	{
 		if (!($browser_id || $record_id)) {
 			return 'error_system';

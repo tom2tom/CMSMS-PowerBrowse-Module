@@ -47,7 +47,7 @@ EOS;
 			$mod = \cms_utils::get_module('PWForms');
 			$dummy = $mod->_GetFormData();
 			$params = [];
-			foreach ($all as $key=>&$row) {
+			foreach ($all as $key => &$row) {
 				$classPath = 'PWForms\\'.$row['type'];
 				$fld = new $classPath($dummy, $params);
 				if ($fld->IsInput || $fld->DisplayExternal) { //TODO check

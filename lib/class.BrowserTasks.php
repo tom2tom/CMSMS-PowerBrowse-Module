@@ -43,21 +43,21 @@ class BrowserTasks
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$browser_id = (int)$params['browser_id'];
+		$browser_id = (int) $params['browser_id'];
 		if (isset($params['browser_owner'])) {
-			$owner = (int)$params['browser_owner'];
+			$owner = (int) $params['browser_owner'];
 		} else {
 			$owner = 0;
 		}
 		$sql = 'UPDATE '.$pre.'module_pwbr_browser SET name=?,owner=?,pagerows=? WHERE browser_id=?';
 		$db->Execute($sql,
-			[trim($params['browser_name']), $owner, (int)$params['browser_pagerows'], $browser_id]);
+			[trim($params['browser_name']), $owner, (int) $params['browser_pagerows'], $browser_id]);
 		$sql = 'UPDATE '.$pre.'module_pwbr_field set shown=?,frontshown=?,sorted=?,order_by=? WHERE field_id=?';
-		foreach ($params['orders'] as $indx=>$fid) {
+		foreach ($params['orders'] as $indx => $fid) {
 			$show = isset($params['shown']) && in_array($fid, $params['shown']);
 			$fshow = isset($params['frontshown']) && in_array($fid, $params['frontshown']);
 			$sort = isset($params['sortable']) && in_array($fid, $params['sortable']);
-			$db->Execute($sql, [$show, $fshow, $sort, $indx+1, $fid]);
+			$db->Execute($sql, [$show, $fshow, $sort, $indx + 1, $fid]);
 		}
 	}
 
@@ -133,12 +133,12 @@ class BrowserTasks
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$browser_id = (int)$params['browser_id'];
+		$browser_id = (int) $params['browser_id'];
 
 		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?', [$browser_id]);
 		unset($row['browser_id']);
 		$row['name'] = (empty($params['browser_name'])) ?
-			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy'):
+			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy') :
 			trim($params['browser_name']);
 		$fields = implode(',', array_keys($row));
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser ('.$fields.')
