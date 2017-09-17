@@ -29,10 +29,16 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND frontshown=1 ORDER BY order_by';
 $data = PWFBrowse\Utils::SafeGet($sql, [$bid]);
-$colnames = array_column($data, 'name');
-$colsorts = array_map(function ($v) {
-	return (int)$v;
-}, array_column($data, 'sorted'));
+if (function_exists('array_column')) { //PHP 5.5+
+	$colnames = array_column($data, 'name');
+} else {
+	$colnames = array_map(function ($one) {
+		return $one['name'];
+	}, $data);
+}
+$colsorts = array_map(function ($one) {
+	return (int) $one['sorted'];
+}, $data);
 $tplvars['colnames'] = $colnames;
 $tplvars['colsorts'] = $colsorts;
 
@@ -46,39 +52,36 @@ $sql = 'SELECT rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=
 $data = PWFBrowse\Utils::SafeGet($sql, [$bid]);
 $rows = [];
 //if ($data) {
+	$cn = count($colnames);
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
-		$fields = [];
 		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents']);
 		if ($browsedata) {
+			$fields = [];
 			//include data for fields named in $colnames
-			foreach ($browsedata as $field) { //$key unused
-				if (count($field) == 2) {
-					$indx = array_search($field[0], $colnames);
-					if ($indx !== FALSE) {
-						$fields[$indx] = $field[1];
-					}
-				} else { //format-parameter(s) present
-					PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
-					if (!is_array($field[0])) {
-						$indx = array_search($field[0], $colnames);
-						if ($indx !== FALSE) {
+			$cd = count($browsedata); //variable: maybe missing ('Modified') or extra (sequences)
+			for ($indx=0; $indx<$cn; $indx++) {
+				$title = $colnames[$indx];
+				foreach ($browsedata  as $key => &$field) {
+					if ($field[0] == $title) {
+						if (count($field) == 2) { //no format-parameter(s) present 
 							$fields[$indx] = $field[1];
+						} elseif ($key != '_ss') { //not a sequence start
+							$fields[$indx] = $funcs->Format($this, $field, $browsedata);
+						} else {
+							$indx = $funcs->ListSequence($this, $colnames, $browsedata, $indx, $fields);
 						}
-					} else {
-						//output sequence-fields
-						foreach ($field[0] as $skey=>$sname) {
-							$indx = array_search($sname, $colnames);
-							if ($indx !== FALSE) {
-								$fields[$indx] = $field[1][$skey];
-							}
-						}
+						unset($field);
+						continue 2;
+					} elseif ($key == '_ss') { //unwanted sequence-start
+						$indx = $funcs->PassSequence($browsedata, $indx);
+						unset($field);
+						continue 2;
 					}
 				}
+				unset($field);
+				$fields[$indx] = NULL;
 			}
-		}
-		if ($fields) {
-			ksort($fields); //conform order to titles
 			$rows[] = $fields;
 		}
 	}
