@@ -126,6 +126,8 @@ EOS;
 			}
 			unset($row);
 
+			$funcs->StartUpdate();
+
 			$oc = count($olds);
 			if ($renums) {
 				foreach ($renums as $newbid => $oldbid) {
@@ -135,7 +137,6 @@ EOS;
 				return [$ic, $oc - $ic];
 			}
 			return [0, $oc];
-			//TODO initiate RecordsUpdate task
 		}
 		return [0, 0];
 	}
