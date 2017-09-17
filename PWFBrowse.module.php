@@ -178,7 +178,7 @@ class PWFBrowse extends CMSModule
 	{
 		switch ($capability) {
 			case CmsCoreCapabilities::PLUGIN_MODULE:
-			case CmsCoreCapabilities::TASKS:
+//			case CmsCoreCapabilities::TASKS: //mainly for CMSMS < 2.2.2
 				return TRUE;
 		}
 		return FALSE;
@@ -277,10 +277,14 @@ EOS;
 
 /*	public function get_tasks()
 	{
-		return new PWFBrowse\RecordsUpdateTask();
+		CmsJobManager as of 2.2.2 is too flaky, & otherwise, constant callbacks are too 'heavy'
+		global $CMS_VERSION;
+		if (version_compare($CMS_VERSION, '2.2.2') < 0) {
+			return new PWFBrowse\RecordsUpdateTask(); //task always in play
+		}
+		return NULL; //can/will manage tasks manually
 	}
 */
-
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
 	public function _CheckAccess($permission='')
