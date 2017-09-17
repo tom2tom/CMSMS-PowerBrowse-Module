@@ -57,7 +57,7 @@ if (isset($params['edit'])) {
 		$value = $field[1];
 		$hidden[] = $this->CreateInputHidden($id, 'field['.$key.']', $title);
 		if (($c = count($field)) > 2) { //format-parameter(s) present
-			PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
+			$funcs->Format($this, $field, $browsedata);
 			if (!is_array($field[0])) {
 				if ($key[0] == '_') { //internal-use fake field, not editable
 					$hidden[] = $this->CreateInputHidden($id, 'value['.$key.']', $value); //un-formatted value
@@ -106,7 +106,7 @@ if (isset($params['edit'])) {
 	$tplvars['title_browser'] = $this->Lang('title_submitted_as', $bname);
 	foreach ($browsedata as $key=>$field) {
 		if (count($field) > 2) { //format-parameter(s) present
-			PWFBrowse\Utils::FormatRecord($this, $field, $browsedata);
+			$funcs->Format($this, $field, $browsedata);
 			if (is_array($field[0])) {
 				//output sequence-fields
 				foreach ($field[0] as $skey=>$sname) {
