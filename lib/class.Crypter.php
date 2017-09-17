@@ -74,6 +74,16 @@ class Crypter Extends Encryption
 	}
 
 	/**
+	remove_preference:
+	@key: module-preferences key
+	*/
+	public function remove_preference($key)
+	{
+		$s = $this->localise();
+		$this->mod->RemovePreference(hash('tiger192,3', $s.$key));
+	}
+
+	/**
 	encrypt_value:
 	@value: value to encrypted, may be empty string
 	@stretches: optional number of rounds to be used for key 'stretching', default 1024 (0 sets this too)
