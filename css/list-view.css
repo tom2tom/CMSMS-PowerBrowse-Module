@@ -8,7 +8,7 @@ table.table_sort th
 table.table_sort th.SortAble
 {
 	padding-left: 10px;
-	background-image: url(../images/sortdark.png);
+	background-image: url(../images/sortlite.png);
 	background-repeat: no-repeat;
 	background-position: center left;
 	cursor: pointer;
@@ -16,7 +16,7 @@ table.table_sort th.SortAble
 table.table_sort th.SortUp
 {
 	padding-left: 10px;
-	background-image: url(../images/ascdark.png);
+	background-image: url(../images/asclite.png);
 	background-repeat: no-repeat;
 	background-position: center left;
 	cursor: pointer;
@@ -24,7 +24,7 @@ table.table_sort th.SortUp
 table.table_sort th.SortDown
 {
 	padding-left: 10px;
-	background-image: url(../images/descdark.png);
+	background-image: url(../images/desclite.png);
 	background-repeat: no-repeat;
 	background-position: center left;
 	cursor: pointer;
