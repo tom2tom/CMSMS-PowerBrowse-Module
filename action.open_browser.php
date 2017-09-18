@@ -28,18 +28,9 @@ if (isset($params['cancel'])) {
 	$params['message'] = $this->_PrettyMessage($message, TRUE, FALSE);
 }
 
+$utils = new PWFBrowse\Utils();
 $tplvars = [];
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.browser.php';
 
-$utils = new PWFBrowse\Utils();
-$jsall = NULL;
-$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
-unset($jsincs);
-unset($jsfuncs);
-unset($jsloads);
-
-echo $utils->ProcessTemplate($this, 'open_browser.tpl', $tplvars);
-if ($jsall) {
-	echo $jsall;
-}
+$utils->Generate($this, 'open_browser.tpl', $tplvars, $jsincs, $jsfuncs, $jsloads);

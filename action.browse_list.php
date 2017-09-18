@@ -310,7 +310,7 @@ $cssfile = $this->GetPreference('list_cssfile');
 $u = ($cssfile) ?
 	$utils->GetUploadsUrl($this).'/'.$cssfile : //using custom css for table
 	$baseurl.'/css/list-view.css';
-$t = <<<EOS
+echo <<<EOS
 <script type="text/javascript">
 //<![CDATA[
  document.getElementById('adminstyler').setAttribute('href',"{$u}");
@@ -318,14 +318,4 @@ $t = <<<EOS
 </script>
 EOS;
 
-$jsall = NULL;
-$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
-unset($jsincs);
-unset($jsfuncs);
-unset($jsloads);
-
-echo $t;
-echo $utils->ProcessTemplate($this, 'browse_list.tpl', $tplvars);
-if ($jsall) {
-	echo $jsall;
-}
+$utils->Generate($this, 'browse_list.tpl', $tplvars, $jsincs, $jsfuncs, $jsloads);

@@ -197,17 +197,6 @@ if (\$linklast.length) {
  \$head.append(linkadd);
 }
 EOS;
-$jsall = NULL;
-$utils->MergeJS(FALSE, [$t], FALSE, $jsall);
-echo $jsall;
+echo $utils->MergeJS(NULL, $t, NULL);
 
-$jsall = NULL;
-$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
-unset($jsincs);
-unset($jsfuncs);
-unset($jsloads);
-
-echo $utils->ProcessTemplate($this, 'default.tpl', $tplvars);
-if ($jsall) {
-	echo $jsall;
-}
+$utils->Generate($this, 'default.tpl', $tplvars, $jsincs, $jsfuncs, $jsloads);

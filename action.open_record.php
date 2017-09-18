@@ -128,15 +128,5 @@ if (isset($params['edit'])) {
 }
 $tplvars['content'] = $content;
 
-/*$jsall = NULL;
-$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
-unset($jsincs);
-unset($jsfuncs);
-unset($jsloads);
-*/
+$utils->Generate($this, 'open_record.tpl', $tplvars); //no js needed
 
-echo $utils->ProcessTemplate($this, 'open_record.tpl', $tplvars);
-/*if ($jsall) {
-	echo $jsall;
-}
-*/

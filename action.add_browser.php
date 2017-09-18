@@ -32,6 +32,10 @@ if (isset($params['submit'])) {
 
 $utils = new PWFBrowse\Utils();
 $tplvars = [];
+/*$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
+*/
 
 if ($params['browser_id'] == -1) { //add browser
 	//TODO c.f. BrowserTasks->AddBrowser(&$mod,&$params)
@@ -81,4 +85,5 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 
-echo $utils->ProcessTemplate($this, $tpl, $tplvars);
+$utils->Generate($this, $tpl, $tplvars); //no js needed
+
