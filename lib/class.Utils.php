@@ -178,15 +178,23 @@ class Utils
 	}
 
 	/**
-	ProcessTemplate:
+	Generate:
 	@mod: reference to current PWFBrowse module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
+	@jsincs: optional string or array of js 'include' directives, default NULL
+	@jsfuncs: optional string or array of js methods, default NULL
+	@jsloads: optional string or array of js onload-methods, default NULL
 	@cache: optional boolean, default TRUE
-	Returns: string, processed template
+	Returns: nothing
 	*/
-	public function ProcessTemplate(&$mod, $tplname, $tplvars, $cache = TRUE)
+	public function Generate(&$mod, $tplname, $tplvars, $jsincs = NULL, $jsfuncs = NULL, $jsloads = NULL, $cache = TRUE)
 	{
+		$jsall = self::MergeJS($jsincs, $jsfuncs, $jsloads);
+		unset($jsincs);
+		unset($jsfuncs);
+		unset($jsloads);
+
 		if ($mod->before20) {
 			global $smarty;
 		} else {
@@ -197,10 +205,11 @@ class Utils
 		}
 		$smarty->assign($tplvars);
 		if ($mod->oldtemplates) {
-			return $mod->ProcessTemplate($tplname);
+			$cache_id = ($cache) ? md5('pwbr'.$tplname.serialize(array_keys($tplvars))) : '';
+			echo $mod->ProcessTemplate($tplname, '', $cache, $cache_id);
 		} else {
 			if ($cache) {
-				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
+				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars))) : '';
 				$lang = \CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwbr'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);
@@ -210,7 +219,10 @@ class Utils
 			} else {
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), NULL, NULL, $smarty, $tplvars);
 			}
-			return $tpl->fetch();
+			$tpl->display();
+		}
+		if ($jsall) {
+			echo $jsall;
 		}
 	}
 
@@ -219,10 +231,9 @@ class Utils
 	@jsincs: string or array of js 'include' directives
 	@jsfuncs: string or array of js methods
 	@jsloads: string or array of js onload-methods
-	@$merged: reference to variable to be populated with the merged js string
-	Returns: nothing
+	Returns: js string
 	*/
-	public function MergeJS($jsincs, $jsfuncs, $jsloads, &$merged)
+	public function MergeJS($jsincs, $jsfuncs, $jsloads)
 	{
 		if (is_array($jsincs)) {
 			$all = $jsincs;
@@ -259,6 +270,6 @@ EOS;
 </script>
 EOS;
 		}
-		$merged = implode(PHP_EOL, $all);
+		return implode(PHP_EOL, $all);
 	}
 }
