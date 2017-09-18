@@ -1,6 +1,6 @@
 <?php
 
-namespace AsyncRequest;
+namespace PWFBrowse\AsyncRequest;
 
 interface IRequest
 {

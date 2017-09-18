@@ -1,6 +1,6 @@
 <?php
 
-namespace AsyncRequest;
+namespace PWFBrowse\AsyncRequest;
 
 class Request implements IRequest
 {
