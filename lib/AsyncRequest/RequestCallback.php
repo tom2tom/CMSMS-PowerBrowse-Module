@@ -4,17 +4,16 @@ namespace AsyncRequest;
 
 class RequestCallback
 {
-
 	/** @var IRequest */
 	private $request;
 
 	/** @var ?callable */
 	private $callback;
 
-	public function __construct(IRequest $request, $callback = NULL)
+	public function __construct(IRequest $request, $callback = null)
 	{
 		if ($callback !== null && !is_callable($callback)) {
-			throw new Exception('Invalid callback');
+			throw new \InvalidArgumentException('Invalid callback');
 		}
 
 		$this->request = $request;
@@ -30,5 +29,4 @@ class RequestCallback
 	{
 		return $this->callback;
 	}
-
 }
