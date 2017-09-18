@@ -30,6 +30,7 @@ if (isset($params['submit'])) {
 		'browser_id'=>$browser_id]);
 }
 
+$utils = new PWFBrowse\Utils();
 $tplvars = [];
 
 if ($params['browser_id'] == -1) { //add browser
@@ -61,10 +62,10 @@ if ($params['browser_id'] == -1) { //add browser
 	$tplvars['hidden'] = $this->CreateInputHidden($id, 'browser_id', $bid).
 		$this->CreateInputHidden($id, 'form_id', $fid);
 	$tplvars['title_form_name'] = $this->Lang('title_form_name');
-	$name = PWFBrowse\Utils::GetFormNameFromID($fid);
+	$name = $utils->GetFormNameFromID($fid);
 	$tplvars['form_name'] = $name;
 	$tplvars['title_browser_oldname'] = $this->Lang('title_browser_oldname');
-	$name = PWFBrowse\Utils::GetBrowserNameFromID($bid);
+	$name = $utils->GetBrowserNameFromID($bid);
 	$tplvars['browser_oldname'] = $name;
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	$tplvars['input_browser_name'] =
@@ -80,4 +81,4 @@ $tplvars['end_form'] = $this->CreateFormEnd();
 $tplvars['save'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('save'));
 $tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 
-echo PWFBrowse\Utils::ProcessTemplate($this, $tpl, $tplvars);
+echo $utils->ProcessTemplate($this, $tpl, $tplvars);

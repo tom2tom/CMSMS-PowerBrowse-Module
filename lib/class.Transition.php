@@ -37,9 +37,10 @@ EOS;
 		$pre = \cms_db_prefix();
 		$converts = self::Get_Converts($db, $pre, $form_id);
 		if ($converts) {
+			$utils = new Utils();
 			$newfid = (int) reset($converts);
 			$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE form_id=?';
-			$data = Utils::SafeGet($sql, [$form_id]);
+			$data = $utils->SafeGet($sql, [$form_id]);
 			if ($data) {
 				$converts = self::Get_Converts($db, $pre, 0);
 				if ($converts) {
@@ -126,7 +127,7 @@ EOS;
 			}
 			unset($row);
 
-			$funcs->StartUpdate();
+			$funcs->StartUpdate($mod);
 
 			$oc = count($olds);
 			if ($renums) {

@@ -48,7 +48,7 @@ if (!$padmin && $this->GetPreference('owned_forms')) {
 	$sql .= ' WHERE BR.owner IN (0,'.$uid.')';
 }
 $sql .= ' ORDER BY BR.name';
-$browsers = PWFBrowse\Utils::SafeGet($sql, FALSE);
+$browsers = $utils->SafeGet($sql, FALSE);
 if ($browsers) {
 	$tplvars['title_browser_name'] = $this->Lang('title_browser_name');
 	if ($iseditor) {

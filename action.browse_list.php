@@ -35,6 +35,7 @@ if (!empty($params['message'])) {
 	$tplvars['message'] = $params['message'];
 }
 
+$utils = new PWFBrowse\Utils();
 $pre = cms_db_prefix();
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 $data = $db->GetRow($sql, [$bid]);
@@ -43,7 +44,7 @@ $pagerows = (int) $data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND shown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql, [$params['browser_id']]);
+$data = $utils->SafeGet($sql, [$params['browser_id']]);
 
 if (function_exists('array_column')) { //PHP 5.5+
 	$colnames = array_column($data, 'name');
@@ -68,7 +69,7 @@ $jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql, [$params['browser_id']]);
+$data = $utils->SafeGet($sql, [$params['browser_id']]);
 $rows = [];
 //if ($data) {
 	$icon_view = $theme->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon');
@@ -307,7 +308,7 @@ if ($pmod) {
 //replace href attribute in existing stylesheet link (early in page-processing)
 $cssfile = $this->GetPreference('list_cssfile');
 $u = ($cssfile) ?
-	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile : //using custom css for table
+	$utils->GetUploadsUrl($this).'/'.$cssfile : //using custom css for table
 	$baseurl.'/css/list-view.css';
 $t = <<<EOS
 <script type="text/javascript">
@@ -318,13 +319,13 @@ $t = <<<EOS
 EOS;
 
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
+$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
 echo $t;
-echo PWFBrowse\Utils::ProcessTemplate($this, 'browse_list.tpl', $tplvars);
+echo $utils->ProcessTemplate($this, 'browse_list.tpl', $tplvars);
 if ($jsall) {
 	echo $jsall;
 }

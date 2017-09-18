@@ -21,6 +21,8 @@ if (!empty($params['message'])) {
 	$tplvars['message'] = $params['message'];
 }
 
+$utils = new PWFBrowse\Utils();
+
 $sql = 'SELECT name,pagerows FROM '.$pre.'module_pwbr_browser WHERE browser_id=?';
 $data = $db->GetRow($sql, [$bid]);
 $tplvars['browser_title'] = $data['name'];
@@ -28,7 +30,7 @@ $pagerows = (int)$data['pagerows']; //0 means unlimited
 
 $sql = 'SELECT name,sorted FROM '.$pre.'module_pwbr_field
 WHERE browser_id=? AND frontshown=1 ORDER BY order_by';
-$data = PWFBrowse\Utils::SafeGet($sql, [$bid]);
+$data = $utils->SafeGet($sql, [$bid]);
 if (function_exists('array_column')) { //PHP 5.5+
 	$colnames = array_column($data, 'name');
 } else {
@@ -49,7 +51,7 @@ $jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
 $sql = 'SELECT rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-$data = PWFBrowse\Utils::SafeGet($sql, [$bid]);
+$data = $utils->SafeGet($sql, [$bid]);
 $rows = [];
 //if ($data) {
 	$cn = count($colnames);
@@ -183,7 +185,7 @@ EOS;
 //apply styling
 $cssfile = $this->GetPreference('list_cssfile');
 $url = ($cssfile) ?
-	PWFBrowse\Utils::GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
+	$utils->GetUploadsUrl($this).'/'.$cssfile: //using custom css for table
 	$baseurl.'/css/list-view.css';
 $t = <<<EOS
 var linkadd = '<link rel="stylesheet" type="text/css" href="{$url}" />',
@@ -196,16 +198,16 @@ if (\$linklast.length) {
 }
 EOS;
 $jsall = NULL;
-PWForms\Utils::MergeJS(FALSE, [$t], FALSE, $jsall);
+$utils->MergeJS(FALSE, [$t], FALSE, $jsall);
 echo $jsall;
 
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
+$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
-echo PWFBrowse\Utils::ProcessTemplate($this, 'default.tpl', $tplvars);
+echo $utils->ProcessTemplate($this, 'default.tpl', $tplvars);
 if ($jsall) {
 	echo $jsall;
 }

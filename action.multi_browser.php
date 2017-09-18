@@ -76,12 +76,13 @@ if (isset($params['clone'])) {
 		$params = ['message' => $this->_PrettyMessage($res, FALSE)];
 	} else {
 		//cannot export multi browsers as a single item, so stuff em into a zip
-		$fn = $this->GetName().$this->Lang('export').
-			'-'.implode('-', $params['sel']).'-'.date('Y-m-d-H-i').'.zip';
-		$fp = PWFBrowse\Utils::GetUploadsPath($this);
+		$utils = new PWFBrowse\Utils();
+		$fp = $utils->GetUploadsPath($this);
 		if (!$fp) {
 			$fp = cms_join_path($config['root_path'], 'tmp');
 		}
+		$fn = $this->GetName().$this->Lang('export').
+			'-'.implode('-', $params['sel']).'-'.date('Y-m-d-H-i').'.zip';
 		$fp .= DIRECTORY_SEPARATOR.$fn;
 		$zip = new ZipArchive();
 		if ($zip && $zip->open($fp, ZipArchive::CREATE) === TRUE) {

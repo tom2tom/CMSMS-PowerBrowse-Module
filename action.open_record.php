@@ -37,6 +37,11 @@ if (!$res) {
 	$this->Redirect($id, 'browse_list', $returnid, $params);
 }
 
+/*/script accumulators
+$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
+*/
 $tplvars = [];
 $this->_BuildNav($id, $returnid, $params, $tplvars);
 
@@ -47,7 +52,8 @@ $tplvars['start_form'] =
 		'form_id'=>$params['form_id']]);
 $tplvars['end_form'] = $this->CreateFormEnd();
 
-$bname = PWFBrowse\Utils::GetBrowserNameFromID($params['browser_id']);
+$utils = new PWFBrowse\Utils();
+$bname = $utils->GetBrowserNameFromID($params['browser_id']);
 $content = [];
 if (isset($params['edit'])) {
 	$hidden = [];
@@ -122,4 +128,15 @@ if (isset($params['edit'])) {
 }
 $tplvars['content'] = $content;
 
-echo PWFBrowse\Utils::ProcessTemplate($this, 'open_record.tpl', $tplvars);
+/*$jsall = NULL;
+$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
+unset($jsincs);
+unset($jsfuncs);
+unset($jsloads);
+*/
+
+echo $utils->ProcessTemplate($this, 'open_record.tpl', $tplvars);
+/*if ($jsall) {
+	echo $jsall;
+}
+*/

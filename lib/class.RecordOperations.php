@@ -28,7 +28,8 @@ class RecordOperations
 			$sql .= '=?';
 			$args = [$record_id];
 		}
-		return Utils::SafeExec($sql, $args);
+		$utils = new Utils();
+		return $utils->SafeExec($sql, $args);
 	}
 
 	/**
@@ -43,7 +44,8 @@ class RecordOperations
 		$sql = 'INSERT INTO '.$pre.'module_pwbr_record TODO';
 //		$db = \cmsms()->GetDb();
 		//TODO
-		$ret = Utils::SafeExec($sql,$args);
+		$utils = new Utils();
+		$ret = $utils->SafeExec($sql,$args);
 		if ($ret && $notify) {
 			//send notice
 		}

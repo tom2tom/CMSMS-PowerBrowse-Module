@@ -76,8 +76,9 @@ class BrowserTasks
 		if ($db->Affected_Rows() == 0) {
 			return FALSE;
 		}
+		$utils = new Utils();
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
-		if (!Utils::SafeExec($sql, [$browser_id])) {
+		if (!$utils->SafeExec($sql, [$browser_id])) {
 			return FALSE;
 		}
 		$sql = 'DELETE FROM '.$pre.'module_pwbr_field WHERE browser_id=?';
@@ -95,7 +96,8 @@ class BrowserTasks
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$formname = Utils::GetFormNameFromID($params['form_id'], FALSE);
+		$utils = new Utils();
+		$formname = $utils->GetFormNameFromID($params['form_id'], FALSE);
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser
 (form_id,name,form_name) VALUES (?,?,?)',
 			[$params['form_id'], $params['name'], $formname]);
@@ -137,9 +139,12 @@ class BrowserTasks
 
 		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?', [$browser_id]);
 		unset($row['browser_id']);
-		$row['name'] = (empty($params['browser_name'])) ?
-			Utils::GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy') :
-			trim($params['browser_name']);
+		if (empty($params['browser_name'])) 
+			$utils = new Utils();
+			$row['name'] = $utils->GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy');
+		} else {
+			$row['name'] = trim($params['browser_name']);
+		}
 		$fields = implode(',', array_keys($row));
 		$db->Execute('INSERT INTO '.$pre.'module_pwbr_browser ('.$fields.')
 VALUES (?,?,?,?,?,?,?)', array_values($row));

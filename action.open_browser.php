@@ -32,14 +32,14 @@ $tplvars = [];
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.browser.php';
 
+$utils = new PWFBrowse\Utils();
 $jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
+$utils->MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
 unset($jsincs);
 unset($jsfuncs);
 unset($jsloads);
 
-echo PWFBrowse\Utils::ProcessTemplate($this, 'open_browser.tpl', $tplvars);
-
+echo $utils->ProcessTemplate($this, 'open_browser.tpl', $tplvars);
 if ($jsall) {
 	echo $jsall;
 }
