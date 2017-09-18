@@ -4,7 +4,6 @@ namespace AsyncRequest;
 
 class Request implements IRequest
 {
-
 	/** @var string */
 	protected $url;
 
@@ -17,10 +16,17 @@ class Request implements IRequest
 	public function __construct($url)
 	{
 		$this->url = $url;
-		$this->handle = curl_init($url);
-		$this->setOption(CURLOPT_RETURNTRANSFER, true);
-		$this->setOption(CURLOPT_HEADER, true);
-		$this->setOption(CURLOPT_FOLLOWLOCATION, true);
+		$this->handle = curl_init();
+		if ($this->handle) {
+			curl_setopt_array($this->handle, [
+				CURLOPT_URL => $url,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HEADER => true,
+				CURLOPT_FOLLOWLOCATION => true]
+			);
+		} else {
+			throw new \RuntimeException('cURL interface is not available.');
+		}
 	}
 
 	/**
@@ -31,6 +37,15 @@ class Request implements IRequest
 	public function setOption($curlOption, $value)
 	{
 		curl_setopt($this->handle, $curlOption, $value);
+	}
+
+	/**
+	 * Sets multiple cURL options
+	 * @param array $curlOptions
+	 */
+	public function setOptionArray($curlOptions)
+	{
+		curl_setopt_array($this->handle, $curlOptions);
 	}
 
 	/**
@@ -50,7 +65,9 @@ class Request implements IRequest
 	public function createResponse($curlResponse)
 	{
 		$error = curl_error($this->handle);
-		$error = $error === '' ? null : $error;
+		if ($error === '') {
+			$error = null;
+		}
 
 		$httpCode = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
 
@@ -72,5 +89,4 @@ class Request implements IRequest
 			curl_close($this->handle);
 		}
 	}
-
 }
