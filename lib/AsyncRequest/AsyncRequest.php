@@ -4,7 +4,6 @@ namespace AsyncRequest;
 
 class AsyncRequest
 {
-
 	const DEFAULT_PRIORITY = 1;
 
 	/** @var resource */
@@ -20,7 +19,7 @@ class AsyncRequest
 	protected $runningCount = 0;
 
 	/** @var ?int */
-	private $parallelLimit = NULL;
+	private $parallelLimit = null;
 
 	public function __construct()
 	{
@@ -95,8 +94,8 @@ class AsyncRequest
 	 */
 	public function waitForData($timeout = 1.0)
 	{
-		if ($this->count() == 0) {
-			throw new Exception('No requests are running.');
+		if (!$this->requests) {
+			throw new \RuntimeException('No request is running.');
 		}
 
 		while (curl_multi_exec($this->handle, $runningCount) === CURLM_CALL_MULTI_PERFORM);
@@ -147,7 +146,7 @@ class AsyncRequest
 	 */
 	protected function startFromQueue()
 	{
-		$freeSlots = $this->parallelLimit === NULL || $this->runningCount < $this->parallelLimit;
+		$freeSlots = $this->parallelLimit === null || $this->runningCount < $this->parallelLimit;
 
 		if (!$this->queue->isEmpty() && $freeSlots) {
 			$uuid = $this->queue->extract();
@@ -156,5 +155,4 @@ class AsyncRequest
 			$this->runningCount++;
 		}
 	}
-
 }

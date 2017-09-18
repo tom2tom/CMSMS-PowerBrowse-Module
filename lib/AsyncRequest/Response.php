@@ -4,7 +4,6 @@ namespace AsyncRequest;
 
 class Response
 {
-
 	/** @var string */
 	private $url;
 
@@ -90,5 +89,4 @@ class Response
 	{
 		return $this->getError() !== null || $this->getHttpCode() >= 400;
 	}
-
 }
