@@ -139,7 +139,7 @@ class BrowserTasks
 
 		$row = $db->GetRow('SELECT * FROM'.pre.'module_pwbr_browser WHERE browser_id=?', [$browser_id]);
 		unset($row['browser_id']);
-		if (empty($params['browser_name'])) 
+		if (empty($params['browser_name'])) {
 			$utils = new Utils();
 			$row['name'] = $utils->GetBrowserNameFromID($browser_id).' '.$mod->Lang('copy');
 		} else {
