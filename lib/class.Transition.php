@@ -248,7 +248,7 @@ EOS;
 				$fid = -$fid; //id < 0 signals FormBuilder field id
 			}
 			$db->Execute($sql, [$newbid, $nm, $see, 0, 0, $order, $fid]);
-			$i++;
+			++$i;
 		}
 	}
 

@@ -118,7 +118,7 @@ class BrowserTasks
 				$show = ($ord < 8);
 				$sort = ($ord < 5);
 				$db->Execute($sql, [$newid, $fieldname, $show, $sort, $ord]);
-				$ord++;
+				++$ord;
 			}
 			unset($fieldname);
 		}

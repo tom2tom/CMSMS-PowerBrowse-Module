@@ -45,7 +45,7 @@ class Utils
 			if ($db->CompleteTrans()) {
 				return $ret;
 			} else {
-				$nt--;
+				--$nt;
 				usleep(50000);
 			}
 		}
@@ -76,7 +76,7 @@ class Utils
 			if ($db->CompleteTrans()) {
 				return TRUE;
 			} else {
-				$nt--;
+				--$nt;
 				usleep(50000);
 			}
 		}
@@ -209,7 +209,7 @@ class Utils
 			echo $mod->ProcessTemplate($tplname, '', $cache, $cache_id);
 		} else {
 			if ($cache) {
-				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars))) : '';
+				$cache_id = md5('pwbr'.$tplname.serialize(array_keys($tplvars)));
 				$lang = \CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwbr'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);

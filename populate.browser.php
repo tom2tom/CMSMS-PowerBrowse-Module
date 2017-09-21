@@ -123,7 +123,7 @@ if ($fields) {
 		} else {
 			$oneset->up = '';
 		}
-		$mc++;
+		++$mc;
 		$previd = $fid; //i.e. always set before use
 		$formatted[] = $oneset;
 	}
