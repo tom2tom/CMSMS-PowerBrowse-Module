@@ -90,6 +90,14 @@ if ($fp && is_dir($fp)) {
 }
 $this->SetPreference('uploads_dir', $ud);
 
+//install job processor (if not done before)
+$rootpath = $config['root_path'];
+$fp = cms_join_path($rootpath, 'jobinterface.php');
+if (!is_file ($fp)) {
+	$fp = cms_join_path(__DIR__, 'jobinterface.php');
+	@copy($fp, $rootpath);
+}
+
 //install our form-dispose field
 $fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');
 $pfmod->RegisterField($fp);
