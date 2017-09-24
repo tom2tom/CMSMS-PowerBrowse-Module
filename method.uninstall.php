@@ -6,26 +6,6 @@ Refer to licence and other details at the top of file PWFBrowse.module.php
 More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 
-//NB caller must be very careful that top-level dir is valid!
-function delTree($dir)
-{
-	$files = array_diff(scandir($dir), ['.', '..']);
-	if ($files) {
-		foreach ($files as $file) {
-			$fp = $dir.DIRECTORY_SEPARATOR.$file;
-			if (is_dir($fp)) {
-				if (!delTree($fp)) {
-					return FALSE;
-				}
-			} else {
-				unlink($fp);
-			}
-		}
-		unset($files);
-	}
-	return rmdir($dir);
-}
-
 if (!$this->_CheckAccess('admin')) {
 	exit;
 }
@@ -53,16 +33,18 @@ $this->RemovePermission('ViewPwFormData');
 
 $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
-	$upd = $this->GetPreference('uploads_dir');
-	if ($upd) {
-		$fp = cms_join_path($fp, $upd);
+	$ud = $this->GetPreference('uploads_dir');
+	if ($ud) {
+		$fp .= DIRECTORY_SEPARATOR.$ud;
 		if ($fp && is_dir($fp)) {
-			delTree($fp);
+			recursive_delete($fp);
 		}
 	}
 }
 // remove preferences
 $this->RemovePreference();
+
+// DON'T remove job processor
 
 // remove disposer
 $pfmod = $this->GetModuleInstance('PWForms');
