@@ -74,17 +74,14 @@ class FormBrowser extends FieldBase
 		return ['main' => $main, 'adv' => $adv];
 	}
 
-	/*
-	NOTE: presentation control(s) here must be suitably replicated in RecordContent::Format()
-	*/
+	//NB RecordContent::Format() recognizes special-cases: 'dt','d','t','_ss','_se','_sb'
 	public function Dispose($id, $returnid)
 	{
 		$browsedata = [];
 		foreach ($this->formdata->Fields as &$obfld) {
-			if (($obfld->IsInput && $obfld->DisplayInForm) //TODO is a browsable field methods: $obfld->IsInputField() && $obfld->DisplayInForm()
-				|| $obfld->IsSequence) {
+	//TODO is a browsable field by API methods: $obfld->IsInputField() && $obfld->DisplayInForm()
+			if (($obfld->IsInput && $obfld->DisplayInForm) || $obfld->IsSequence) {
 				$save = [$obfld->Name, $obfld->DisplayableValue()];
-				//TODO other presentation control(s) if relevant
 				if ($obfld->IsTimeStamp) {
 					if ($obfld->ShowDate) {
 						if ($obfld->ShowTime) {
@@ -98,15 +95,18 @@ class FormBrowser extends FieldBase
 						continue;
 					}
 				} elseif ($obfld->IsSequence) {
-					$save[0] = ''; //nothing displayed for these
-					$save[1] = '';
+					$sid = $obfld->GetProperty('privatename'); //identifier
 					if ($obfld->Type == 'SequenceStart') {
-						$save['_ss'] = 'TODO'; //identifier
+						$save['_ss'] = $sid; //'SequenceStart'
+						$save[0] = $sid.'>>'; //title to facilitate list-setup
 					} elseif ($obfld->LastBreak) {
-						$save['_se'] = 'TODO'; //final 'SequenceEnd' + corresponding identifier
+						$save['_se'] = $sid; //final 'SequenceEnd'
+						$save[0] = $sid.'<<';
 					} else {
-						$save['_sb'] = 'TODO'; //intermediate 'SequenceEnd' + corresponding identifier
+						$save['_sb'] = $sid; //intermediate 'SequenceEnd'
+						$save[0] = $sid.'||';
 					}
+					$save[1] = ''; //no value
 				}
 				$browsedata[$obfld->Id] = $save;
 			}
