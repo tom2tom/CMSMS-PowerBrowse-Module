@@ -65,8 +65,8 @@ class Jobber
 	 [0] = module name
 	 [1] = module-action name
 	 [2] = array of action-parameters (optional)
-	ATM jobs queue is stored as array, FIFO processed, no state-recall, no priorities c.f. SplPriorityQueue
-	*/
+	 ATM jobs queue is stored as array, FIFO processed, no state-recall, no priorities c.f. SplPriorityQueue
+	 */
 	public function PushJob($jobdata)
 	{
 		if ($jobdata) {
@@ -93,8 +93,8 @@ class Jobber
 
 	/**
 	@param key string regexp to match in current-module preferences
-	Returns: associative array, keyed by matching preference name
-	*/
+	 Returns: associative array, keyed by matching preference name
+	 */
 	public function GetPreferencesLike($key)
 	{
 		$matches = [];
@@ -103,7 +103,7 @@ class Jobber
 			$patn = '~'.$this->mod->GetName().'.+'.$key.'~';
 			foreach ($prefs as $key => &$val) {
 				if (preg_match($patn, $key)) {
-					$p = strpos($key,'_mapi_pref_');
+					$p = strpos($key, '_mapi_pref_');
 					$skey = substr($key, $p + 11);
 					$matches[$skey] = $val;
 				}
@@ -119,49 +119,51 @@ class Jobber
 	@see https://github.com/lastguest/murmurhash-php
 	@param  string $key   text to hash
 	@param  number $seed  positive integer
-	@return number 32-bit positive integer
-	*/
+	 @return number 32-bit positive integer
+	 */
 	public function murmurhash3_int($key, $seed = 5381)
 	{
-		$key  = array_values(unpack('C*',(string) $key));
+		$h1 = (int) $seed;
+		$key = array_values(unpack('C*', (string) $key));
 		$klen = count($key);
 		$remainder = $klen & 3;
-		$bytes = $klen - $remainder;
-		$h1 = (int)$seed;
 		$i = 0;
+		$bytes = $klen - $remainder;
+
 		while ($i < $bytes) {
-			$k1 = $key[$i] | ($key[$i+1] << 8) | ($key[$i+2] << 16) | ($key[$i+3] << 24);
-			$k1  = (((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16))) & 0xffffffff;
-			$k1  = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
-			$k1  = (((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16))) & 0xffffffff;
+			$k1 = $key[$i] | ($key[$i + 1] << 8) | ($key[$i + 2] << 16) | ($key[$i + 3] << 24);
+			$k1 = (((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16))) & 0xffffffff;
+			$k1 = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
+			$k1 = (((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16))) & 0xffffffff;
 			$h1 ^= $k1;
-			$h1  = $h1 << 13 | ($h1 >= 0 ? $h1 >> 19 : (($h1 & 0x7fffffff) >> 19) | 0x1000);
+			$h1 = $h1 << 13 | ($h1 >= 0 ? $h1 >> 19 : (($h1 & 0x7fffffff) >> 19) | 0x1000);
 			$h1b = (((($h1 & 0xffff) * 5) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 5) & 0xffff) << 16))) & 0xffffffff;
-			$h1  = ((($h1b & 0xffff) + 0x6b64) + ((((($h1b >= 0 ? $h1b >> 16 : (($h1b & 0x7fffffff) >> 16) | 0x8000)) + 0xe654) & 0xffff) << 16));
+			$h1 = ((($h1b & 0xffff) + 0x6b64) + ((((($h1b >= 0 ? $h1b >> 16 : (($h1b & 0x7fffffff) >> 16) | 0x8000)) + 0xe654) & 0xffff) << 16));
 		}
+
 		$k1 = 0;
 		$i += 4;
 		switch ($remainder) {
 			case 3: $k1 ^= $key[$i + 2] << 16;
 			case 2: $k1 ^= $key[$i + 1] << 8;
 			case 1: $k1 ^= $key[$i];
-				$k1  = ((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16)) & 0xffffffff;
-				$k1  = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
-				$k1  = ((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16)) & 0xffffffff;
+				$k1 = ((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16)) & 0xffffffff;
+				$k1 = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
+				$k1 = ((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16)) & 0xffffffff;
 				$h1 ^= $k1;
 		}
 		$h1 ^= $klen;
 		$h1 ^= ($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000);
-		$h1  = ((($h1 & 0xffff) * 0x85ebca6b) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+		$h1 = ((($h1 & 0xffff) * 0x85ebca6b) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
 		$h1 ^= ($h1 >= 0 ? $h1 >> 13 : (($h1 & 0x7fffffff) >> 13) | 0x40000);
-		$h1  = (((($h1 & 0xffff) * 0xc2b2ae35) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+		$h1 = (((($h1 & 0xffff) * 0xc2b2ae35) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
 		$h1 ^= ($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000);
 
 		return $h1;
 	}
 
 /* simpler hash
- 	public function djb2a_hash($key)
+	public function djb2a_hash($key)
 	{
 		$key  = array_values(unpack('C*',(string) $key));
 		$klen = count($key);
@@ -179,8 +181,8 @@ class Jobber
 	Uses murmur3 hash : see
 	https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 	http://fastcompression.blogspot.com.au/2012/04/selecting-checksum-algorithm.html?spref=tw
-	https://encode.ru/threads/2556-Improving-xxHash
-	*/
+	 https://encode.ru/threads/2556-Improving-xxHash
+	 */
 	public function GetToken($key)
 	{
 		$val = uniqid($key, TRUE);
@@ -220,8 +222,8 @@ class Jobber
 	Initiate async task(s) recorded in queue
 	@param action name of module-action to be run
 	@param params optional array of action-parameters
-	@param qdata otional data to be appended to jobs-queue-array
-	*/
+	 @param qdata otional data to be appended to jobs-queue-array
+	 */
 	public function StartJob($jobdata = NULL)
 	{
 		$logfile = '/var/www/html/cmsms/modules/PWFBrowse/lib/my.log'; //DEBUG
@@ -255,11 +257,11 @@ class Jobber
 		curl_multi_add_handle($mh, $ch);
 
 //======================================
-		$running = null;
+		$running = NULL;
 		//execute the handle
 		do {
 			$mrc = curl_multi_exec($mh, $running);
-//				curl_multi_select($mh);
+//			curl_multi_select($mh);
 		} while ($mrc == CURLM_CALL_MULTI_PERFORM);
 		//PITY ABOUT THIS ?
 		while ($running && $mrc == CURLM_OK) {
@@ -286,7 +288,7 @@ class Jobber
 		$config = \cmsms()->GetConfig();
 		$rootpath = $config['root_path'];
 		$fp = \cms_join_path($rootpath, 'jobinterface.php');
-		if (!is_file ($fp)) {
+		if (!is_file($fp)) {
 			$fp = \cms_join_path(__DIR__, 'jobinterface.php');
 			@copy($fp, $rootpath);
 		}
