@@ -353,34 +353,4 @@ EOS;
 		}
 		$tplvars['inner_nav'] = $navstr;
 	}
-
-	public function _CreateActionURL($action, $id='__', $params=[])
-	{
-		if ($this->before20) {
-			global $config;
-			$root = $config['root_url'];
-		} else {
-			$root = CMS_ROOT_URL;
-		}
-		if (!$id) {
-			$id='__';
-		}
-		$url = $root.'/jobinterface.php?mact='.$this->GetName().','.$id.','.$action.',0';
-
-		if (isset($_SESSION[CMS_USER_KEY])) {
-			$url .= '&'.CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]; //in $_REQUEST but not subsequent action $params[]
-		}
-
-		if ($params) {
-			$ignores = ['assign', 'id', 'returnid', 'action', 'module'];
-			foreach ($params as $key => $value) {
-				$key = cms_htmlentities($key);
-				if (!in_array($key, $ignores)) {
-					$value = cms_htmlentities($value);
-					$url .= '&'.$id.$key.'='.rawurlencode($value);
-				}
-			}
-		}
-		return $url;
-	}
 }
