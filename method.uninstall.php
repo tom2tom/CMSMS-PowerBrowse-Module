@@ -25,6 +25,8 @@ $sql = $dict->DropIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record');
 $dict->ExecuteSQLArray($sql);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwbr_record');
 $dict->ExecuteSQLArray($sqlarray);
+$sqlarray = $dict->DropTableSQL($pre.'module_pwbr_seq');
+$dict->ExecuteSQLArray($sqlarray);
 
 // remove permissions
 $this->RemovePermission('ModifyPwBrowsers');
