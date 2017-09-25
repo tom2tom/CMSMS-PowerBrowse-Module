@@ -13,6 +13,9 @@ class Jobber
 	//module-preference identifiers
 	const QMUTEX = 'JobsMtx';
 	const QNAME = 'JobsQ';
+	//in-action parameter-identifiers
+	const QKEY = '_qk_';
+	const QSKEY = '_sk_'; //a.k.a. CMS_SECURE_PARAM_NAME, maybe N/A here
 
 	protected $mod;
 
@@ -24,6 +27,7 @@ class Jobber
 	public function GetQLock()
 	{
 		$i = 5000;
+		//TODO real threadsafe mutex
 		while ($this->mod->GetPreference(self::QMUTEX, 0)) {
 			if ($i < 500000) {
 				$i += $i;
@@ -35,51 +39,59 @@ class Jobber
 
 	public function ReleaseQLock()
 	{
+		//TODO real threadsafe mutex
 		$this->mod->SetPreference(self::QMUTEX, 0);
 	}
 
 	public function GetQ()
 	{
 		$this->GetQLock();
-		$qdata = $this->mod->GetPreference(self::QNAME);
-		if ($qdata) {
-			return unserialize($qdata);
+		$jobdata = $this->mod->GetPreference(self::QNAME);
+		if ($jobdata) {
+			return unserialize($jobdata);
 		}
 		return [];
 	}
 
-	public function SetQ($qdata)
+	public function SetQ($jobdata)
 	{
-		$qdata = ($qdata) ? serialize($qdata) : '';
-		$this->mod->SetPreference(self::QNAME, $qdata);
+		$jobdata = ($jobdata) ? serialize($jobdata) : '';
+		$this->mod->SetPreference(self::QNAME, $jobdata);
 		$this->ReleaseQLock();
 	}
 
-	//ATM jobs queue is stored as array, FIFO processed, no state-recall, no priorities c.f. SplPriorityQueue
-	public function PushJob($qdata)
+	/**
+	@param jobdata 2- or 3-member array,
+	 [0] = module name
+	 [1] = module-action name
+	 [2] = array of action-parameters (optional)
+	ATM jobs queue is stored as array, FIFO processed, no state-recall, no priorities c.f. SplPriorityQueue
+	*/
+	public function PushJob($jobdata)
 	{
-		if ($qdata) {
+		if ($jobdata) {
 			$qnow = $this->GetQ();
-			$qnow[] = $qdata;
+			$qnow[] = NULL;
+			end($qnow);
+			$key = key($qnow); //i.e. last-append
+			if ($jobdata[2]) { //parameter(s) present
+				$jobdata[2][self::QKEY] = $key;
+			} else {
+				$jobdata[2] = [self::QKEY => $key];
+			}
+			$qnow[$key] = $jobdata;
 			$this->SetQ($qnow);
 		}
 	}
 
-	public function PopJob($qdata)
+	public function PopJob($jobdatakey)
 	{
-		if ($qdata) {
-			$qnow = $this->GetQ();
-			$p = array_search($qdata, $qnow); //TODO CHECK THIS WORKS
-			if ($p !== FALSE) {
-				unset($qnow[$p]);
-				$this->SetQ($qnow);
-			} else {
-				$this->ReleaseQLock();
-			}
-		}
+		$qnow = $this->GetQ();
+		unset($qnow[$jobdatakey]);
+		$this->SetQ($qnow);
 	}
 
-	/*
+	/**
 	@param key string regexp to match in current-module preferences
 	Returns: associative array, keyed by matching preference name
 	*/
@@ -101,19 +113,79 @@ class Jobber
 		return $matches;
 	}
 
-	/*
+	/**
+	PHP implementation of MurmurHash3
+	@author Stefano Azzolini (lastguest@gmail.com)
+	@see https://github.com/lastguest/murmurhash-php
+	@param  string $key   text to hash
+	@param  number $seed  positive integer
+	@return number 32-bit positive integer
+	*/
+	public function murmurhash3_int($key, $seed = 5381)
+	{
+		$key  = array_values(unpack('C*',(string) $key));
+		$klen = count($key);
+		$remainder = $klen & 3;
+		$bytes = $klen - $remainder;
+		$h1 = (int)$seed;
+		$i = 0;
+		while ($i < $bytes) {
+			$k1 = $key[$i] | ($key[$i+1] << 8) | ($key[$i+2] << 16) | ($key[$i+3] << 24);
+			$k1  = (((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16))) & 0xffffffff;
+			$k1  = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
+			$k1  = (((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16))) & 0xffffffff;
+			$h1 ^= $k1;
+			$h1  = $h1 << 13 | ($h1 >= 0 ? $h1 >> 19 : (($h1 & 0x7fffffff) >> 19) | 0x1000);
+			$h1b = (((($h1 & 0xffff) * 5) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 5) & 0xffff) << 16))) & 0xffffffff;
+			$h1  = ((($h1b & 0xffff) + 0x6b64) + ((((($h1b >= 0 ? $h1b >> 16 : (($h1b & 0x7fffffff) >> 16) | 0x8000)) + 0xe654) & 0xffff) << 16));
+		}
+		$k1 = 0;
+		$i += 4;
+		switch ($remainder) {
+			case 3: $k1 ^= $key[$i + 2] << 16;
+			case 2: $k1 ^= $key[$i + 1] << 8;
+			case 1: $k1 ^= $key[$i];
+				$k1  = ((($k1 & 0xffff) * 0xcc9e2d51) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0xcc9e2d51) & 0xffff) << 16)) & 0xffffffff;
+				$k1  = $k1 << 15 | ($k1 >= 0 ? $k1 >> 17 : (($k1 & 0x7fffffff) >> 17) | 0x4000);
+				$k1  = ((($k1 & 0xffff) * 0x1b873593) + ((((($k1 >= 0 ? $k1 >> 16 : (($k1 & 0x7fffffff) >> 16) | 0x8000)) * 0x1b873593) & 0xffff) << 16)) & 0xffffffff;
+				$h1 ^= $k1;
+		}
+		$h1 ^= $klen;
+		$h1 ^= ($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000);
+		$h1  = ((($h1 & 0xffff) * 0x85ebca6b) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+		$h1 ^= ($h1 >= 0 ? $h1 >> 13 : (($h1 & 0x7fffffff) >> 13) | 0x40000);
+		$h1  = (((($h1 & 0xffff) * 0xc2b2ae35) + ((((($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000)) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+		$h1 ^= ($h1 >= 0 ? $h1 >> 16 : (($h1 & 0x7fffffff) >> 16) | 0x8000);
+
+		return $h1;
+	}
+
+/* simpler hash
+ 	public function djb2a_hash($key)
+	{
+		$key  = array_values(unpack('C*',(string) $key));
+		$klen = count($key);
+		$h1 = 5381;
+		for ($i = 0; $i < $klen; $i++) {
+			$h1 = ($h1 + ($h1 << 5)) ^ $key[$i]; //aka $h1 = $h1*33 ^ $key[$i]
+		}
+
+		return $h1;
+	}
+*/
+	/**
 	@param key string used to 'salt' uniqueid()
-	Returns: 16-byte hexadecimal token, highly likely to be a collision
-	Uses djb2a hash : see https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
+	Returns: 16-byte hexadecimal token, highly unlikely to be a collision
+	Uses murmur3 hash : see
+	https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
+	http://fastcompression.blogspot.com.au/2012/04/selecting-checksum-algorithm.html?spref=tw
+	https://encode.ru/threads/2556-Improving-xxHash
 	*/
 	public function GetToken($key)
 	{
 		$val = uniqid($key, TRUE);
-		$l = strlen($val);
-		$num = 5381;
-		for ($i = 0; $i < $l; $i++) {
-			$num = ($num + ($num << 5)) ^ $val[$i]; //aka $num = $num*33 ^ $val[$i]
-		}
+//		$num = $this->djb2a_hash($val);
+		$num = $this->murmurhash3_int($val);
 		return dechex($num);
 	}
 
