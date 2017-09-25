@@ -23,8 +23,12 @@ class Jobber
 
 	public function GetQLock()
 	{
+		$i = 5000;
 		while ($this->mod->GetPreference(self::QMUTEX, 0)) {
-			usleep(10000);
+			if ($i < 500000) {
+				$i += $i;
+			}
+			usleep($i);
 		}
 		$this->mod->SetPreference(self::QMUTEX, 1);
 	}
