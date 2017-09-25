@@ -42,7 +42,8 @@ class RecordContent
 			$cont = serialize($store);
 		}
 		unset($store);
-		return Utils::SafeExec(
+		$utils = new Utils();
+		return $utils->SafeExec(
 'INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,flags,contents) VALUES ('.$browser_id.','.$form_id.','.$rounds.','.$status.',?)',
 			[$cont]);
 	}
@@ -78,27 +79,61 @@ class RecordContent
 			$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 			unset($store);
 		}
-		return Utils::SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',flags=0,contents=? WHERE record_id='.$record_id,
+		$utils = new Utils();
+		return $utils->SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',flags=0,contents=? WHERE record_id='.$record_id,
 			[$cont]);
 	}
 
-	/**
-	Trigger async RecordsUpdate task
-	*/
-	public function StartUpdate()
+	public function StartUpdate(&$mod)
 	{
-/* CmsJobManager as of 2.2.2 is too flaky TODO find something better
-		global $CMS_VERSION;
-		if (version_compare($CMS_VERSION, '2.2.2') < 0) {
-	$adbg = 1; //TODO no public API for just-in-time processing - see CmsRegularTaskHandler class
-		} else {
-			$tasker = new RecordsUpdateTask();
-			$job = new \CMSMS\Async\RegularTask($tasker);
-			$job->module = 'PWFBrowse';
-			$jobber = \ModuleOperations::get_instance()->get_module_instance('CmsJobManager', '', TRUE);
-			$jobber->save_job($job);
+		//TODO unique but in-action-discoverable key
+		$pref = \cms_db_prefix();
+		$val = \cmsms()->getDB()->GenID($pref.'module_pwbr_seq');
+		$modname = $this->mod->GetName();
+		$key = substr($modname, 0, 4).$val;
+		$funcs = new Jobber($mod);
+		$token = $funcs->GetToken($key);
+		$mod->SetPreference($key, $token);
+		$funcs->StartJob([$modname, 'update_data', [$key => $token]]);
+	}
+
+	public function DoUpdate(&$mod)
+	{
+		$funcs = new Jobber($mod);
+		$funcs->GetQLock(); //obtain lock on jobs Q
+		$cfuncs = new Crypter($mod);
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE flags=1 ORDER BY browser_id,record_id';
+		$db = \cmsms()->GetDB();
+		$rst = $db->SelectLimit($sql, 20, 0);
+		if ($rst) {
+			if (!$rst->EOF) {
+				$utils = new Utils();
+				$newrounds = (int) ($mod->GetPreference('rounds_factor') * 100); //update to default rounds (if not already there)
+				$pw = $cfuncs->decrypt_preference(Crypter::MKEY);
+				$oldpw = $cfuncs->decrypt_preference(Crypter::MKEY.'OLD'); //FALSE ok
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds='.$newrounds.',contents=? WHERE record_id=';
+				do {
+					$oldrounds = $rst->fields['rounds'];
+					$val = ($oldrounds > 0) ?
+						$cfuncs->decrypt_value($rst->fields['contents'], $oldrounds, $oldpw) :
+						unserialize($rst->fields['contents']);
+					$val = ($newrounds > 0) ?
+						$cfuncs->encrypt_value($val, $newrounds, $pw) :
+						serialize($val);
+//					if (!$utils->SafeExec($sql, [$val, $rst->fields['record_id']])) {
+						//TODO handle error
+//					}
+					$rst->MoveNext();
+				} while (!$rst->EOF);
+				$rst->Close();
+				$funcs->ReleaseQLock();
+				return; //TODO repeat if needed
+			}
+			$rst->Close();
 		}
-*/
+		$cfuncs->remove_preference(Crypter::MKEY.'OLD'); //kill old pw if any
+		$funcs->ReleaseQLock(); //unlock mutex
 	}
 
 	/**
@@ -122,7 +157,7 @@ class RecordContent
 					if ($pw) {
 						$decrypted = $cfuncs->decrypt_value($source, $rounds, $pw);
 						if ($decrypted) {
-							self::StartUpdate();
+							self::StartUpdate($mod);
 						}
 					} else {
 					}
@@ -152,7 +187,8 @@ class RecordContent
 	*/
 	public function Load(&$mod, $pre, $record_id)
 	{
-		$data = Utils::SafeGet(
+		$utils = new Utils();
+		$data = $utils->SafeGet(
 		'SELECT rounds,contents FROM '.$pre.'module_pwbr_record WHERE record_id=?',
 			[$record_id], 'row');
 		if ($data) {
@@ -186,6 +222,13 @@ class RecordContent
 		$first = TRUE;
 		$c = count($datarow);
 		for ($si = $startcol + 1; $si < $c; ++$si) {
+/*	$datarow[$si]['_ss'] = $token; //'SequenceStart'
+	$datarow[$si][0] = $token.'>>'; pseudo title
+	$datarow[$si]['_se'] = $token; //final 'SequenceEnd'
+	$datarow[$si][0] = $token.'<<';
+	$datarow[$si]['_sb'] = $token; //intermediate 'SequenceEnd'
+	$datarow[$si][0] = $token.'||';
+*/
 			if (isset($datarow[$si]['_se'])) {
 				if ($datarow[$si]['_se'] === $token) {
 					++$repeats;
@@ -288,7 +331,7 @@ class RecordContent
 	 other member(s) relate to custom-formatting
 	@htmlout: optional boolean, for possible downstream sequence-processing, default TRUE
 	Returns: nothing, but @field content will probably be changed
-	NOTE: the processing here must be suitably replicated in class.FormBrowser.php
+	NOTE: the processing here must be suitably replicated in FormBrowser::Dispose()
 	*/
 	public function Format(&$mod, &$field, &$datarow, $htmlout = TRUE)
 	{
@@ -343,7 +386,6 @@ class RecordContent
 				}
 			}
 		}
-
 		return $field[1];
 	}
 }
