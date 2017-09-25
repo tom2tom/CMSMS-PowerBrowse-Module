@@ -59,6 +59,13 @@ $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->CreateIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record', 'browser_id');
 $dict->ExecuteSQLArray($sqlarray);
 
+$flds = '
+id I(2),
+';
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_seq', $flds); //NOT a I(11) standard sequence
+$dict->ExecuteSQLArray($sqlarray);
+$db->Execute('INSERT INTO '.$pre.'module_pwbr_seq FIELDS(id) VALUES(0)');
+
 $this->CreatePermission('ModifyPwBrowsers', $this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData', $this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData', $this->Lang('perm_see'));
@@ -91,12 +98,8 @@ if ($fp && is_dir($fp)) {
 $this->SetPreference('uploads_dir', $ud);
 
 //install job processor (if not done before)
-$rootpath = $config['root_path'];
-$fp = cms_join_path($rootpath, 'jobinterface.php');
-if (!is_file ($fp)) {
-	$fp = cms_join_path(__DIR__, 'jobinterface.php');
-	@copy($fp, $rootpath);
-}
+$funcs = new PWFBrowse\Jobber($this);
+$funcs->init();
 
 //install our form-dispose field
 $fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');
