@@ -98,8 +98,10 @@ if ($fp && is_dir($fp)) {
 $this->SetPreference('uploads_dir', $ud);
 
 //install job processor (if not done before)
-$funcs = new PWFBrowse\Jobber($this);
+$funcs = new Async\Utils();
 $funcs->init();
+$handle = $funcs->AddQ('PWFB', 'FIFO'); //async-jobs queue
+$this->SetPreference('Qhandle', $handle);
 
 //install our form-dispose field
 $fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');

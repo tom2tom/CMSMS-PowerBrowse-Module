@@ -43,12 +43,19 @@ if ($fp && is_dir($fp)) {
 		}
 	}
 }
+
+// remove jobs-queue (if any)
+$handle = $this->GetPreference('Qhandle');
+if ($handle) {
+	$funcs = new Async\Utils();
+	$funcs->DropQ($handle);
+}
+// BUT DON'T remove jobs-queue processor
+
 // remove preferences
 $this->RemovePreference();
 
-// DON'T remove job processor
-
-// remove disposer
+// remove form-disposer
 $pfmod = $this->GetModuleInstance('PWForms');
 if ($pfmod) {
 	$fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');
