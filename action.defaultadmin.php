@@ -63,8 +63,10 @@ if (isset($params['submit'])) {
 		if ($rehash) {
 			//flag all records for update
 			$pre = cms_db_prefix();
-			$sql = 'UPDATE '.$pre.'module_pwbr_record SET flags=1'; 
-			//TODO trigger async RecordsUpdate task
+			$sql = 'UPDATE '.$pre.'module_pwbr_record SET flags=1';
+			//initiate async update
+			$funcs = new PWFBrowse\RecordContent();
+			$funcs->StartUpdate();
 		}
 		$params['message'] = $this->_PrettyMessage('prefs_updated');
 	}
@@ -73,14 +75,9 @@ if (isset($params['submit'])) {
 	$params['active_tab'] = 'settings';
 }
 
+$utils = new PWFBrowse\Utils();
 $tplvars = [];
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-$jsall = NULL;
-PWFBrowse\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);
-
-echo PWFBrowse\Utils::ProcessTemplate($this, 'adminpanel.tpl', $tplvars);
-if ($jsall) {
-	echo $jsall;
-}
+$utils->Generate($this, 'adminpanel.tpl', $tplvars, $jsincs, $jsfuncs, $jsloads);
