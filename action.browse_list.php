@@ -68,10 +68,13 @@ $jsfuncs = [];
 $jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
-$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
+$sql = 'SELECT record_id,rounds,pass,contents FROM '.$pre.'module_pwbr_record WHERE browser_id=?';
 $data = $utils->SafeGet($sql, [$params['browser_id']]);
 $rows = [];
 //if ($data) {
+	$cfuncs = new PWFBrowse\Crypter($this);
+	$pwcache = [$cfuncs->decrypt_preference(PWFBrowse\Crypter::MKEY)]; //default P/W
+
 	$icon_view = $theme->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon');
 	if ($pmod) {
 		$icon_edit = $theme->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon');
@@ -81,7 +84,14 @@ $rows = [];
 	$cn = count($colnames);
 	$funcs = new PWFBrowse\RecordContent();
 	foreach ($data as &$one) {
-		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents']);
+		$indx = $one['pass'] + 0;
+		if (!isset($pwcache[$indx])) {
+			$pwcache[$i] = $cfuncs->decrypt_preference('newpass'.$indx);
+		}
+		$pw = $pwcache[$indx];
+
+		$browsedata = $funcs->Decrypt($this, $one['rounds'], $one['contents'], FALSE, $cfuncs, $pw);
+
 		if ($browsedata) {
 			$fields = [];
 			$cd = count($browsedata); //variable: maybe missing ('Modified') or extra (sequences)
