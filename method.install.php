@@ -45,6 +45,12 @@ form_field I(2) DEFAULT 0
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
+/*
+flags-field bits:
+b0 = rounds-change triggered
+b1 = P/W change triggered
+b2 = P/W change-again triggered (i.e. before prior P/W change completed)
+*/
 $flds = '
 record_id I(4) AUTO KEY,
 browser_id I(2),
@@ -102,6 +108,7 @@ $funcs = new Async\Utils();
 $funcs->init();
 $handle = $funcs->AddQ('PWFB', 'FIFO'); //async-jobs queue
 $this->SetPreference('Qhandle', $handle);
+$this->SetPreference('Qjobtimeout', 10); //max duration (seconds) for each async action session
 
 //install our form-dispose field
 $fp = cms_join_path($this->GetModulePath(), 'lib', 'class.FormBrowser.php');
