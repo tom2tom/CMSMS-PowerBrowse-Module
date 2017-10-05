@@ -19,39 +19,20 @@ if (!isset($gCms)) {
 //error_log('supplied $_REQUEST '.serialize($_REQUEST)."\n", 3, $logfile);
 //error_log('supplied parameters '.serialize($params)."\n", 3, $logfile);
 
-$key = substr($this->GetName(), 0, 4); //1st 4 chars in module name
-$funcs = new PWFBrowse\Jobber($this);
-$prefs = $funcs->GetPreferencesLike($key);
-if ($prefs) {
-	$match = FALSE;
-	foreach ($prefs as $key => $val) {
-		if (isset($params[$key]) && $params[$key] == $val) {
-			$match = TRUE;
-			break;
-		}
-	}
-	if (!$match) {
-		error_log('action_update exit no matched token'."\n", 3, $logfile);
-		exit;
-	}
-} else {
-	error_log('action_update exit no tokens'."\n", 3, $logfile);
+$handle = $this->GetPreference('Qhandle');
+$utils = new Async\Utils();
+if (!$utils->CheckJob($handle, $params)) {
+	error_log('action_update exit invalid security parameters'."\n", 3, $logfile);
 	exit;
 }
-
-//error_log('action_update @3'."\n", 3, $logfile);
 
 $c = count(ob_list_handlers());
 //error_log('action_update '.$c.' handlers'."\n", 3, $logfile);
 for ($cnt = 0; $cnt < $c; $cnt++) {
 	ob_end_clean();
 }
-/*
-while(ob_get_level()) {
-	@ob_end_clean();
-}
-*/
-error_log('action_update @4'."\n", 3, $logfile);
+
+//error_log('action_update before headers'."\n", 3, $logfile);
 
 ignore_user_abort(true);
 header('Connection: Close');
@@ -60,15 +41,15 @@ $size = strlen($out);
 header("Content-Length: $size");
 header($out);
 flush();
+usleep(20000);
 
-error_log('action_update @5'."\n", 3, $logfile);
+//error_log('action_update @5'."\n", 3, $logfile);
 touch('/var/www/html/cmsms/modules/PWFBrowse/lib/toucher.txt');
 
-/*
 $funcs = new PWFBrowse\RecordContent();
-$funcs->DoUpdate($this);
-*/
+$funcs->DoUpdate($this, $params);
 
 error_log('action_update end'."\n", 3, $logfile);
 
 exit;
+
