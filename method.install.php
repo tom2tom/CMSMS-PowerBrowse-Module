@@ -45,18 +45,13 @@ form_field I(2) DEFAULT 0
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-/*
-flags-field bits:
-b0 = rounds-change triggered
-b1 = P/W change triggered
-b2 = P/W change-again triggered (i.e. before prior P/W change completed)
-*/
 $flds = '
 record_id I(4) AUTO KEY,
 browser_id I(2),
 form_id I(2),
 rounds I(2) DEFAULT 0,
-flags I(1) DEFAULT 0,
+pass I(1) DEFAULT 0,
+newpass I(1) DEFAULT 0,
 contents B(16364)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_record', $flds, $taboptarray);
