@@ -7,7 +7,7 @@ More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 //re-crypt a batch of stored records (if any are in need of such)
 
-$logfile = '/var/www/html/cmsms/modules/PWFBrowse/lib/my.log'; //DEBUG
+$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
 //error_log('action_update start'."\n", 3, $logfile);
 
 if (!isset($gCms)) {
@@ -44,7 +44,7 @@ flush();
 usleep(20000);
 
 //error_log('action_update @5'."\n", 3, $logfile);
-touch('/var/www/html/cmsms/modules/PWFBrowse/lib/toucher.txt');
+//touch('/var/www/html/cmsms/modules/PWFBrowse/lib/toucher.txt');
 
 $funcs = new PWFBrowse\RecordContent();
 $funcs->DoUpdate($this, $params);
