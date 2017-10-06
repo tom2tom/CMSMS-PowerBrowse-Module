@@ -265,7 +265,7 @@ if ($padmin) {
 
 	$cfuncs = new PWFBrowse\Crypter($this);
 	$key = PWFBrowse\Crypter::MKEY;
-	$t = $cfuncs->decrypt_preference($key);
+	$t = ($asyncpw) ? $asyncpw : $cfuncs->decrypt_preference($key);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(FALSE, $id, $t, $key, 'cloaked',
