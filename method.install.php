@@ -99,7 +99,7 @@ if ($fp && is_dir($fp)) {
 $this->SetPreference('uploads_dir', $ud);
 
 //install job processor (if not done before)
-$funcs = new Async\Utils();
+$funcs = new Async\Qface();
 $funcs->init();
 $handle = $funcs->AddQ('PWFB', 'FIFO'); //async-jobs queue
 $this->SetPreference('Qhandle', $handle);

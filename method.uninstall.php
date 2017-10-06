@@ -47,7 +47,7 @@ if ($fp && is_dir($fp)) {
 // remove jobs-queue (if any)
 $handle = $this->GetPreference('Qhandle');
 if ($handle) {
-	$funcs = new Async\Utils();
+	$funcs = new Async\Qface();
 	$funcs->DropQ($handle);
 }
 // BUT DON'T remove jobs-queue processor
