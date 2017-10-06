@@ -32,19 +32,17 @@ class RecordContent
 		$store = ['_s' => [0 => $mod->Lang('title_submitted'), 1 => $stamp, 'dt' => '']] + $data;
 		if ($rounds > 0) {
 			$defr = (int) ($mod->GetPreference('rounds_factor') * 100); //maybe 0
-			$status = ($defr == $rounds) ? 0 : 1;
 			if ($cfuncs == NULL) {
 				$cfuncs = new Crypter($mod);
 			}
 			$cont = $cfuncs->encrypt_value(serialize($store), $rounds);
 		} else {
-			$status = 1;
 			$cont = serialize($store);
 		}
 		unset($store);
 		$utils = new Utils();
 		return $utils->SafeExec(
-'INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,flags,contents) VALUES ('.$browser_id.','.$form_id.','.$rounds.','.$status.',?)',
+'INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,contents) VALUES ('.$browser_id.','.$form_id.','.$rounds.',?)',
 			[$cont]);
 	}
 
@@ -80,88 +78,169 @@ class RecordContent
 			unset($store);
 		}
 		$utils = new Utils();
-		return $utils->SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',flags=0,contents=? WHERE record_id='.$record_id,
+		return $utils->SafeExec('UPDATE '.$pre.'module_pwbr_record SET rounds='.$rounds.',pass=0,newpass=0,contents=? WHERE record_id='.$record_id,
 			[$cont]);
 	}
 
-	public function StartUpdate(&$mod)
+	/**
+	StartUpdate:
+	@mod: reference to PWFBrowse module object
+	@params: optional assoc. array of job-parameters, default []
+	*/
+	public function StartUpdate(&$mod, $params = [])
 	{
-		//TODO unique but in-action-discoverable key
 		$pref = \cms_db_prefix();
-		$val = \cmsms()->getDB()->GenID($pref.'module_pwbr_seq');
-		$modname = $this->mod->GetName();
-		$key = substr($modname, 0, 4).$val;
-		$funcs = new Jobber($mod);
-		$token = $funcs->GetToken($key);
-		$mod->SetPreference($key, $token);
-		$funcs->StartJob([$modname, 'update_data', [$key => $token]]);
-	}
-
-	public function DoUpdate(&$mod)
-	{
-		$funcs = new Jobber($mod);
-		$funcs->GetQLock(); //obtain lock on jobs Q
-		$cfuncs = new Crypter($mod);
-		$pre = \cms_db_prefix();
-		$sql = 'SELECT record_id,rounds,contents FROM '.$pre.'module_pwbr_record WHERE flags=1 ORDER BY browser_id,record_id';
 		$db = \cmsms()->GetDB();
-		$rst = $db->SelectLimit($sql, 20, 0);
-		if ($rst) {
-			if (!$rst->EOF) {
-				$utils = new Utils();
-				$newrounds = (int) ($mod->GetPreference('rounds_factor') * 100); //update to default rounds (if not already there)
-				$pw = $cfuncs->decrypt_preference(Crypter::MKEY);
-				$oldpw = $cfuncs->decrypt_preference(Crypter::MKEY.'OLD'); //FALSE ok
-				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds='.$newrounds.',contents=? WHERE record_id=';
-				do {
-					$oldrounds = $rst->fields['rounds'];
-					$val = ($oldrounds > 0) ?
-						$cfuncs->decrypt_value($rst->fields['contents'], $oldrounds, $oldpw) :
-						unserialize($rst->fields['contents']);
-					$val = ($newrounds > 0) ?
-						$cfuncs->encrypt_value($val, $newrounds, $pw) :
-						serialize($val);
-//					if (!$utils->SafeExec($sql, [$val, $rst->fields['record_id']])) {
-						//TODO handle error
-//					}
-					$rst->MoveNext();
-				} while (!$rst->EOF);
-				$rst->Close();
-				$funcs->ReleaseQLock();
-				return; //TODO repeat if needed
-			}
-			$rst->Close();
+		$val = $db->GenID($pref.'module_pwbr_seq');
+		$modname = $mod->GetName();
+		$jobkey = substr($modname, 0, 4).$val;
+
+		$handle = $mod->GetPreference('Qhandle');
+		$jobdata = [$modname, 'update_data'];
+		if ($params) {
+			$jobdata[] = $params;
 		}
-		$cfuncs->remove_preference(Crypter::MKEY.'OLD'); //kill old pw if any
-		$funcs->ReleaseQLock(); //unlock mutex
+		$funcs = new \Async\Qface();
+		$funcs->StartJob($handle, $jobkey, $jobdata);
 	}
 
 	/**
+	DoUpdate:
+	Update records-data asynchronously
+	@mod: reference to PWFBrowse module object
+	@params: assoc. array of request-parameters, or equivalent
+	*/
+	public function DoUpdate(&$mod, $params = [])
+	{
+		$pre = \cms_db_prefix();
+		$newrounds = (int) ($mod->GetPreference('rounds_factor') * 100); //update to default rounds (if not already there)
+		$sql = 'SELECT record_id,rounds,pass,newpass,contents FROM '.$pre.'module_pwbr_record WHERE rounds!='.$newrounds.' OR pass!=newpass ORDER BY browser_id,record_id';
+		$db = \cmsms()->GetDB();
+		$rst = $db->Execute($sql);
+
+$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
+
+		if ($rst) {
+
+//$p = 0;
+
+			if (!$rst->EOF) {
+
+//error_log('DoUpdate recordset found'."\n", 3, $logfile);
+
+				$utils = new Utils();
+				$cfuncs = new Crypter($mod);
+				$pwcache = [$cfuncs->decrypt_preference(Crypter::MKEY)]; //default P/W
+				$limit = time() + $mod->GetPreference('Qjobtimeout', 10);
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET rounds='.$newrounds.',pass=newpass,contents=? WHERE record_id=';
+				while (!$rst->EOF && time() < $limit) {
+					$i = $rst->fields['pass'] + 0;
+					if (!isset($pwcache[$i])) {
+						$pwcache[$i] = $cfuncs->decrypt_preference('newpass'.$i);
+					}
+					$oldpw = $pwcache[$i];
+
+					$i = $rst->fields['newpass'] + 0;
+					if (!isset($pwcache[$i])) {
+						$pwcache[$i] = $cfuncs->decrypt_preference('newpass'.$i);
+					}
+					$newpw = $pwcache[$i];
+
+					$oldrounds = $rst->fields['rounds'];
+					$val = ($oldrounds > 0) ?
+						$cfuncs->decrypt_value($rst->fields['contents'], $oldrounds, $oldpw) :
+						$rst->fields['contents'];
+					if ($newrounds > 0) {
+						$val = $cfuncs->encrypt_value($val, $newrounds, $newpw);
+					}
+					if (!$utils->SafeExec($sql.$rst->fields['record_id'], [$val])) {
+//						TODO handle error
+						$adbg1 = 1;
+					}
+//++$p;
+					$rst->MoveNext();
+				}
+			}
+
+//error_log('DoUpdate recordset ('.$p.') finished'."\n", 3, $logfile);
+
+			$handle = $mod->GetPreference('Qhandle');
+			$funcs = new \Async\Qface();
+			if ($rst->EOF) {
+
+error_log('DoUpdate job finished'."\n", 3, $logfile);
+
+				$funcs->CancelJob($handle, $params);
+
+//error_log('DoUpdate CancelJob finished'."\n", 3, $logfile);
+
+				$t = $mod->GetPreference('newpasses');
+				if ($t) { //any 'newpass'.* passwords used here or before
+					$used = explode(',', $t);
+					$t = end($used); //'last-used' password
+					$newpw = $cfuncs->decrypt_preference('newpass'.$t);
+					foreach ($used as $t) {
+						$cfuncs->remove_preference('newpass'.$t);
+					}
+					$mod->SetPreference('newpasses', '');
+					if ($newpw !== FALSE) {
+						$cfuncs->encrypt_preference(Crypter::MKEY, $newpw);
+					}
+				}
+				$sql = 'UPDATE '.$pre.'module_pwbr_record SET pass=0,newpass=0';
+				$db->Execute($sql);
+			} else { //timed out, re-run the job
+
+error_log('DoUpdate job restart triggered'."\n", 3, $logfile);
+
+				$utils->StartJob($handle);
+			}
+			$rst->Close();
+		} else {
+
+//error_log('DoUpdate no records'."\n", 3, $logfile);
+
+			$handle = $mod->GetPreference('Qhandle');
+			$funcs = new \Async\Qface();
+			$funcs->CancelJob($handle, $params);
+
+			$t = $mod->GetPreference('newpasses');
+			if ($t) { //any 'newpass'.* passwords used here or before
+				$used = explode(',', $t);
+				$t = end($used); //'last-used' password
+				$cfuncs = new Crypter($mod);
+				$newpw = $cfuncs->decrypt_preference('newpass'.$t);
+				foreach ($used as $t) {
+					$cfuncs->remove_preference('newpass'.$t);
+				}
+				$mod->SetPreference('newpasses', '');
+				if ($newpw !== FALSE) {
+					$cfuncs->encrypt_preference(Crypter::MKEY, $newpw);
+				}
+			}
+			$sql = 'UPDATE '.$pre.'module_pwbr_record SET pass=0,newpass=0';
+			$db->Execute($sql);
+		}
+	}
+
+	/**
+	Decrypt:
 	@mod: reference to PWFBrowse module object
 	@rounds: number of key-stretches, 0 if no encryption
 	@source: string to be decrypted
 	@raw: optional boolean, whether to skip unserialization of decrypted value, default FALSE
 	@cfuncs: optional Crypter-object, default NULL (populate this when batching)
+	@pw: optional plaintext password, default FALSE (populate this when batching)
 	Must be compatible with self::Insert/Update
 	*/
-	public function Decrypt(&$mod, $rounds, $source, $raw = FALSE, &$cfuncs = NULL)
+	public function Decrypt(&$mod, $rounds, $source, $raw = FALSE, &$cfuncs = NULL, $pw = FALSE)
 	{
 		if ($source) {
 			if ($rounds > 0) {
 				if ($cfuncs == NULL) {
 					$cfuncs = new Crypter($mod);
 				}
-				$decrypted = $cfuncs->decrypt_value($source, $rounds);
-				if (!$decrypted) {
-					$pw = $cfuncs->decrypt_preference(Crypter::MKEY.'OLD');
-					if ($pw) {
-						$decrypted = $cfuncs->decrypt_value($source, $rounds, $pw);
-						if ($decrypted) {
-							self::StartUpdate($mod);
-						}
-					} else {
-					}
-				}
+				$decrypted = $cfuncs->decrypt_value($source, $rounds, $pw);
 			} else {
 				$decrypted = $source;
 			}
