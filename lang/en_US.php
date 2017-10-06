@@ -87,6 +87,7 @@ $lang['owner']='Owner';
 
 $lang['pageof']='showing page %s of %s';
 $lang['pagerows']='rows-per-page';
+$lang['pending_password']='New pass-phrase is pending (reload to update)';
 $lang['perm_browsers']='Modify PowerForm Browsers';
 $lang['perm_data']='Modify Recorded PowerForm Data';
 $lang['perm_see']='View/export Recorded PowerForm Data';
