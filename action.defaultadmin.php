@@ -13,7 +13,8 @@ if (!($padmin || $pmod || $pview)) {
 	exit;
 }
 
-$asyncpw = '';
+$asyncpw = FALSE; //no async pw change pending
+
 if (isset($params['submit'])) {
 	if ($padmin) {
 		$this->SetPreference('date_format', trim($params['date_format']));
@@ -54,16 +55,16 @@ if (isset($params['submit'])) {
 			$this->SetPreference($key, $i);
 		}
 
-		$asyncpw = $this->Lang('pending_password');
-
 		$cfuncs = new PWFBrowse\Crypter($this);
 		$key = PWFBrowse\Crypter::MKEY;
-		$oldpw = $cfuncs->decrypt_preference($key);
-		$newpw = trim($params[$key]);
-		if ($oldpw != $newpw && $newpw != $asyncpw) {
-			$rehash = TRUE;
+		if (isset($params[$key])) {
+			$oldpw = $cfuncs->decrypt_preference($key);
+			$newpw = trim($params[$key]);
+			if ($oldpw != $newpw) {
+				$rehash = TRUE;
+			}
 		} else {
-			$asyncpw = '';
+			$oldpw = $newpw = ''; //do nothing to P/W
 		}
 
 		if ($rehash) {
@@ -88,6 +89,7 @@ if (isset($params['submit'])) {
 					$this->SetPreference('newpasses', $t);
 					$sql = 'UPDATE '.$pre.'module_pwbr_record SET newpass='.$i;
 					$db->Execute($sql);
+					$asyncpw = TRUE;
 				}
 				//initiate async update
 				$funcs = new PWFBrowse\RecordContent();
