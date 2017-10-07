@@ -101,7 +101,7 @@ $this->SetPreference('uploads_dir', $ud);
 //install job processor (if not done before)
 $funcs = new Async\Qface();
 $funcs->init();
-$handle = $funcs->AddQ('PWFB', 'FIFO'); //async-jobs queue
+$handle = $funcs->AddQ('PWFB', 'Multi'); //async-jobs queue
 $this->SetPreference('Qhandle', $handle);
 $this->SetPreference('Qjobtimeout', 10); //max duration (seconds) for each async action session
 
