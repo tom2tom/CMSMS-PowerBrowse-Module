@@ -113,20 +113,10 @@ class FormBrowser extends FieldBase
 		}
 		unset($obfld);
 		if ($browsedata) {
-			$pre = \cms_db_prefix();
-			$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
-			$db = \cmsms()->GetDb();
-			$form_id = $this->formdata->Id;
-			$browsers = $db->GetCol($sql, [$form_id]); //TODO support high-load
-			if ($browsers) {
-				$stamp = time(); //TODO default locale OK?
-				$funcs = new \PWFBrowse\RecordContent();
-				$this->GetModule();
-				foreach ($browsers as $browser_id) {
-					$funcs->Insert($this->mymodule, $pre, $browser_id, $form_id, $stamp, $browsedata, 0);
-				}
-			} else {
-				return [FALSE, $this->formdata->formsmodule->Lang('missing_type', 'browser for form')]; //TODO lang
+			$funcs = new \PWFBrowse\RecordContent();
+			$this->GetModule();
+			if (!$funcs->InsertAll($this->mymodule, $this->formdata->Id, $browsedata)) {
+				return [FALSE, $this->formdata->formsmodule->Lang('missing_type', $this->mymodule->Lang('browser_type'))];
 			}
 		}
 		return [TRUE, ''];
