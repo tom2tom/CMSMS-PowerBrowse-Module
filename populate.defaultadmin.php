@@ -263,16 +263,21 @@ if ($padmin) {
 		$configs[] = $oneset;
 	}
 
-	$cfuncs = new PWFBrowse\Crypter($this);
-	$key = PWFBrowse\Crypter::MKEY;
-	$t = ($asyncpw) ? $asyncpw : $cfuncs->decrypt_preference($key);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
-	$oneset->input = $this->CreateTextArea(FALSE, $id, $t, $key, 'cloaked',
-		$id.'passwd', '', '', 40, 2);
+	if (!$asyncpw) {
+		$cfuncs = new PWFBrowse\Crypter($this);
+		$key = PWFBrowse\Crypter::MKEY;
+		$t = $cfuncs->decrypt_preference($key);
+		$oneset->input = $this->CreateTextArea(FALSE, $id, $t, $key, 'cloaked',
+			$id.'passwd', '', '', 40, 2);
+	} else {
+		$oneset->input = $this->Lang('pending_password');
+	}
 	$configs[] = $oneset;
 
-	$jsincs[] = <<<EOS
+	if (!$asyncpw) {
+		$jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery-inputCloak.min.js"></script>
 EOS;
 	$jsloads[] = <<<EOS
@@ -281,6 +286,8 @@ EOS;
   symbol:'\u25CF'
  });
 EOS;
+	}
+
 	$tplvars['configs'] = $configs;
 
 	$jsfuncs[] = <<<EOS
