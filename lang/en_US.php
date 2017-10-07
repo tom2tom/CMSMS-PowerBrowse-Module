@@ -15,6 +15,7 @@ $lang['apply']='Apply';
 $lang['back']='Back to list';
 $lang['browser1']='Browser %s';
 $lang['browser2']='Browser %s %s';
+$lang['browser_type'] = 'browser for form'; //a 'type' for a missing-type message
 $lang['browser_deleted']='The browser has been deleted';
 
 $lang['cancel']='Cancel';
