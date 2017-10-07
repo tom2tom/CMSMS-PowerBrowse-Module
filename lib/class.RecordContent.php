@@ -18,12 +18,12 @@ class RecordContent
 	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
 	@stamp: timestamp for form submission
 	@data: reference to array of plaintext form-data to be stored
-	@rounds: no. of key-stretches, 0 if no encryption
-	@cfuncs: optional Crypter-object, default NULL (populate this when batching)
 	 Each member of @data is array:
 	 [0] = (public) title
 	 [1] = value
 	 [2] (maybe) = extra stuff e.g. 'stamp' flag
+	@rounds: no. of key-stretches, 0 if no encryption
+	@cfuncs: optional Crypter-object, default NULL (populate this when batching)
 	Returns: boolean indicating success
 	*/
 	public function Insert(&$mod, $pre, $browser_id, $form_id, $stamp, &$data, $rounds, &$cfuncs = NULL)
@@ -44,6 +44,32 @@ class RecordContent
 		return $utils->SafeExec(
 'INSERT INTO '.$pre.'module_pwbr_record (browser_id,form_id,rounds,contents) VALUES ('.$browser_id.','.$form_id.','.$rounds.',?)',
 			[$cont]);
+	}
+
+	/**
+	InsertAll:
+	@mod: reference to PWFBrowse module object
+	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
+	@data: reference to array of plaintext form-data to be stored (initially without encryption)
+	Returns: boolean indicating success
+	*/
+	public function InsertAll(&$mod, $form_id, &$data)
+	{
+		//TODO support high-load c.f. async StartUpdate()
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
+		$db = \cmsms()->GetDb();
+		$browsers = $db->GetCol($sql, [$form_id]);
+		if ($browsers) {
+			$ret = TRUE;
+			$stamp = time(); //TODO default locale OK?
+			foreach ($browsers as $browser_id) {
+				$ret = $ret && $this->Insert($mod, $pre, $browser_id, $form_id, $stamp, $data, 0);
+			}
+			$this->StartUpdate($mod);
+			return $ret;
+		}
+		return FALSE;
 	}
 
 	/**
@@ -89,9 +115,9 @@ class RecordContent
 	*/
 	public function StartUpdate(&$mod, $params = [])
 	{
-		$pref = \cms_db_prefix();
+		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDB();
-		$val = $db->GenID($pref.'module_pwbr_seq');
+		$val = $db->GenID($pre.'module_pwbr_seq');
 		$modname = $mod->GetName();
 		$jobkey = substr($modname, 0, 4).$val;
 
