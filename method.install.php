@@ -60,13 +60,6 @@ $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->CreateIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record', 'browser_id');
 $dict->ExecuteSQLArray($sqlarray);
 
-$flds = '
-id I(2),
-';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_seq', $flds); //NOT a I(11) standard sequence
-$dict->ExecuteSQLArray($sqlarray);
-$db->Execute('INSERT INTO '.$pre.'module_pwbr_seq FIELDS(id) VALUES(0)');
-
 $this->CreatePermission('ModifyPwBrowsers', $this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData', $this->Lang('perm_data'));
 $this->CreatePermission('ViewPwFormData', $this->Lang('perm_see'));
