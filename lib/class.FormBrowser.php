@@ -113,11 +113,16 @@ class FormBrowser extends FieldBase
 		}
 		unset($obfld);
 		if ($browsedata) {
-			$funcs = new \PWFBrowse\RecordContent();
 			$this->GetModule();
-			if (!$funcs->InsertAll($this->mymodule, $this->formdata->Id, $browsedata)) {
-				return [FALSE, $this->formdata->formsmodule->Lang('missing_type', $this->mymodule->Lang('browser_type'))];
-			}
+			$handle = $this->mymodule->GetPreference('Qhandle');
+			$pre = \cms_db_prefix();
+			$db = \cmsms()->GetDB();
+			$jobkey = $db->GenID($pre.'module_pwbr_seq');
+
+			$funcs = new \Async\Qface();
+			$funcs->StartJob($handle, $jobkey,
+			[self::MODNAME, 'store_data', ['formid' => $this->formdata->Id, 'formdata' => serialize($browsedata)]],
+			1); //highest priority
 		}
 		return [TRUE, ''];
 	}
