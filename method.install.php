@@ -15,8 +15,8 @@ if (!$pfmod) {
 	return $this->_PrettyMessage('error_module_forms', FALSE);
 }
 
-$taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
- 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci'];
+$taboptarray = ['mysql' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci',
+ 'mysqli' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci'];
 $dict = NewDataDictionary($db);
 $pre = cms_db_prefix();
 
@@ -59,6 +59,13 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $sqlarray = $dict->CreateIndexSQL('idx_recordbrowser', $pre.'module_pwbr_record', 'browser_id');
 $dict->ExecuteSQLArray($sqlarray);
+
+$flds = '
+id I(2),
+';
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwbr_seq', $flds); //NOT a I(11) standard sequence
+$dict->ExecuteSQLArray($sqlarray);
+$db->Execute('INSERT INTO '.$pre.'module_pwbr_seq FIELDS(id) VALUES(0)');
 
 $this->CreatePermission('ModifyPwBrowsers', $this->Lang('perm_browsers'));
 $this->CreatePermission('ModifyPwFormData', $this->Lang('perm_data'));
