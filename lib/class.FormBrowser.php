@@ -112,19 +112,33 @@ class FormBrowser extends FieldBase
 			}
 		}
 		unset($obfld);
-		if ($browsedata) {
-			$this->GetModule();
-			$handle = $this->mymodule->GetPreference('Qhandle');
-			$pre = \cms_db_prefix();
-			$db = \cmsms()->GetDB();
-			$jobkey = $db->GenID($pre.'module_pwbr_seq');
 
+		if ($browsedata) {
+			$browsedata = serialize(['_m' => [0 => NULL, 1 => time(), 'dt' => '']] + $browsedata); //defer title (i.e.[0]) translation
+			//avoid module-loading
+			$handle = \cms_siteprefs::get(self::MODNAME.'_mapi_pref_Qhandle', '');
+			$jobkey = $this->djb2a_hash(microtime().getmypid()) & 0xffff; //not ABSOLUTELY unique, but good enough
+			//avoid autoloading
+			$config = cmsms()->GetConfig();
+			$fp = $config['root_path'].DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Async'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'class.Qface.php';
+			require_once $fp;
 			$funcs = new \Async\Qface();
 			$funcs->StartJob($handle, $jobkey,
-			[self::MODNAME, 'store_data', ['formid' => $this->formdata->Id, 'formdata' => serialize($browsedata)]],
+			[self::MODNAME, 'store_data', ['formid' => $this->formdata->Id, 'formdata' => $browsedata]],
 			1); //highest priority
 		}
 		return [TRUE, ''];
+	}
+
+	protected function djb2a_hash($key)
+	{
+		$key = array_values(unpack('C*',(string) $key)); //actual byte-length (i.e. no mb interference);
+		$klen = count($key);
+		$h1 = 5381;
+		for ($i = 0; $i < $klen; $i++) {
+			$h1 = ($h1 + ($h1 << 5)) ^ $key[$i]; //aka $h1 = $h1*33 ^ $key[$i]
+		}
+		return $h1;
 	}
 
 	public function __toString()
