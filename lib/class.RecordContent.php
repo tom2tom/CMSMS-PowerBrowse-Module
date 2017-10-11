@@ -47,32 +47,6 @@ class RecordContent
 	}
 
 	/**
-	InsertAll:
-	@mod: reference to PWFBrowse module object
-	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
-	@data: reference to array of plaintext form-data to be stored (initially without encryption)
-	Returns: boolean indicating success
-	*/
-	public function InsertAll(&$mod, $form_id, &$data)
-	{
-		//TODO support high-load c.f. async StartUpdate()
-		$pre = \cms_db_prefix();
-		$sql = 'SELECT browser_id FROM '.$pre.'module_pwbr_browser WHERE form_id=?';
-		$db = \cmsms()->GetDb();
-		$browsers = $db->GetCol($sql, [$form_id]);
-		if ($browsers) {
-			$ret = TRUE;
-			$stamp = time(); //TODO default locale OK?
-			foreach ($browsers as $browser_id) {
-				$ret = $ret && $this->Insert($mod, $pre, $browser_id, $form_id, $stamp, $data, 0);
-			}
-			$this->StartUpdate($mod);
-			return $ret;
-		}
-		return FALSE;
-	}
-
-	/**
 	Update:
 	@mod: reference to PWFBrowse module object
 	@pre: table-names prefix
@@ -115,19 +89,16 @@ class RecordContent
 	*/
 	public function StartUpdate(&$mod, $params = [])
 	{
+		$handle = $mod->GetPreference('Qhandle');
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDB();
-		$val = $db->GenID($pre.'module_pwbr_seq');
-		$modname = $mod->GetName();
-		$jobkey = substr($modname, 0, 4).$val;
-
-		$handle = $mod->GetPreference('Qhandle');
-		$jobdata = [$modname, 'update_data'];
+		$jobkey = $db->GenID($pre.'module_pwbr_seq');
+		$jobdata = [$mod->GetName(), 'update_data'];
 		if ($params) {
 			$jobdata[] = $params;
 		}
 		$funcs = new \Async\Qface();
-		$funcs->StartJob($handle, $jobkey, $jobdata);
+		$funcs->StartJob($handle, $jobkey, $jobdata, 2);
 	}
 
 	/**
