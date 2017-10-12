@@ -7,11 +7,11 @@ More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 //re-crypt a batch of stored records (if any are in need of such)
 
-$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
+//$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
 //error_log('action_update start'."\n", 3, $logfile);
 
 if (!isset($gCms)) {
-	error_log('action_update exit no gCms'."\n", 3, $logfile);
+//	error_log('action_update exit no gCms'."\n", 3, $logfile);
 	exit;
 }
 
@@ -22,7 +22,7 @@ if (!isset($gCms)) {
 $handle = $this->GetPreference('Qhandle');
 $funcs = new Async\Qface();
 if (!$funcs->CheckJob($handle, $params)) {
-	error_log('action_update exit invalid security parameters'."\n", 3, $logfile);
+//	error_log('action_update exit invalid security parameters'."\n", 3, $logfile);
 	exit;
 }
 
@@ -49,7 +49,7 @@ usleep(20000);
 $funcs = new PWFBrowse\RecordContent();
 $funcs->DoUpdate($this, $params);
 
-error_log('action_update end'."\n", 3, $logfile);
+//error_log('action_update end'."\n", 3, $logfile);
 
 exit;
 

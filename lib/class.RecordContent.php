@@ -115,7 +115,7 @@ class RecordContent
 		$db = \cmsms()->GetDB();
 		$rst = $db->Execute($sql);
 
-$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
+//$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
 
 		if ($rst) {
 
@@ -165,7 +165,7 @@ $logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
 			$funcs = new \Async\Qface();
 			if ($rst->EOF) {
 
-error_log('DoUpdate job finished'."\n", 3, $logfile);
+//error_log('DoUpdate job finished'."\n", 3, $logfile);
 
 				$funcs->CancelJob($handle, $params);
 
@@ -188,7 +188,7 @@ error_log('DoUpdate job finished'."\n", 3, $logfile);
 				$db->Execute($sql);
 			} else { //timed out, re-run the job
 
-error_log('DoUpdate job restart triggered'."\n", 3, $logfile);
+//error_log('DoUpdate job restart triggered'."\n", 3, $logfile);
 
 				$utils->StartJob($handle);
 			}
