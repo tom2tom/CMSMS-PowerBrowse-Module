@@ -29,19 +29,19 @@ class PWFBrowse extends CMSModule
 		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
 		$this->oldtemplates = $this->before20 || 1; //TODO
 		//TODO detect whether customised autoloader is in place, if so don't autoregister here
-		spl_autoload_register([$this, 'cmsms_spacedload']);
+//		spl_autoload_register([$this, 'cmsms_spacedload']);
 	}
 
-	public function __destruct()
+/*	public function __destruct()
 	{
 		spl_autoload_unregister([$this, 'cmsms_spacedload']);
 		if (function_exists('parent::__destruct')) {
 			parent::__destruct();
 		}
 	}
-
+*/
 	/* namespace autoloader - CMSMS 2.1- default autoloader doesn't do spacing for modules */
-	private function cmsms_spacedload($class)
+/*	private function cmsms_spacedload($class)
 	{
 		$prefix = get_class().'\\'; //our namespace prefix
 		$o = ($class[0] != '\\') ? 0:1;
@@ -79,7 +79,7 @@ class PWFBrowse extends CMSModule
 			include $fp;
 		}
 	}
-
+*/
 	public function AllowAutoInstall()
 	{
 		return FALSE;
