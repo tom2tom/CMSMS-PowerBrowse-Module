@@ -15,6 +15,11 @@ if (!$pfmod) {
 	return $this->_PrettyMessage('error_module_forms', FALSE);
 }
 
+$fp = cms_join_path(dirname(__DIR__), 'Async', 'lib');
+if (!is_dir($fp)) {
+	return $this->_PrettyMessage('error_module_async', FALSE);
+}
+
 $taboptarray = ['mysql' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci',
  'mysqli' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci'];
 $dict = NewDataDictionary($db);
@@ -98,7 +103,7 @@ if ($fp && is_dir($fp)) {
 }
 $this->SetPreference('uploads_dir', $ud);
 
-//install job processor (if not done before)
+//install job processor
 $funcs = new Async\Qface();
 $funcs->init();
 $handle = $funcs->AddQ('PWFB', 'Multi'); //async-jobs queue
