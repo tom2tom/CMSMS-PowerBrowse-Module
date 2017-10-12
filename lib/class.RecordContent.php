@@ -114,8 +114,8 @@ class RecordContent
 		$sql = 'SELECT record_id,rounds,pass,newpass,contents FROM '.$pre.'module_pwbr_record WHERE rounds!='.$newrounds.' OR pass!=newpass ORDER BY browser_id,record_id';
 		$db = \cmsms()->GetDB();
 		$rst = $db->Execute($sql);
-
-//$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
+//$config = cmsms()->GetConfig();
+//$logfile = $config['root_path'].DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.'async'.DIRECTORY_SEPARATOR.'debug.log''; //DEBUG
 
 		if ($rst) {
 
