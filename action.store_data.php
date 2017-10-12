@@ -7,11 +7,11 @@ More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 //store and crypt a form-record
 
-$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
+//$logfile = '/var/www/html/cmsms/modules/Async/my.log'; //DEBUG
 //error_log('action_store start'."\n", 3, $logfile);
 
 if (!isset($gCms)) {
-	error_log('action_store exit no gCms'."\n", 3, $logfile);
+//	error_log('action_store exit no gCms'."\n", 3, $logfile);
 	exit;
 }
 
@@ -22,7 +22,7 @@ if (!isset($gCms)) {
 $handle = $this->GetPreference('Qhandle');
 $funcs = new Async\Qface();
 if (!$funcs->CheckJob($handle, $params)) {
-	error_log('action_store exit invalid security parameters'."\n", 3, $logfile);
+//	error_log('action_store exit invalid security parameters'."\n", 3, $logfile);
 	exit;
 }
 
@@ -44,11 +44,12 @@ flush();
 usleep(20000);
 
 //error_log('action_store @5'."\n", 3, $logfile);
-//touch('/var/www/html/cmsms/modules/PWFBrowse/lib/toucher.txt');
-
-$funcs2 = new PWFBrowse\RecordContent();
-$data = $funcs2->Stamp($this, unserialize($params['formdata']));
-$data = serialize($data);
+$data = unserialize(html_entity_decode($params['formdata']));
+//$data = unserialize($data);
+//error_log('action_store '. count($data) .' keys'."\n", 3, $logfile);
+//error_log('action_store @5'."\n", 3, $logfile);
+$data['_m'][0] = $this->Lang('title_submitted'); //column title not set when the form was disposed
+$data = $db->qStr(serialize($data));
 
 $form_id = $params['formid'];
 $pre = \cms_db_prefix();
@@ -59,11 +60,14 @@ FROM {$pre}module_pwbr_browser WHERE form_id=?
 EOS;
 $db->Execute($sql, [$form_id, $form_id]); //TODO $utils->SafeExec()
 
-error_log('action_store @6'."\n", 3, $logfile);
+//error_log('action_store @8'."\n", 3, $logfile);
 
+$funcs->CancelJob($handle, $params);
+
+$funcs = new PWFBrowse\RecordContent();
 $funcs->StartUpdate($this);
 
-error_log('action_store end'."\n", 3, $logfile);
+//error_log('action_store end'."\n", 3, $logfile);
 
 exit;
 
