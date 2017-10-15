@@ -51,6 +51,16 @@ if ($handle) {
 	$funcs->DropQ($handle);
 }
 // BUT DON'T remove jobs-queue processor
+/*
+$cache = ;
+if ($cache) {
+	$cache->cleanall(PWFBrowse::ASYNCSPACE);
+}
+$mutex = ;
+if ($mutex) {
+	$mutex->cleanall(PWFBrowse::ASYNCSPACE);
+}
+*/
 
 // remove preferences
 $this->RemovePreference();
