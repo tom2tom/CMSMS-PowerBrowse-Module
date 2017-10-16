@@ -119,6 +119,9 @@ EOS;
 								$nid = -$fid; //id < 0 signals FormBuilder field
 							}
 							$olddata[$nid] = [$names[$fid], $fval];
+/*
+[PHP Notice:  Undefined offset: 222 in /home/eaglemon/public_html/modules/PWFBrowse/lib/class.Transition.php on line 121
+*/
 						}
 						$funcs->Insert($mod, $pre, $newbid, $newfid, $one->submitted_date, $olddata, 0);
 					}
@@ -240,8 +243,16 @@ EOS;
 				$see = 0;
 				$order = $l + $i;
 			}
-			$nm = ($indx && !empty($names[$indx])) ? $names[$indx] : 'unnamed-'.$oldbid.':'.$i;
-			$fid = (int) $one['field_id'];
+/*
+[PHP Notice:  Undefined offset: 1 in /home/eaglemon/public_html/modules/PWFBrowse/lib/class.Transition.php on line 235 (+3)
+*/
+			if ($indx && !empty($names[$indx])) {
+				$fid = (int)$indx;
+				$nm = $names[$indx];
+			} else {
+				$fid = $l + $i; //TODO
+				$nm = 'unnamed-'.$oldbid.':'.$i;
+			}
 			if ($fieldconverts && array_key_exists($fid, $fieldconverts)) {
 				$fid = (int) $fieldconverts[$fid];
 			} else {
