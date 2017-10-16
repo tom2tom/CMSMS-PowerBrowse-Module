@@ -18,15 +18,16 @@ class RecordExport
 	*/
 	public function ExportName(&$mod, $browser_id = FALSE, $record_id = FALSE)
 	{
+		$utils = new Utils();
 		if (!$browser_id) {
 			if (is_array($record_id)) {
 				$rid = reset($record_id);
 			} else {
 				$rid = $record_id;
 			}
-			$browser_id = Utils::GetBrowserIDForRecord($rid);
+			$browser_id = $utils->GetBrowserIDForRecord($rid);
 		}
-		$bname = Utils::GetBrowserNameFromID($browser_id);
+		$bname = $utils->GetBrowserNameFromID($browser_id);
 		$sname = preg_replace('/\W/', '_', $bname);
 		$datestr = date('Y-m-d-H-i');
 		return $mod->GetName().$mod->Lang('export').'-'.$sname.'-'.$datestr.'.csv';
@@ -55,7 +56,8 @@ class RecordExport
 		$pre = \cms_db_prefix();
 		if ($browser_id) {
 			$sql = 'SELECT record_id FROM '.$pre.'module_pwbr_record WHERE browser_id=? ORDER BY record_id';
-			$all = Utils::SafeGet($sql, [$browser_id], 'col');
+			$utils = new Utils();
+			$all = $utils->SafeGet($sql, [$browser_id], 'col');
 		} elseif ($record_id) {
 			if (is_array($record_id)) {
 				$all = $record_id;
@@ -123,9 +125,9 @@ class RecordExport
 			//data lines(s)
 			foreach ($all as $one) {
 				list($res, $browsedata) = $funcs->Load($mod, $pre, $one);
-				if (!$res) {
+				if (!$res) { //decryption error
 					continue;
-				}	//decryption error
+				}
 				$vals = [];
 				foreach ($browsedata as $field) { //$key unused
 					if (count($field) == 2) {
@@ -136,7 +138,7 @@ class RecordExport
 						$fv = str_replace($sep, $r, $fv);
 						$vals[] = preg_replace('/[\n\t\r]/', $sep2, $fv);
 					} else { //format-parameter(s) present
-						Utils::FormatRecord($mod, $field, $browsedata, FALSE);
+						$funcs->Format($mod, $field, $browsedata, FALSE);
 						if (!is_array($field[0])) {
 							$fv = $field[1];
 							if ($strip) {
@@ -225,7 +227,8 @@ class RecordExport
 		$fname = $this->ExportName($mod, $browser_id, $record_id);
 
 		if ($mod->GetPreference('export_file')) {
-			$updir = Utils::GetUploadsPath($mod);
+			$utils = new Utils();
+			$updir = $utils->GetUploadsPath($mod);
 			if ($updir) {
 				$filepath = $updir.DIRECTORY_SEPARATOR.$fname;
 				$fp = fopen($filepath, 'w');
@@ -233,7 +236,7 @@ class RecordExport
 					$success = $this->CSV($mod, $browser_id, $record_id, $fp, $sep);
 					fclose($fp);
 					if ($success) {
-						$url = Utils::GetUploadsUrl($mod).'/'.$fname;
+						$url = $utils->GetUploadsUrl($mod).'/'.$fname;
 						@ob_clean();
 						@ob_clean();
 						header('Location: '.$url);
