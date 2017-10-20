@@ -118,9 +118,10 @@ class FormBrowser extends FieldBase
 			//avoid module-loading
 			$handle = \cms_siteprefs::get(self::MODNAME.'_mapi_pref_Qhandle', '');
 			$jobkey = $this->djb2a_hash(microtime().getmypid()) & 0xffff; //not ABSOLUTELY unique, but good enough
-			//avoid autoloading
+			//minimise autoloading
 			$config = cmsms()->GetConfig();
-			$fp = $config['root_path'].DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Async'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'class.Qface.php';
+			//TODO whatever configured assets folder
+			$fp = $config['root_path'].DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'Queue'.DIRECTORY_SEPARATOR.'class.Qface.php';
 			require_once $fp;
 			$funcs = new \CMSMS\Assets\Queue\Qface();
 			$funcs->StartJob($handle, $jobkey,
@@ -135,7 +136,7 @@ class FormBrowser extends FieldBase
 		$key = array_values(unpack('C*',(string) $key)); //actual byte-length (i.e. no mb interference);
 		$klen = count($key);
 		$h1 = 5381;
-		for ($i = 0; $i < $klen; $i++) {
+		for ($i = 0; $i < $klen; ++$i) {
 			$h1 = ($h1 + ($h1 << 5)) ^ $key[$i]; //aka $h1 = $h1*33 ^ $key[$i]
 		}
 		return $h1;
