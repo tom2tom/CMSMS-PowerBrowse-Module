@@ -10,14 +10,14 @@ if (!$this->_CheckAccess('modify')) {
 	exit;
 }
 
+$fp = cms_join_path($config['root_path'],'assets','Queue');
+if (!is_dir($fp)) {
+	return $this->_PrettyMessage('error_system', FALSE);
+}
+
 $pfmod = $this->GetModuleInstance('PWForms');
 if (!$pfmod) {
 	return $this->_PrettyMessage('error_module_forms', FALSE);
-}
-
-$fp = cms_join_path(dirname(__DIR__), 'Async', 'lib');
-if (!is_dir($fp)) {
-	return $this->_PrettyMessage('error_module_async', FALSE);
 }
 
 $taboptarray = ['mysql' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci',
@@ -104,8 +104,8 @@ if ($fp && is_dir($fp)) {
 $this->SetPreference('uploads_dir', $ud);
 
 //install job processor
-$funcs = new Async\Qface();
-$funcs->init();
+$funcs = new CMSMS\Assets\Queue\Qface();
+//DEBUG $funcs->init();
 $handle = $funcs->AddQ('PWFB', 'Multi'); //async-jobs queue
 $this->SetPreference('Qhandle', $handle);
 $this->SetPreference('Qjobtimeout', 10); //max duration (seconds) for each async action session

@@ -7,7 +7,7 @@ More info at http://dev.cmsmadesimple.org/projects/pwfbrowse
 */
 //store and crypt a form-record
 
-//$logfile = $config['root_path'].DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.'async'.DIRECTORY_SEPARATOR.'debug.log''; //DEBUG
+//$logfile = $config['root_path'].DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.'async'.DIRECTORY_SEPARATOR.'debug.log'; //DEBUG
 //error_log('action_store start'."\n", 3, $logfile);
 
 if (!isset($gCms)) {
@@ -20,7 +20,7 @@ if (!isset($gCms)) {
 //error_log('supplied parameters '.serialize($params)."\n", 3, $logfile);
 
 $handle = $this->GetPreference('Qhandle');
-$funcs = new Async\Qface();
+$funcs = new CMSMS\Assets\Queue\Qface();
 if (!$funcs->CheckJob($handle, $params)) {
 //	error_log('action_store exit invalid security parameters'."\n", 3, $logfile);
 	exit;
@@ -69,6 +69,5 @@ $funcs = new PWFBrowse\RecordContent();
 $funcs->StartUpdate($this);
 
 //error_log('action_store end'."\n", 3, $logfile);
-
 exit;
 

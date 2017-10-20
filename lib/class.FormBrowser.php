@@ -122,7 +122,7 @@ class FormBrowser extends FieldBase
 			$config = cmsms()->GetConfig();
 			$fp = $config['root_path'].DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Async'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'class.Qface.php';
 			require_once $fp;
-			$funcs = new \Async\Qface();
+			$funcs = new \CMSMS\Assets\Queue\Qface();
 			$funcs->StartJob($handle, $jobkey,
 			[self::MODNAME, 'store_data', ['formid' => $this->formdata->Id, 'formdata' => $browsedata]],
 			1); //highest priority
