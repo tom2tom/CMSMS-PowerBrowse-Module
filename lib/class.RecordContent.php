@@ -97,7 +97,7 @@ class RecordContent
 		if ($params) {
 			$jobdata[] = $params;
 		}
-		$funcs = new \CMSMS\Assets\Queue\Qface();
+		$funcs = new \Async\Queue\Qface();
 		$funcs->StartJob($handle, $jobkey, $jobdata, 2);
 	}
 
@@ -162,7 +162,7 @@ class RecordContent
 //error_log('DoUpdate recordset ('.$p.') finished'."\n", 3, $logfile);
 
 			$handle = $mod->GetPreference('Qhandle');
-			$funcs = new \CMSMS\Assets\Queue\Qface();
+			$funcs = new \Async\Queue\Qface();
 			if ($rst->EOF) {
 
 //error_log('DoUpdate job finished'."\n", 3, $logfile);
@@ -198,7 +198,7 @@ class RecordContent
 //error_log('DoUpdate no records'."\n", 3, $logfile);
 
 			$handle = $mod->GetPreference('Qhandle');
-			$funcs = new \CMSMS\Assets\Queue\Qface();
+			$funcs = new \Async\Queue\Qface();
 			$funcs->CancelJob($handle, $params);
 
 			$t = $mod->GetPreference('newpasses');

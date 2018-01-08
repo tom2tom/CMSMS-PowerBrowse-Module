@@ -123,7 +123,7 @@ class FormBrowser extends FieldBase
 			//TODO whatever configured assets folder
 			$fp = $config['root_path'].DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'Queue'.DIRECTORY_SEPARATOR.'class.Qface.php';
 			require_once $fp;
-			$funcs = new \CMSMS\Assets\Queue\Qface();
+			$funcs = new \Async\Queue\Qface();
 			$funcs->StartJob($handle, $jobkey,
 			[self::MODNAME, 'store_data', ['formid' => $this->formdata->Id, 'formdata' => $browsedata]],
 			1); //highest priority

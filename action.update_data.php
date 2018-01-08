@@ -20,7 +20,7 @@ if (!isset($gCms)) {
 //error_log('supplied parameters '.serialize($params)."\n", 3, $logfile);
 
 $handle = $this->GetPreference('Qhandle');
-$funcs = new CMSMS\Assets\Queue\Qface();
+$funcs = new Async\Queue\Qface();
 if (!$funcs->CheckJob($handle, $params)) {
 //	error_log('action_update exit invalid security parameters'."\n", 3, $logfile);
 	exit;

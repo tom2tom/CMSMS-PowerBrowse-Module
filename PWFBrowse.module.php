@@ -142,7 +142,7 @@ class PWFBrowse extends CMSModule
 
 	public function GetDependencies()
 	{
-		return ['PWForms'=>'0.7'];
+		return ['Async' => '0.2', 'PWForms'=>'0.7'];
 	}
 
 	public function MinimumCMSVersion()

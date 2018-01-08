@@ -103,9 +103,7 @@ if ($fp && is_dir($fp)) {
 }
 $this->SetPreference('uploads_dir', $ud);
 
-//install job processor
-$funcs = new CMSMS\Assets\Queue\Qface();
-//DEBUG $funcs->init();
+$funcs = new Async\Queue\Qface();
 $handle = $funcs->AddQ('PWFB', 'Multi'); //async-jobs queue
 $this->SetPreference('Qhandle', $handle);
 $this->SetPreference('Qjobtimeout', 10); //max duration (seconds) for each async action session
